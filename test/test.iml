@@ -30,7 +30,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
-    <orderEntry type="module" module-name="mpdroid" scope="RUNTIME" />
+    <orderEntry type="module" module-name="mpdroid" scope="PROVIDED" />
     <orderEntry type="library" name="test libs" level="project" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library>

@@ -10,9 +10,10 @@ public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroi
         super("com.bender.mpdroid", MpDroidActivity.class);
     }
 
-    public void testTheTruth()
+    public void testConstructor()
     {
-        assertEquals(true, true);
+        MpDroidActivity activity = getActivity();
+        assertNotNull(activity);
     }
 
 }
