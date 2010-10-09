@@ -30,8 +30,17 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
-    <orderEntry type="module" module-name="mpdroid" scope="PROVIDED" />
+    <orderEntry type="module" module-name="mpdroid" scope="RUNTIME" />
     <orderEntry type="library" name="test libs" level="project" />
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar:///opt/android-sdk-linux_86/platforms/android-8/android.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
