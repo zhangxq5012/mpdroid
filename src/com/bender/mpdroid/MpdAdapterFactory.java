@@ -50,6 +50,11 @@ public class MpdAdapterFactory
     private static class NullMpdAdapter implements MpdAdapterIF
     {
 
+        public PlayStatus getPlayStatus()
+        {
+            return PlayStatus.Stopped;
+        }
+
         public void connect(String server, int port, String password)
         {
             Log.e(TAG, "connect(server,port,password) called on NULL object");
@@ -77,9 +82,10 @@ public class MpdAdapterFactory
             return null;
         }
 
-        public void playOrPause()
+        public PlayStatus playOrPause()
         {
             Log.e(TAG, "playOrPause() called on NULL object");
+            return PlayStatus.Stopped;
         }
     }
 }

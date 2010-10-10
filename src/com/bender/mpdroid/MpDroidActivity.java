@@ -135,7 +135,21 @@ public class MpDroidActivity extends Activity
         playButton.setEnabled(connected);
     }
 
-    private class ConnectTask extends AsyncTask<Object, Object, Boolean>
+    private void updatePlayStatusOnUI(MpdAdapterIF.PlayStatus playStatus)
+    {
+        switch (playStatus)
+        {
+            case Playing:
+                playButton.setText(getString(R.string.pause));
+                break;
+            case Paused:
+                playButton.setText(getString(R.string.play));
+            default:
+                playButton.setText(getString(R.string.play));
+        }
+    }
+
+    private class ConnectTask extends AsyncTask<Object, MpdAdapterIF.PlayStatus, Boolean>
     {
         @Override
         protected Boolean doInBackground(Object... unused)
@@ -152,6 +166,10 @@ public class MpDroidActivity extends Activity
                 mpdAdapterIF.connect(server);
             }
             boolean connected = mpdAdapterIF.isConnected();
+
+            MpdAdapterIF.PlayStatus playStatus = mpdAdapterIF.getPlayStatus();
+            publishProgress(playStatus);
+
             String connectedText = makeConnectedText(server, connected);
             Log.v(TAG, connectedText);
             Log.v(TAG, "MPD Server version: " + mpdAdapterIF.getServerVersion());
@@ -171,6 +189,11 @@ public class MpDroidActivity extends Activity
             Toast.makeText(MpDroidActivity.this, makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
         }
 
+        @Override
+        protected void onProgressUpdate(MpdAdapterIF.PlayStatus... values)
+        {
+            updatePlayStatusOnUI(values[0]);
+        }
     }
 
     private class ButtonClickListener implements View.OnClickListener
@@ -223,13 +246,20 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class PlayTask extends AsyncTask<Object, Object, Object>
+    private class PlayTask extends AsyncTask<Object, Object, MpdAdapterIF.PlayStatus>
     {
         @Override
-        protected Object doInBackground(Object... objects)
+        protected MpdAdapterIF.PlayStatus doInBackground(Object... objects)
         {
-            mpdAdapterIF.playOrPause();
-            return null;
+            return mpdAdapterIF.playOrPause();
         }
+
+        @Override
+        protected void onPostExecute(MpdAdapterIF.PlayStatus playStatus)
+        {
+            Log.v(TAG, "Play Status Update: " + playStatus);
+            updatePlayStatusOnUI(playStatus);
+        }
+
     }
 }

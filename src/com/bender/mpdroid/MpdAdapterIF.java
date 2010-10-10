@@ -5,6 +5,15 @@ package com.bender.mpdroid;
  */
 public interface MpdAdapterIF
 {
+    PlayStatus getPlayStatus();
+
+    public enum PlayStatus
+    {
+        Playing,
+        Paused,
+        Stopped
+    }
+
     void connect(String server, int port, String password);
 
     void connect(String server);
@@ -15,5 +24,6 @@ public interface MpdAdapterIF
 
     String getServerVersion();
 
-    void playOrPause();
+    PlayStatus playOrPause();
+
 }

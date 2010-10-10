@@ -44,6 +44,7 @@ public final class R
         public static final int app_name = 0x7f050000;
         public static final int connect = 0x7f050005;
         public static final int disconnect = 0x7f050008;
+        public static final int pause = 0x7f05000a;
         public static final int play = 0x7f050009;
         public static final int port = 0x7f050006;
         public static final int preferences = 0x7f050007;

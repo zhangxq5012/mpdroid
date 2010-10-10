@@ -9,6 +9,11 @@ public class StubbedMpdAdapater implements MpdAdapterIF
     public int connectCount;
     public int disconnectCount;
 
+    public PlayStatus getPlayStatus()
+    {
+        return PlayStatus.Stopped;
+    }
+
     public void connect(String server, int port, String password)
     {
         connect();
@@ -41,8 +46,8 @@ public class StubbedMpdAdapater implements MpdAdapterIF
         return "Stubbed MPD Server";
     }
 
-    public void playOrPause()
+    public PlayStatus playOrPause()
     {
-        //todo: implement
+        return PlayStatus.Stopped;
     }
 }
