@@ -14,4 +14,6 @@ public interface MpdAdapterIF
     boolean isConnected();
 
     String getServerVersion();
+
+    void play();
 }

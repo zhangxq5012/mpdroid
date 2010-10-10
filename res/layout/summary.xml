@@ -23,16 +23,24 @@
               android:enabled="false"
             />
 
+    <!--
     <Button android:id="@+id/preference"
             android:text="@string/preferences"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             />
+            -->
 
     <Button android:id="@+id/connect"
             android:text="@string/connect"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            />
+    <Button android:id="@+id/play"
+            android:text="@string/play"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
             />
 
     <!--<EditText

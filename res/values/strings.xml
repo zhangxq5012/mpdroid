@@ -8,4 +8,6 @@
     <string name="connect">Connect</string>
     <string name="port">Port</string>
     <string name="preferences">MPD Server Settings</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="play">Play</string>
 </resources>

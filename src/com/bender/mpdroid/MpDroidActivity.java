@@ -22,11 +22,11 @@ public class MpDroidActivity extends Activity
     private static final String TAG = MpDroidActivity.class.getSimpleName();
     private static final int REQUEST_PREFERENCES = 1;
 
-    private Button preferencesButton;
     private TextView serverTextView;
     private TextView portTextView;
     private CheckBox useAuthenticationCheckbox;
     private Button connectButton;
+    private Button playButton;
 
     private MpdPreferences myPreferences;
     private MpdAdapterIF mpdAdapterIF;
@@ -49,18 +49,18 @@ public class MpDroidActivity extends Activity
 
     private void initializeWidgets()
     {
-        preferencesButton = (Button) findViewById(R.id.preference);
         serverTextView = (TextView) findViewById(R.id.server_name);
         portTextView = (TextView) findViewById(R.id.port);
         useAuthenticationCheckbox = (CheckBox) findViewById(R.id.use_authentication);
         connectButton = (Button) findViewById(R.id.connect);
+        playButton = (Button) findViewById(R.id.play);
     }
 
     private void initializeListeners()
     {
         ButtonClickListener buttonClickListener = new ButtonClickListener();
-        preferencesButton.setOnClickListener(buttonClickListener);
         connectButton.setOnClickListener(buttonClickListener);
+        playButton.setOnClickListener(buttonClickListener);
     }
 
     private void connect()
@@ -128,6 +128,13 @@ public class MpDroidActivity extends Activity
         return mpdAdapterIF;
     }
 
+    private void updateConnectedStatusOnUI(Boolean connected)
+    {
+        String text = connected ? getString(R.string.disconnect) : getString(R.string.connect);
+        connectButton.setText(text);
+        playButton.setEnabled(connected);
+    }
+
     private class ConnectTask extends AsyncTask<Object, Object, Boolean>
     {
         @Override
@@ -148,7 +155,6 @@ public class MpDroidActivity extends Activity
             String connectedText = makeConnectedText(server, connected);
             Log.v(TAG, connectedText);
             Log.v(TAG, "MPD Server version: " + mpdAdapterIF.getServerVersion());
-            mpdAdapterIF.disconnect();
             return connected;
         }
 
@@ -161,22 +167,69 @@ public class MpDroidActivity extends Activity
         @Override
         protected void onPostExecute(Boolean connected)
         {
+            updateConnectedStatusOnUI(connected);
             Toast.makeText(MpDroidActivity.this, makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
         }
+
     }
 
     private class ButtonClickListener implements View.OnClickListener
     {
         public void onClick(View view)
         {
-            if (view == preferencesButton)
+            if (view == connectButton)
             {
-                openPreferences();
-            } else if (view == connectButton)
+                boolean connected = mpdAdapterIF.isConnected();
+                if (connected)
+                {
+                    disconnect();
+                } else
+                {
+                    connect();
+                }
+            } else if (view == playButton)
             {
-                connect();
+                play();
             }
         }
 
+    }
+
+    private void play()
+    {
+        PlayTask playTask = new PlayTask();
+        playTask.execute();
+    }
+
+    private void disconnect()
+    {
+        DisconnectTask disconnectTask = new DisconnectTask();
+        disconnectTask.execute();
+    }
+
+    private class DisconnectTask extends AsyncTask<Object, Object, Boolean>
+    {
+        @Override
+        protected Boolean doInBackground(Object... ignored)
+        {
+            mpdAdapterIF.disconnect();
+            return mpdAdapterIF.isConnected();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean connected)
+        {
+            updateConnectedStatusOnUI(connected);
+        }
+    }
+
+    private class PlayTask extends AsyncTask<Object, Object, Object>
+    {
+        @Override
+        protected Object doInBackground(Object... objects)
+        {
+            mpdAdapterIF.play();
+            return null;
+        }
     }
 }

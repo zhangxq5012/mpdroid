@@ -76,5 +76,10 @@ public class MpdAdapterFactory
             Log.e(TAG, "getServerVersion() called on NULL object");
             return null;
         }
+
+        public void play()
+        {
+            Log.e(TAG, "play() called on NULL object");
+        }
     }
 }
