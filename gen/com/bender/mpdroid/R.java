@@ -21,7 +21,8 @@ public final class R {
         public static final int port=0x7f070001;
         public static final int prev=0x7f070004;
         public static final int server_name=0x7f070000;
-        public static final int settings_menu=0x7f070009;
+        public static final int settings_menu=0x7f07000a;
+        public static final int song_name=0x7f070009;
         public static final int use_authentication=0x7f070002;
         public static final int volume=0x7f070007;
     }
@@ -38,6 +39,7 @@ public final class R {
         public static final int disconnect=0x7f050008;
         public static final int mute=0x7f05000e;
         public static final int next=0x7f05000b;
+        public static final int now_playing=0x7f05000f;
         public static final int pause=0x7f05000a;
         public static final int play=0x7f050009;
         public static final int port=0x7f050006;
@@ -45,6 +47,7 @@ public final class R {
         public static final int prev=0x7f05000c;
         public static final int server=0x7f050001;
         public static final int server_summary=0x7f050002;
+        public static final int song_name=0x7f050010;
         public static final int use_authentication=0x7f050004;
         public static final int use_port=0x7f050003;
         public static final int volume=0x7f05000d;

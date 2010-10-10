@@ -110,6 +110,10 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
 
         private class StubbedSongAdapter implements MpdSongAdapterIF
         {
+            public String getSongName()
+            {
+                return null;
+            }
         }
     }
 }

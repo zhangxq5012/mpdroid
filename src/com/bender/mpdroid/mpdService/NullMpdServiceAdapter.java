@@ -55,15 +55,4 @@ class NullMpdServiceAdapter implements MpdServiceAdapterIF
     }
 
 
-    private class NullPlaylistAdapter implements MpdPlaylistAdapterIF
-    {
-        public MpdSongAdapterIF getCurrentSong()
-        {
-            return new NullPlaylistAdapter.NullSongAdapter();
-        }
-
-        private class NullSongAdapter implements MpdSongAdapterIF
-        {
-        }
-    }
 }

@@ -15,4 +15,6 @@
     <string name="prev">Prev</string>
     <string name="volume">Volume</string>
     <string name="mute">Mute</string>
+    <string name="now_playing">Now Playing:</string>
+    <string name="song_name">Song Name</string>
 </resources>

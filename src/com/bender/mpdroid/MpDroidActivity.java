@@ -10,9 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import com.bender.mpdroid.mpdService.MpdAdapterFactory;
-import com.bender.mpdroid.mpdService.MpdPlayerAdapterIF;
-import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
+import com.bender.mpdroid.mpdService.*;
 
 /**
  * Main activity for the mpd droid application
@@ -31,10 +29,13 @@ public class MpDroidActivity extends Activity
     private Button prevButton;
     private SeekBar volumeSeekBar;
     private Button muteButton;
+    private TextView songNameTextView;
 
     private MpdPreferences myPreferences;
+
     private MpdServiceAdapterIF mpdServiceAdapterIF;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
+    private MpdPlaylistAdapterIF mpdPlaylistAdapterIF;
 
     /**
      * Called when the activity is first created.
@@ -63,6 +64,7 @@ public class MpDroidActivity extends Activity
         prevButton = (Button) findViewById(R.id.prev);
         volumeSeekBar = (SeekBar) findViewById(R.id.volume);
         muteButton = (Button) findViewById(R.id.mute);
+        songNameTextView = (TextView) findViewById(R.id.song_name);
     }
 
     private void initializeListeners()
@@ -152,7 +154,10 @@ public class MpDroidActivity extends Activity
         muteButton.setEnabled(connected);
         if (connected)
         {
-            volumeSeekBar.setProgress(mpdPlayerAdapterIF.getVolume());
+            GetVolumeTask getVolumeTask = new GetVolumeTask();
+            getVolumeTask.execute();
+            GetSongTask getSongTask = new GetSongTask();
+            getSongTask.execute();
         }
     }
 
@@ -380,6 +385,39 @@ public class MpDroidActivity extends Activity
         {
             Integer volume = values[0];
             volumeSeekBar.setProgress(volume);
+        }
+    }
+
+    private class GetVolumeTask extends AsyncTask<Object, Object, Integer>
+    {
+        @Override
+        protected Integer doInBackground(Object... objects)
+        {
+            return mpdPlayerAdapterIF.getVolume();
+        }
+
+        @Override
+        protected void onPostExecute(Integer volume)
+        {
+            volumeSeekBar.setProgress(volume);
+        }
+    }
+
+    private class GetSongTask extends AsyncTask<Object, Object, MpdSongAdapterIF>
+    {
+        @Override
+        protected MpdSongAdapterIF doInBackground(Object... objects)
+        {
+            mpdPlaylistAdapterIF = mpdServiceAdapterIF.getPlaylist();
+            MpdSongAdapterIF currentSong = mpdPlaylistAdapterIF.getCurrentSong();
+            return currentSong;
+        }
+
+        @Override
+        protected void onPostExecute(MpdSongAdapterIF mpdSongAdapterIF)
+        {
+            String songName = mpdSongAdapterIF.getSongName();
+            songNameTextView.setText(getString(R.string.song_name) + ": " + songName);
         }
     }
 }

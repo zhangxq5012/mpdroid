@@ -136,7 +136,14 @@ class JavaMDPMpdServiceAdapter implements MpdServiceAdapterIF
 
     public MpdPlaylistAdapterIF getPlaylist()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if (mpdService != null)
+        {
+            return new JavaMPDPlaylistAdapter(mpdService.getMPDPlaylist());
+        }
+        else
+        {
+            return new NullPlaylistAdapter();
+        }
     }
 
 }
