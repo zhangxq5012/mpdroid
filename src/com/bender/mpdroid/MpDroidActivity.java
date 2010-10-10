@@ -228,7 +228,7 @@ public class MpDroidActivity extends Activity
         @Override
         protected Object doInBackground(Object... objects)
         {
-            mpdAdapterIF.play();
+            mpdAdapterIF.playOrPause();
             return null;
         }
     }

@@ -15,5 +15,5 @@ public interface MpdAdapterIF
 
     String getServerVersion();
 
-    void play();
+    void playOrPause();
 }

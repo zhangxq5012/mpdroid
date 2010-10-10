@@ -97,7 +97,7 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         return version;
     }
 
-    public void play()
+    public void playOrPause()
     {
         try
         {

@@ -41,7 +41,7 @@ public class StubbedMpdAdapater implements MpdAdapterIF
         return "Stubbed MPD Server";
     }
 
-    public void play()
+    public void playOrPause()
     {
         //todo: implement
     }

@@ -77,9 +77,9 @@ public class MpdAdapterFactory
             return null;
         }
 
-        public void play()
+        public void playOrPause()
         {
-            Log.e(TAG, "play() called on NULL object");
+            Log.e(TAG, "playOrPause() called on NULL object");
         }
     }
 }
