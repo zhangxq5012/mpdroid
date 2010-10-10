@@ -39,6 +39,12 @@
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 />
+        <Button android:id="@+id/stop"
+                android:text="@string/stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                />
         <Button android:id="@+id/play"
                 android:text="@string/play"
                 android:layout_width="wrap_content"

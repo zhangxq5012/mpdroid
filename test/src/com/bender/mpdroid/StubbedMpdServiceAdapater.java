@@ -71,6 +71,10 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
             return PlayStatus.Stopped;
         }
 
+        public void stop()
+        {
+        }
+
         public PlayStatus getPlayStatus()
         {
             return PlayStatus.Stopped;

@@ -15,6 +15,11 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
         return PlayStatus.Stopped;
     }
 
+    public void stop()
+    {
+        Log.e(TAG, "stop() called on NULL object");
+    }
+
     public PlayStatus getPlayStatus()
     {
         Log.e(TAG, "getPlayStatus() called on NULL object");

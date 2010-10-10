@@ -25,6 +25,7 @@ public class MpDroidActivity extends Activity
     private CheckBox useAuthenticationCheckbox;
     private Button connectButton;
     private Button playButton;
+    private Button stopButton;
     private Button nextButton;
     private Button prevButton;
     private SeekBar volumeSeekBar;
@@ -60,6 +61,7 @@ public class MpDroidActivity extends Activity
         useAuthenticationCheckbox = (CheckBox) findViewById(R.id.use_authentication);
         connectButton = (Button) findViewById(R.id.connect);
         playButton = (Button) findViewById(R.id.play);
+        stopButton = (Button) findViewById(R.id.stop);
         nextButton = (Button) findViewById(R.id.next);
         prevButton = (Button) findViewById(R.id.prev);
         volumeSeekBar = (SeekBar) findViewById(R.id.volume);
@@ -72,6 +74,7 @@ public class MpDroidActivity extends Activity
         ButtonClickListener buttonClickListener = new ButtonClickListener();
         connectButton.setOnClickListener(buttonClickListener);
         playButton.setOnClickListener(buttonClickListener);
+        stopButton.setOnClickListener(buttonClickListener);
         nextButton.setOnClickListener(buttonClickListener);
         prevButton.setOnClickListener(buttonClickListener);
         volumeSeekBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener());
@@ -148,6 +151,7 @@ public class MpDroidActivity extends Activity
         String text = connected ? getString(R.string.disconnect) : getString(R.string.connect);
         connectButton.setText(text);
         playButton.setEnabled(connected);
+        stopButton.setEnabled(connected);
         nextButton.setEnabled(connected);
         prevButton.setEnabled(connected);
         volumeSeekBar.setEnabled(connected);
@@ -249,6 +253,11 @@ public class MpDroidActivity extends Activity
             {
                 play();
             }
+            else if (view == stopButton)
+            {
+                StopTask stopTask = new StopTask();
+                stopTask.execute();
+            }
             else if (view == nextButton)
             {
                 NextTask nextTask = new NextTask();
@@ -273,6 +282,22 @@ public class MpDroidActivity extends Activity
             {
                 mpdPlayerAdapterIF.prev();
                 return null;
+            }
+        }
+
+        private class StopTask extends AsyncTask<Object, Object, MpdPlayerAdapterIF.PlayStatus>
+        {
+            @Override
+            protected MpdPlayerAdapterIF.PlayStatus doInBackground(Object... objects)
+            {
+                mpdPlayerAdapterIF.stop();
+                return mpdPlayerAdapterIF.getPlayStatus();
+            }
+
+            @Override
+            protected void onPostExecute(MpdPlayerAdapterIF.PlayStatus playStatus)
+            {
+                updatePlayStatusOnUI(playStatus);
             }
         }
     }

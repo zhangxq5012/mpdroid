@@ -19,6 +19,8 @@ public interface MpdPlayerAdapterIF
 
     PlayStatus playOrPause();
 
+    void stop();
+
     public enum PlayStatus
     {
         Playing,

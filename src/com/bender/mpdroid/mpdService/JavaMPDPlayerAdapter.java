@@ -174,6 +174,24 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
         return playStatus;
     }
 
+    public void stop()
+    {
+        try
+        {
+            mpdPlayer.stop();
+        }
+        catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+        catch (MPDPlayerException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+    }
+
     private static enum JavaMDPPlayStatus
     {
         Playing(MPDPlayer.PlayerStatus.STATUS_PLAYING, PlayStatus.Playing),

@@ -17,4 +17,5 @@
     <string name="mute">Mute</string>
     <string name="now_playing">Now Playing:</string>
     <string name="song_name">Song Name</string>
+    <string name="stop">Stop</string>
 </resources>
