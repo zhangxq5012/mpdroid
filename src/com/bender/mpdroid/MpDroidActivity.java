@@ -2,6 +2,7 @@ package com.bender.mpdroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,9 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * todo: replace with documentation
+ * Main activity for the mpd droid application
  */
-public class MpDroidActivity extends Activity implements View.OnClickListener
+public class MpDroidActivity extends Activity
 {
     private static final String TAG = MpDroidActivity.class.getSimpleName();
     private static final int REQUEST_PREFERENCES = 1;
@@ -23,6 +24,7 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
     private TextView portTextView;
     private CheckBox useAuthenticationCheckbox;
     private Button connectButton;
+
     private MpdPreferences myPreferences;
     private MpdAdapterIF mpdAdapterIF;
 
@@ -34,11 +36,11 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.summary);
-        MpdAdapterIF mpdAdapterIF = MpdAdapter.createAdapter();
+        mpdAdapterIF = MpdAdapterFactory.createAdapter();
         myPreferences = new MpdPreferences(this);
         initializeWidgets();
         initializeListeners();
-        updatePreferences();
+        updatePreferencesDisplay();
         Log.v(TAG, "onCreate: DONE");
     }
 
@@ -53,44 +55,15 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
 
     private void initializeListeners()
     {
-        preferencesButton.setOnClickListener(this);
-        connectButton.setOnClickListener(this);
+        ButtonClickListener buttonClickListener = new ButtonClickListener();
+        preferencesButton.setOnClickListener(buttonClickListener);
+        connectButton.setOnClickListener(buttonClickListener);
     }
 
-    public void onClick(View view)
-    {
-        if (view == preferencesButton)
-        {
-            Intent launchPreferencesIntent = new Intent();
-            launchPreferencesIntent.setClass(this, MpDroidPreferenceActivity.class);
-            startActivityForResult(launchPreferencesIntent, REQUEST_PREFERENCES);
-        } else if (view == connectButton)
-        {
-            connect();
-        }
-    }
-
-    //todo: wrap in a thread
     private void connect()
     {
-        String server = myPreferences.getServer();
-        int port = myPreferences.getPort();
-        boolean useAuthentication = myPreferences.useAuthentication();
-        if (useAuthentication)
-        {
-            String password = myPreferences.getPassword();
-            mpdAdapterIF.connect(server, port, password);
-        } else
-        {
-            mpdAdapterIF.connect(server);
-        }
-        boolean connected = mpdAdapterIF.isConnected();
-        String connectedText = connected ? "Connected to " + server + "!"
-                : "Unable to Connect to " + server + "!";
-        Log.v(TAG, connectedText);
-        Log.v(TAG, "MPD Server version: " + mpdAdapterIF.getServerVersion());
-        Toast.makeText(this, connectedText, Toast.LENGTH_SHORT);
-        mpdAdapterIF.disconnect();
+        ConnectTask connectTask = new ConnectTask();
+        connectTask.execute();
     }
 
     @Override
@@ -98,11 +71,11 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
     {
         if (requestCode == REQUEST_PREFERENCES)
         {
-            updatePreferences();
+            updatePreferencesDisplay();
         }
     }
 
-    private void updatePreferences()
+    private void updatePreferencesDisplay()
     {
         String server = myPreferences.getServer();
         serverTextView.setText(getText(R.string.server) + ": " + server);
@@ -120,5 +93,58 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
     MpdAdapterIF getMpdAdapterIF()
     {
         return mpdAdapterIF;
+    }
+
+    private class ConnectTask extends AsyncTask<Object, Object, Boolean>
+    {
+        @Override
+        protected Boolean doInBackground(Object... unused)
+        {
+            String server = myPreferences.getServer();
+            int port = myPreferences.getPort();
+            boolean useAuthentication = myPreferences.useAuthentication();
+            if (useAuthentication)
+            {
+                String password = myPreferences.getPassword();
+                mpdAdapterIF.connect(server, port, password);
+            } else
+            {
+                mpdAdapterIF.connect(server);
+            }
+            boolean connected = mpdAdapterIF.isConnected();
+            String connectedText = makeConnectedText(server, connected);
+            Log.v(TAG, connectedText);
+            Log.v(TAG, "MPD Server version: " + mpdAdapterIF.getServerVersion());
+            mpdAdapterIF.disconnect();
+            return connected;
+        }
+
+        private String makeConnectedText(String server, boolean connected)
+        {
+            return connected ? "Connected to " + server + "!"
+                    : "Unable to Connect to " + server + "!";
+        }
+
+        @Override
+        protected void onPostExecute(Boolean connected)
+        {
+            Toast.makeText(MpDroidActivity.this, makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class ButtonClickListener implements View.OnClickListener
+    {
+        public void onClick(View view)
+        {
+            if (view == preferencesButton)
+            {
+                Intent launchPreferencesIntent = new Intent();
+                launchPreferencesIntent.setClass(MpDroidActivity.this, MpDroidPreferenceActivity.class);
+                startActivityForResult(launchPreferencesIntent, REQUEST_PREFERENCES);
+            } else if (view == connectButton)
+            {
+                connect();
+            }
+        }
     }
 }

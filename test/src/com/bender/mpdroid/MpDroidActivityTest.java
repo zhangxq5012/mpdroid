@@ -5,11 +5,12 @@ import android.view.View;
 
 public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroidActivity>
 {
+    static
+    {
+        System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, StubbedMpdAdapater.class.getName());
+    }
 
-    private MpDroidActivity activity;static
-{
-    System.setProperty(MpdAdapter.MPD_ADAPTER_CLASSNAME_PROPERTY, StubbedMpdActivity.class.getName());
-}
+    private MpDroidActivity activity;
 
     public MpDroidActivityTest()
     {
@@ -42,11 +43,11 @@ public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroi
         });
 
         MpdAdapterIF mpdAdapterIF = activity.getMpdAdapterIF();
-        assertEquals(true, mpdAdapterIF instanceof StubbedMpdActivity);
-        StubbedMpdActivity stubbedMpdActivity = (StubbedMpdActivity) mpdAdapterIF;
+        assertEquals(true, mpdAdapterIF instanceof StubbedMpdAdapater);
+        StubbedMpdAdapater stubbedMpdAdapater = (StubbedMpdAdapater) mpdAdapterIF;
         // make sure connect is called
-        assertEquals(1, stubbedMpdActivity.connectCount);
-        assertEquals(1, stubbedMpdActivity.disconnectCount);
+        assertEquals(1, stubbedMpdAdapater.connectCount);
+        assertEquals(1, stubbedMpdAdapater.disconnectCount);
 
     }
 }

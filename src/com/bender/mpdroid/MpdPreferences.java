@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+/**
+ * Manages the preferences for mpd droid.
+ */
 public class MpdPreferences
 {
+    private static final int DEFAULT_MPD_PORT = 6600;
     private SharedPreferences sharedPreferences;
 
     public MpdPreferences(Context context)
@@ -48,6 +52,6 @@ public class MpdPreferences
 
     public int getDefaultPort()
     {
-        return 6600;
+        return DEFAULT_MPD_PORT;
     }
 }

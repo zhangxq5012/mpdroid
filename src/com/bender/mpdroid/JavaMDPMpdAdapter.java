@@ -6,53 +6,22 @@ import org.bff.javampd.exception.MPDConnectionException;
 import org.bff.javampd.exception.MPDPlayerException;
 import org.bff.javampd.exception.MPDResponseException;
 
-import java.lang.reflect.Constructor;
 import java.net.UnknownHostException;
 
 /**
- * todo: replace with documentation
+ * This is an mpd adapter that uses the JavaMPD library to talk to the mpd server.
+ *
+ * @see org.bff.javampd.MPD
  */
-public class MpdAdapter implements MpdAdapterIF
+public class JavaMDPMpdAdapter implements MpdAdapterIF
 {
     private MPD mpdService;
-    private static final String TAG = MpdAdapter.class.getSimpleName();
-    private static String adapterClassName;
+    private static final String TAG = JavaMDPMpdAdapter.class.getSimpleName();
 
-    public static final String MPD_ADAPTER_CLASSNAME_PROPERTY = "MPD_ADAPTER";
-
-    //todo: move to factory class
-    static
+    public JavaMDPMpdAdapter()
     {
-        adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, MpdAdapter.class.getName());
-
     }
 
-    public static MpdAdapterIF createAdapter()
-    {
-        MpdAdapterIF mpdAdapterIF;
-        try
-        {
-            Class<MpdAdapterIF> adapterClass = (Class<MpdAdapterIF>) Class.forName(adapterClassName);
-            Constructor<MpdAdapterIF> constructor = adapterClass.getConstructor();
-            constructor.setAccessible(true);
-            mpdAdapterIF = constructor.newInstance();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            mpdAdapterIF = new NullMpdAdapter();
-        }
-        return mpdAdapterIF;
-    }
-
-    public MpdAdapter()
-    {
-        this(null);
-    }
-
-    private MpdAdapter(MPD mpdService)
-    {
-        this.mpdService = mpdService;
-    }
 
     public void connect(String server, int port, String password)
     {
@@ -147,33 +116,4 @@ public class MpdAdapter implements MpdAdapterIF
         }
     }
 
-    private static class NullMpdAdapter implements MpdAdapterIF
-    {
-        public void connect(String server, int port, String password)
-        {
-            Log.e(TAG, "connect(server,port,password) called on NULL object");
-        }
-
-        public void connect(String server)
-        {
-            Log.e(TAG, "connect(server) called on NULL object");
-        }
-
-        public void disconnect()
-        {
-            Log.e(TAG, "disconnect() called on NULL object");
-        }
-
-        public boolean isConnected()
-        {
-            Log.e(TAG, "isConnected() called on NULL object");
-            return false;
-        }
-
-        public String getServerVersion()
-        {
-            Log.e(TAG, "getServerVersion() called on NULL object");
-            return null;
-        }
-    }
 }

@@ -1,9 +1,9 @@
 package com.bender.mpdroid;
 
 /**
- * todo: replace with documentation
+ * This is a stubbed mpd adapter. It is meant to be used for testing.
  */
-public class StubbedMpdActivity implements MpdAdapterIF
+public class StubbedMpdAdapater implements MpdAdapterIF
 {
     private boolean connected;
     public int connectCount;
