@@ -1,7 +1,7 @@
 package com.bender.mpdroid;
 
 /**
- * todo: replace with documentation
+ * An adapter interface to control the mpd server.
  */
 public interface MpdAdapterIF
 {
@@ -15,6 +15,8 @@ public interface MpdAdapterIF
     }
 
     void connect(String server, int port, String password);
+
+    void connect(String server, int port);
 
     void connect(String server);
 

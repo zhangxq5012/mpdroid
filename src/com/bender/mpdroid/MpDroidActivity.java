@@ -157,10 +157,14 @@ public class MpDroidActivity extends Activity
             String server = myPreferences.getServer();
             int port = myPreferences.getPort();
             boolean useAuthentication = myPreferences.useAuthentication();
+            boolean usePort = myPreferences.usePort();
             if (useAuthentication)
             {
                 String password = myPreferences.getPassword();
                 mpdAdapterIF.connect(server, port, password);
+            } else if (usePort)
+            {
+                mpdAdapterIF.connect(server, port);
             } else
             {
                 mpdAdapterIF.connect(server);

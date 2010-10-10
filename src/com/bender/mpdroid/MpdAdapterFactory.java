@@ -60,6 +60,11 @@ public class MpdAdapterFactory
             Log.e(TAG, "connect(server,port,password) called on NULL object");
         }
 
+        public void connect(String server, int port)
+        {
+            Log.e(TAG, "connect(server,port) called on NULL object");
+        }
+
         public void connect(String server)
         {
             Log.e(TAG, "connect(server) called on NULL object");

@@ -17,6 +17,7 @@
                         android:defaultValue="6600"
                         android:title="@string/port"
                         android:dependency="use_port"
+                        android:singleLine="true"
             />
     <CheckBoxPreference android:key="use_authentication"
                         android:defaultValue="false"

@@ -19,6 +19,11 @@ public class StubbedMpdAdapater implements MpdAdapterIF
         connect();
     }
 
+    public void connect(String server, int port)
+    {
+        connect();
+    }
+
     public void connect(String server)
     {
         connect();

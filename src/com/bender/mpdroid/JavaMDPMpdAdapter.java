@@ -30,7 +30,11 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         PlayStatus status = PlayStatus.Stopped;
         try
         {
-            status = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdService.getMPDPlayer().getStatus());
+            if (mpdService != null)
+            {
+                MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
+                status = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
+            }
         } catch (MPDException e)
         {
             e.printStackTrace();
@@ -47,6 +51,22 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
             {
                 mpdService = new MPD(server, port, password);
             }
+        } catch (UnknownHostException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        } catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+    }
+
+    public void connect(String server, int port)
+    {
+        try
+        {
+            mpdService = new MPD(server, port);
         } catch (UnknownHostException e)
         {
             e.printStackTrace();
