@@ -5,7 +5,7 @@ import org.bff.javampd.exception.MPDConnectionException;
 import org.bff.javampd.exception.MPDPlaylistException;
 
 /**
- * todo: replace with documentation
+ * JavaMPD implementation of #MpdPlaylistAdapterIF
  */
 class JavaMPDPlaylistAdapter implements MpdPlaylistAdapterIF
 {

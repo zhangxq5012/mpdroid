@@ -3,7 +3,7 @@ package com.bender.mpdroid.mpdService;
 import android.util.Log;
 
 /**
- * todo: replace with documentation
+ * Null object song adapter
  */
 class NullSongAdapter implements MpdSongAdapterIF
 {

@@ -1,7 +1,7 @@
 package com.bender.mpdroid.mpdService;
 
 /**
- * todo: replace with documentation
+ * mpd service player interface
  */
 public interface MpdPlayerAdapterIF
 {

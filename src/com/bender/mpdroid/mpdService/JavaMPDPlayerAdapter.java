@@ -9,7 +9,7 @@ import org.bff.javampd.exception.MPDException;
 import org.bff.javampd.exception.MPDPlayerException;
 
 /**
- * todo: replace with documentation
+ * JavaMPD implementation of #MpdPlayerAdapterIF
  */
 class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
 {

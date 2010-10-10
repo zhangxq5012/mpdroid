@@ -1,7 +1,7 @@
 package com.bender.mpdroid.mpdService;
 
 /**
- * todo: replace with documentation
+ * Null object playlist adapter
  */
 class NullPlaylistAdapter implements MpdPlaylistAdapterIF
 {

@@ -3,7 +3,7 @@ package com.bender.mpdroid.mpdService;
 import org.bff.javampd.objects.MPDSong;
 
 /**
- * todo: replace with documentation
+ * JavaMPD implementation of #MpdSongAdapterIF
  */
 class JavaMPDSongAdapter implements MpdSongAdapterIF
 {
