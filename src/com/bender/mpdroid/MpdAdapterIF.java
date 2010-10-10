@@ -11,6 +11,12 @@ public interface MpdAdapterIF
 
     void prev();
 
+    Integer setVolume(Integer volume);
+
+    Integer getVolume();
+
+    Boolean toggleMute();
+
     public enum PlayStatus
     {
         Playing,

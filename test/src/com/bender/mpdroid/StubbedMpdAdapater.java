@@ -8,6 +8,7 @@ public class StubbedMpdAdapater implements MpdAdapterIF
     private boolean connected;
     public int connectCount;
     public int disconnectCount;
+    private Integer volume;
 
     public PlayStatus getPlayStatus()
     {
@@ -20,6 +21,22 @@ public class StubbedMpdAdapater implements MpdAdapterIF
 
     public void prev()
     {
+    }
+
+    public Integer setVolume(Integer volume)
+    {
+        this.volume = volume;
+        return getVolume();
+    }
+
+    public Integer getVolume()
+    {
+        return this.volume;
+    }
+
+    public Boolean toggleMute()
+    {
+        return false;
     }
 
     public void connect(String server, int port, String password)

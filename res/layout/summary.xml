@@ -23,14 +23,6 @@
               android:enabled="false"
             />
 
-    <!--
-    <Button android:id="@+id/preference"
-            android:text="@string/preferences"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            />
-            -->
-
     <Button android:id="@+id/connect"
             android:text="@string/connect"
             android:layout_width="fill_parent"
@@ -62,38 +54,20 @@
 
     </LinearLayout>
 
-    <!--<EditText
-            android:id="@+id/server_name"
+    <TextView
+            android:text="@string/volume"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:text="@string/server"/>
-    <CheckBox
-            android:id="@+id/use_port"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/use_port"/>
-    <EditText
-            android:id="@+id/port"
-            android:singleLine="true"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="6600"/>
-    <CheckBox
-            android:id="@+id/use_authentication"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/use_authentication"/>
-    <EditText
-            android:id="@+id/password"
-            android:singleLine="true"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:password="true"/>
-    <Button
-            android:id="@+id/summary"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/connect"/>
-            -->
+            />
+    <SeekBar android:id="@+id/volume"
+             android:max="100"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+            />
+    <CheckBox android:id="@+id/mute"
+              android:text="@string/mute"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+            />
+
 </LinearLayout>

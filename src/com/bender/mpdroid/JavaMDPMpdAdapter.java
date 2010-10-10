@@ -3,6 +3,8 @@ package com.bender.mpdroid;
 import android.util.Log;
 import org.bff.javampd.MPD;
 import org.bff.javampd.MPDPlayer;
+import org.bff.javampd.events.PlayerChangeEvent;
+import org.bff.javampd.events.PlayerChangeListener;
 import org.bff.javampd.exception.MPDConnectionException;
 import org.bff.javampd.exception.MPDException;
 import org.bff.javampd.exception.MPDPlayerException;
@@ -15,10 +17,11 @@ import java.net.UnknownHostException;
  *
  * @see org.bff.javampd.MPD
  */
-public class JavaMDPMpdAdapter implements MpdAdapterIF
+class JavaMDPMpdAdapter implements MpdAdapterIF
 {
     private MPD mpdService;
     private static final String TAG = JavaMDPMpdAdapter.class.getSimpleName();
+    private boolean muted;
 
     public JavaMDPMpdAdapter()
     {
@@ -86,6 +89,79 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         }
     }
 
+    public Integer setVolume(Integer volume)
+    {
+        Integer currentVolume = 0;
+        try
+        {
+            if (mpdService != null)
+            {
+                MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
+                mpdPlayer.setVolume(volume);
+                currentVolume = mpdPlayer.getVolume();
+            }
+        }
+        catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+        catch (MPDPlayerException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+        return currentVolume;
+    }
+
+    public Integer getVolume()
+    {
+        Integer volume = 0;
+        try
+        {
+            if (mpdService != null)
+            {
+                volume = mpdService.getMPDPlayer().getVolume();
+            }
+        }
+        catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+        catch (MPDPlayerException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+        return volume;
+    }
+
+    public Boolean toggleMute()
+    {
+        try
+        {
+            MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
+            if (muted)
+            {
+                mpdPlayer.unMute();
+            }
+            else
+            {
+                mpdPlayer.mute();
+            }
+        }
+        catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+        }
+        catch (MPDPlayerException e)
+        {
+            e.printStackTrace();
+        }
+        return muted;
+    }
+
     public void connect(String server, int port, String password)
     {
         try
@@ -93,6 +169,7 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
             if (mpdService != null)
             {
                 mpdService = new MPD(server, port, password);
+                initializeListeners();
             }
         }
         catch (UnknownHostException e)
@@ -107,11 +184,17 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         }
     }
 
+    private void initializeListeners()
+    {
+        mpdService.getMPDPlayer().addPlayerChangeListener(new JavaMPDPlayerChangeListener());
+    }
+
     public void connect(String server, int port)
     {
         try
         {
             mpdService = new MPD(server, port);
+            initializeListeners();
         }
         catch (UnknownHostException e)
         {
@@ -130,6 +213,7 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         try
         {
             mpdService = new MPD(server);
+            initializeListeners();
         }
         catch (UnknownHostException e)
         {
@@ -248,6 +332,22 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
                 }
             }
             return ret;
+        }
+    }
+
+    private class JavaMPDPlayerChangeListener implements PlayerChangeListener
+    {
+        public void playerChanged(PlayerChangeEvent event)
+        {
+            switch (event.getId())
+            {
+                case PlayerChangeEvent.PLAYER_MUTED:
+                    muted = true;
+                    break;
+                case PlayerChangeEvent.PLAYER_UNMUTED:
+                    muted = false;
+                    break;
+            }
         }
     }
 }

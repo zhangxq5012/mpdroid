@@ -13,4 +13,6 @@
     <string name="pause">Pause</string>
     <string name="next">Next</string>
     <string name="prev">Prev</string>
+    <string name="volume">Volume</string>
+    <string name="mute">Mute</string>
 </resources>

@@ -67,6 +67,24 @@ public class MpdAdapterFactory
             Log.e(TAG, "prev() called on NULL object");
         }
 
+        public Integer setVolume(Integer volume)
+        {
+            Log.e(TAG, "setVolume(volume) called on NULL object");
+            return 0;
+        }
+
+        public Integer getVolume()
+        {
+            Log.e(TAG, "getVolume() called on NULL object");
+            return 0;
+        }
+
+        public Boolean toggleMute()
+        {
+            Log.e(TAG, "toggleMute() called on NULL object");
+            return false;
+        }
+
         public void connect(String server, int port, String password)
         {
             Log.e(TAG, "connect(server,port,password) called on NULL object");

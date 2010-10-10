@@ -9,10 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 /**
  * Main activity for the mpd droid application
@@ -29,9 +26,12 @@ public class MpDroidActivity extends Activity
     private Button playButton;
     private Button nextButton;
     private Button prevButton;
+    private SeekBar volumeSeekBar;
+    private Button muteButton;
 
     private MpdPreferences myPreferences;
     private MpdAdapterIF mpdAdapterIF;
+    private static final Integer MUTE_VOLUME = 0;
 
     /**
      * Called when the activity is first created.
@@ -58,6 +58,8 @@ public class MpDroidActivity extends Activity
         playButton = (Button) findViewById(R.id.play);
         nextButton = (Button) findViewById(R.id.next);
         prevButton = (Button) findViewById(R.id.prev);
+        volumeSeekBar = (SeekBar) findViewById(R.id.volume);
+        muteButton = (Button) findViewById(R.id.mute);
     }
 
     private void initializeListeners()
@@ -67,6 +69,8 @@ public class MpDroidActivity extends Activity
         playButton.setOnClickListener(buttonClickListener);
         nextButton.setOnClickListener(buttonClickListener);
         prevButton.setOnClickListener(buttonClickListener);
+        volumeSeekBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener());
+        muteButton.setOnClickListener(buttonClickListener);
     }
 
     private void connect()
@@ -141,6 +145,12 @@ public class MpDroidActivity extends Activity
         playButton.setEnabled(connected);
         nextButton.setEnabled(connected);
         prevButton.setEnabled(connected);
+        volumeSeekBar.setEnabled(connected);
+        muteButton.setEnabled(connected);
+        if (connected)
+        {
+            volumeSeekBar.setProgress(mpdAdapterIF.getVolume());
+        }
     }
 
     private void updatePlayStatusOnUI(MpdAdapterIF.PlayStatus playStatus)
@@ -240,6 +250,11 @@ public class MpDroidActivity extends Activity
                 PrevTask prevTask = new PrevTask();
                 prevTask.execute();
             }
+            else if (view == muteButton)
+            {
+                ToggleMuteTask toggleMuteTask = new ToggleMuteTask();
+                toggleMuteTask.execute();
+            }
         }
 
         private class PrevTask extends AsyncTask<Object, Object, Object>
@@ -305,6 +320,62 @@ public class MpDroidActivity extends Activity
         {
             mpdAdapterIF.next();
             return null;
+        }
+    }
+
+    private class VolumeSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener
+    {
+        public void onProgressChanged(SeekBar seekBar, int volume, boolean fromUser)
+        {
+            if (seekBar == volumeSeekBar && fromUser)
+            {
+                VolumeTask volumeTask = new VolumeTask();
+                volumeTask.execute(volume);
+            }
+        }
+
+        public void onStartTrackingTouch(SeekBar seekBar)
+        {
+        }
+
+        public void onStopTrackingTouch(SeekBar seekBar)
+        {
+        }
+
+    }
+
+    private class VolumeTask extends AsyncTask<Integer, Object, Integer>
+    {
+        @Override
+        protected Integer doInBackground(Integer... params)
+        {
+            Integer volume = params[0];
+            return mpdAdapterIF.setVolume(volume);
+        }
+    }
+
+    private class ToggleMuteTask extends AsyncTask<Object, Integer, Boolean>
+    {
+        @Override
+        protected Boolean doInBackground(Object... objects)
+        {
+            Boolean muted = mpdAdapterIF.toggleMute();
+            Integer volume = mpdAdapterIF.getVolume();
+            publishProgress(volume);
+            return muted;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean muted)
+        {
+            muteButton.setSelected(muted);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values)
+        {
+            Integer volume = values[0];
+            volumeSeekBar.setProgress(volume);
         }
     }
 }
