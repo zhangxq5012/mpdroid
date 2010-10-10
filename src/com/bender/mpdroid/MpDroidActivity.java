@@ -27,6 +27,8 @@ public class MpDroidActivity extends Activity
     private CheckBox useAuthenticationCheckbox;
     private Button connectButton;
     private Button playButton;
+    private Button nextButton;
+    private Button prevButton;
 
     private MpdPreferences myPreferences;
     private MpdAdapterIF mpdAdapterIF;
@@ -54,6 +56,8 @@ public class MpDroidActivity extends Activity
         useAuthenticationCheckbox = (CheckBox) findViewById(R.id.use_authentication);
         connectButton = (Button) findViewById(R.id.connect);
         playButton = (Button) findViewById(R.id.play);
+        nextButton = (Button) findViewById(R.id.next);
+        prevButton = (Button) findViewById(R.id.prev);
     }
 
     private void initializeListeners()
@@ -61,6 +65,8 @@ public class MpDroidActivity extends Activity
         ButtonClickListener buttonClickListener = new ButtonClickListener();
         connectButton.setOnClickListener(buttonClickListener);
         playButton.setOnClickListener(buttonClickListener);
+        nextButton.setOnClickListener(buttonClickListener);
+        prevButton.setOnClickListener(buttonClickListener);
     }
 
     private void connect()
@@ -133,6 +139,8 @@ public class MpDroidActivity extends Activity
         String text = connected ? getString(R.string.disconnect) : getString(R.string.connect);
         connectButton.setText(text);
         playButton.setEnabled(connected);
+        nextButton.setEnabled(connected);
+        prevButton.setEnabled(connected);
     }
 
     private void updatePlayStatusOnUI(MpdAdapterIF.PlayStatus playStatus)
@@ -217,9 +225,26 @@ public class MpDroidActivity extends Activity
             } else if (view == playButton)
             {
                 play();
+            } else if (view == nextButton)
+            {
+                NextTask nextTask = new NextTask();
+                nextTask.execute();
+            } else if (view == prevButton)
+            {
+                PrevTask prevTask = new PrevTask();
+                prevTask.execute();
             }
         }
 
+        private class PrevTask extends AsyncTask<Object, Object, Object>
+        {
+            @Override
+            protected Object doInBackground(Object... objects)
+            {
+                mpdAdapterIF.prev();
+                return null;
+            }
+        }
     }
 
     private void play()
@@ -265,5 +290,15 @@ public class MpDroidActivity extends Activity
             updatePlayStatusOnUI(playStatus);
         }
 
+    }
+
+    private class NextTask extends AsyncTask<Object, Object, Object>
+    {
+        @Override
+        protected Object doInBackground(Object... objects)
+        {
+            mpdAdapterIF.next();
+            return null;
+        }
     }
 }

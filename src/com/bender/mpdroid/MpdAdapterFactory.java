@@ -52,7 +52,18 @@ public class MpdAdapterFactory
 
         public PlayStatus getPlayStatus()
         {
+            Log.e(TAG, "getPlayStatus() called on NULL object");
             return PlayStatus.Stopped;
+        }
+
+        public void next()
+        {
+            Log.e(TAG, "next() called on NULL object");
+        }
+
+        public void prev()
+        {
+            Log.e(TAG, "prev() called on NULL object");
         }
 
         public void connect(String server, int port, String password)

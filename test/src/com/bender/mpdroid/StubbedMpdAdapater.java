@@ -14,6 +14,14 @@ public class StubbedMpdAdapater implements MpdAdapterIF
         return PlayStatus.Stopped;
     }
 
+    public void next()
+    {
+    }
+
+    public void prev()
+    {
+    }
+
     public void connect(String server, int port, String password)
     {
         connect();

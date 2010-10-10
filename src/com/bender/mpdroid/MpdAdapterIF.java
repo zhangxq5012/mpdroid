@@ -7,6 +7,10 @@ public interface MpdAdapterIF
 {
     PlayStatus getPlayStatus();
 
+    void next();
+
+    void prev();
+
     public enum PlayStatus
     {
         Playing,

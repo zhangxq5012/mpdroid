@@ -43,6 +43,44 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         return status;
     }
 
+    public void next()
+    {
+        try
+        {
+            if (mpdService != null)
+            {
+                mpdService.getMPDPlayer().playNext();
+            }
+        } catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        } catch (MPDPlayerException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+    }
+
+    public void prev()
+    {
+        try
+        {
+            if (mpdService != null)
+            {
+                mpdService.getMPDPlayer().playPrev();
+            }
+        } catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        } catch (MPDPlayerException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+    }
+
     public void connect(String server, int port, String password)
     {
         try
