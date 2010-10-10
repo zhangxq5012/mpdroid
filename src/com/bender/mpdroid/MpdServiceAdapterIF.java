@@ -3,27 +3,8 @@ package com.bender.mpdroid;
 /**
  * An adapter interface to control the mpd server.
  */
-public interface MpdAdapterIF
+public interface MpdServiceAdapterIF
 {
-    PlayStatus getPlayStatus();
-
-    void next();
-
-    void prev();
-
-    Integer setVolume(Integer volume);
-
-    Integer getVolume();
-
-    Boolean toggleMute();
-
-    public enum PlayStatus
-    {
-        Playing,
-        Paused,
-        Stopped
-    }
-
     void connect(String server, int port, String password);
 
     void connect(String server, int port);
@@ -36,6 +17,7 @@ public interface MpdAdapterIF
 
     String getServerVersion();
 
-    PlayStatus playOrPause();
+    MpdPlayerAdapterIF getPlayer();
 
+    MpdPlaylistAdapterIF getPlaylist();
 }

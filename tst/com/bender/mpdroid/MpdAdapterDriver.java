@@ -10,17 +10,17 @@ public class MpdAdapterDriver
     {
         final String server = "192.168.2.2";
         System.out.println("Using authentication:");
-        MpdAdapterIF adapterIF = MpdAdapterFactory.createAdapter();
-        adapterIF.connect(server, 6600, "dancured62");
-        System.out.println("Connected: " + adapterIF.isConnected());
-        adapterIF.disconnect();
+        MpdServiceAdapterIF serviceAdapterIF = MpdAdapterFactory.createAdapter();
+        serviceAdapterIF.connect(server, 6600, "dancured62");
+        System.out.println("Connected: " + serviceAdapterIF.isConnected());
+        serviceAdapterIF.disconnect();
 
         System.out.println();
         System.out.println("No authentication:");
-        adapterIF = MpdAdapterFactory.createAdapter();
-        adapterIF.connect(server);
-        System.out.println("Connected: " + adapterIF.isConnected());
-        System.out.println("Version: " + adapterIF.getServerVersion());
-        adapterIF.disconnect();
+        serviceAdapterIF = MpdAdapterFactory.createAdapter();
+        serviceAdapterIF.connect(server);
+        System.out.println("Connected: " + serviceAdapterIF.isConnected());
+        System.out.println("Version: " + serviceAdapterIF.getServerVersion());
+        serviceAdapterIF.disconnect();
     }
 }

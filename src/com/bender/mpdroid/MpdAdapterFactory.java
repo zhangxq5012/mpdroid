@@ -1,14 +1,12 @@
 package com.bender.mpdroid;
 
-import android.util.Log;
-
 import java.lang.reflect.Constructor;
 
 /**
- * Constructs the appropriate #MpdAdapterIF instance based on the system property #MPD_ADAPTER_CLASSNAME_PROPERTY.
+ * Constructs the appropriate #MpdServiceAdapterIF instance based on the system property #MPD_ADAPTER_CLASSNAME_PROPERTY.
  * If the initialization fails then a null object #MpdAdapaterIF is constructed.
  *
- * @see com.bender.mpdroid.MpdAdapterIF
+ * @see MpdServiceAdapterIF
  */
 public class MpdAdapterFactory
 {
@@ -19,108 +17,30 @@ public class MpdAdapterFactory
 
     static
     {
-        adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, JavaMDPMpdAdapter.class.getName());
+        adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, JavaMDPMpdServiceAdapter.class.getName());
     }
 
     /**
-     * Create a new instance of the #MpdAdapterIF instance.
+     * Create a new instance of the #MpdServiceAdapterIF instance.
      *
      * @return new instance or Null object if instantiation fails.
      */
-    public static MpdAdapterIF createAdapter()
+    public static MpdServiceAdapterIF createAdapter()
     {
-        MpdAdapterIF mpdAdapterIF;
+        MpdServiceAdapterIF mpdServiceAdapterIF;
         try
         {
-            @SuppressWarnings({"unchecked"}) Class<MpdAdapterIF> adapterClass = (Class<MpdAdapterIF>) Class.forName(adapterClassName);
-            Constructor<MpdAdapterIF> constructor = adapterClass.getConstructor();
+            @SuppressWarnings({"unchecked"}) Class<MpdServiceAdapterIF> adapterClass = (Class<MpdServiceAdapterIF>) Class.forName(adapterClassName);
+            Constructor<MpdServiceAdapterIF> constructor = adapterClass.getConstructor();
             constructor.setAccessible(true);
-            mpdAdapterIF = constructor.newInstance();
+            mpdServiceAdapterIF = constructor.newInstance();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            mpdAdapterIF = new NullMpdAdapter();
+            mpdServiceAdapterIF = new NullMpdServiceAdapter();
         }
-        return mpdAdapterIF;
+        return mpdServiceAdapterIF;
     }
 
-    /**
-     * A null MpdAdapter. This is used when the adapter can't be initialized.
-     */
-    private static class NullMpdAdapter implements MpdAdapterIF
-    {
-
-        public PlayStatus getPlayStatus()
-        {
-            Log.e(TAG, "getPlayStatus() called on NULL object");
-            return PlayStatus.Stopped;
-        }
-
-        public void next()
-        {
-            Log.e(TAG, "next() called on NULL object");
-        }
-
-        public void prev()
-        {
-            Log.e(TAG, "prev() called on NULL object");
-        }
-
-        public Integer setVolume(Integer volume)
-        {
-            Log.e(TAG, "setVolume(volume) called on NULL object");
-            return 0;
-        }
-
-        public Integer getVolume()
-        {
-            Log.e(TAG, "getVolume() called on NULL object");
-            return 0;
-        }
-
-        public Boolean toggleMute()
-        {
-            Log.e(TAG, "toggleMute() called on NULL object");
-            return false;
-        }
-
-        public void connect(String server, int port, String password)
-        {
-            Log.e(TAG, "connect(server,port,password) called on NULL object");
-        }
-
-        public void connect(String server, int port)
-        {
-            Log.e(TAG, "connect(server,port) called on NULL object");
-        }
-
-        public void connect(String server)
-        {
-            Log.e(TAG, "connect(server) called on NULL object");
-        }
-
-        public void disconnect()
-        {
-            Log.e(TAG, "disconnect() called on NULL object");
-        }
-
-        public boolean isConnected()
-        {
-            Log.e(TAG, "isConnected() called on NULL object");
-            return false;
-        }
-
-        public String getServerVersion()
-        {
-            Log.e(TAG, "getServerVersion() called on NULL object");
-            return null;
-        }
-
-        public PlayStatus playOrPause()
-        {
-            Log.e(TAG, "playOrPause() called on NULL object");
-            return PlayStatus.Stopped;
-        }
-    }
 }

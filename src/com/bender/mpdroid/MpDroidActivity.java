@@ -30,8 +30,8 @@ public class MpDroidActivity extends Activity
     private Button muteButton;
 
     private MpdPreferences myPreferences;
-    private MpdAdapterIF mpdAdapterIF;
-    private static final Integer MUTE_VOLUME = 0;
+    private MpdServiceAdapterIF mpdServiceAdapterIF;
+    private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
     /**
      * Called when the activity is first created.
@@ -41,7 +41,7 @@ public class MpDroidActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.summary);
-        mpdAdapterIF = MpdAdapterFactory.createAdapter();
+        mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
         myPreferences = new MpdPreferences(this);
         initializeWidgets();
         initializeListeners();
@@ -133,9 +133,9 @@ public class MpDroidActivity extends Activity
      *
      * @return mpd adapter
      */
-    MpdAdapterIF getMpdAdapterIF()
+    MpdServiceAdapterIF getMpdServiceAdapterIF()
     {
-        return mpdAdapterIF;
+        return mpdServiceAdapterIF;
     }
 
     private void updateConnectedStatusOnUI(Boolean connected)
@@ -149,11 +149,11 @@ public class MpDroidActivity extends Activity
         muteButton.setEnabled(connected);
         if (connected)
         {
-            volumeSeekBar.setProgress(mpdAdapterIF.getVolume());
+            volumeSeekBar.setProgress(mpdPlayerAdapterIF.getVolume());
         }
     }
 
-    private void updatePlayStatusOnUI(MpdAdapterIF.PlayStatus playStatus)
+    private void updatePlayStatusOnUI(MpdPlayerAdapterIF.PlayStatus playStatus)
     {
         switch (playStatus)
         {
@@ -167,7 +167,7 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class ConnectTask extends AsyncTask<Object, MpdAdapterIF.PlayStatus, Boolean>
+    private class ConnectTask extends AsyncTask<Object, MpdPlayerAdapterIF.PlayStatus, Boolean>
     {
         @Override
         protected Boolean doInBackground(Object... unused)
@@ -179,24 +179,25 @@ public class MpDroidActivity extends Activity
             if (useAuthentication)
             {
                 String password = myPreferences.getPassword();
-                mpdAdapterIF.connect(server, port, password);
+                mpdServiceAdapterIF.connect(server, port, password);
             }
             else if (usePort)
             {
-                mpdAdapterIF.connect(server, port);
+                mpdServiceAdapterIF.connect(server, port);
             }
             else
             {
-                mpdAdapterIF.connect(server);
+                mpdServiceAdapterIF.connect(server);
             }
-            boolean connected = mpdAdapterIF.isConnected();
+            boolean connected = mpdServiceAdapterIF.isConnected();
 
-            MpdAdapterIF.PlayStatus playStatus = mpdAdapterIF.getPlayStatus();
+            mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
+            MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
             publishProgress(playStatus);
 
             String connectedText = makeConnectedText(server, connected);
             Log.v(TAG, connectedText);
-            Log.v(TAG, "MPD Server version: " + mpdAdapterIF.getServerVersion());
+            Log.v(TAG, "MPD Server version: " + mpdServiceAdapterIF.getServerVersion());
             return connected;
         }
 
@@ -214,7 +215,7 @@ public class MpDroidActivity extends Activity
         }
 
         @Override
-        protected void onProgressUpdate(MpdAdapterIF.PlayStatus... values)
+        protected void onProgressUpdate(MpdPlayerAdapterIF.PlayStatus... values)
         {
             updatePlayStatusOnUI(values[0]);
         }
@@ -226,7 +227,7 @@ public class MpDroidActivity extends Activity
         {
             if (view == connectButton)
             {
-                boolean connected = mpdAdapterIF.isConnected();
+                boolean connected = mpdServiceAdapterIF.isConnected();
                 if (connected)
                 {
                     disconnect();
@@ -262,7 +263,7 @@ public class MpDroidActivity extends Activity
             @Override
             protected Object doInBackground(Object... objects)
             {
-                mpdAdapterIF.prev();
+                mpdPlayerAdapterIF.prev();
                 return null;
             }
         }
@@ -285,8 +286,8 @@ public class MpDroidActivity extends Activity
         @Override
         protected Boolean doInBackground(Object... ignored)
         {
-            mpdAdapterIF.disconnect();
-            return mpdAdapterIF.isConnected();
+            mpdServiceAdapterIF.disconnect();
+            return mpdServiceAdapterIF.isConnected();
         }
 
         @Override
@@ -296,16 +297,16 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class PlayTask extends AsyncTask<Object, Object, MpdAdapterIF.PlayStatus>
+    private class PlayTask extends AsyncTask<Object, Object, MpdPlayerAdapterIF.PlayStatus>
     {
         @Override
-        protected MpdAdapterIF.PlayStatus doInBackground(Object... objects)
+        protected MpdPlayerAdapterIF.PlayStatus doInBackground(Object... objects)
         {
-            return mpdAdapterIF.playOrPause();
+            return mpdPlayerAdapterIF.playOrPause();
         }
 
         @Override
-        protected void onPostExecute(MpdAdapterIF.PlayStatus playStatus)
+        protected void onPostExecute(MpdPlayerAdapterIF.PlayStatus playStatus)
         {
             Log.v(TAG, "Play Status Update: " + playStatus);
             updatePlayStatusOnUI(playStatus);
@@ -318,7 +319,7 @@ public class MpDroidActivity extends Activity
         @Override
         protected Object doInBackground(Object... objects)
         {
-            mpdAdapterIF.next();
+            mpdPlayerAdapterIF.next();
             return null;
         }
     }
@@ -350,7 +351,7 @@ public class MpDroidActivity extends Activity
         protected Integer doInBackground(Integer... params)
         {
             Integer volume = params[0];
-            return mpdAdapterIF.setVolume(volume);
+            return mpdPlayerAdapterIF.setVolume(volume);
         }
     }
 
@@ -359,8 +360,8 @@ public class MpDroidActivity extends Activity
         @Override
         protected Boolean doInBackground(Object... objects)
         {
-            Boolean muted = mpdAdapterIF.toggleMute();
-            Integer volume = mpdAdapterIF.getVolume();
+            Boolean muted = mpdPlayerAdapterIF.toggleMute();
+            Integer volume = mpdPlayerAdapterIF.getVolume();
             publishProgress(volume);
             return muted;
         }

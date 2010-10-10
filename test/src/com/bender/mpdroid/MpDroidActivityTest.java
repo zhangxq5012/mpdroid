@@ -7,7 +7,7 @@ public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroi
 {
     static
     {
-        System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, StubbedMpdAdapater.class.getName());
+        System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, StubbedMpdServiceAdapater.class.getName());
     }
 
     private MpDroidActivity activity;
@@ -42,9 +42,9 @@ public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroi
             }
         });
 
-        MpdAdapterIF mpdAdapterIF = activity.getMpdAdapterIF();
-        assertEquals(true, mpdAdapterIF instanceof StubbedMpdAdapater);
-        StubbedMpdAdapater stubbedMpdAdapater = (StubbedMpdAdapater) mpdAdapterIF;
+        MpdServiceAdapterIF mpdServiceAdapterIF = activity.getMpdServiceAdapterIF();
+        assertEquals(true, mpdServiceAdapterIF instanceof StubbedMpdServiceAdapater);
+        StubbedMpdServiceAdapater stubbedMpdAdapater = (StubbedMpdServiceAdapater) mpdServiceAdapterIF;
         // make sure connect is called
         assertEquals(1, stubbedMpdAdapater.connectCount);
         assertEquals(1, stubbedMpdAdapater.disconnectCount);

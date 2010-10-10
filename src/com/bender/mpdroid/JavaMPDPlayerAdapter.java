@@ -1,43 +1,35 @@
 package com.bender.mpdroid;
 
 import android.util.Log;
-import org.bff.javampd.MPD;
 import org.bff.javampd.MPDPlayer;
 import org.bff.javampd.events.PlayerChangeEvent;
 import org.bff.javampd.events.PlayerChangeListener;
 import org.bff.javampd.exception.MPDConnectionException;
 import org.bff.javampd.exception.MPDException;
 import org.bff.javampd.exception.MPDPlayerException;
-import org.bff.javampd.exception.MPDResponseException;
-
-import java.net.UnknownHostException;
 
 /**
- * This is an mpd adapter that uses the JavaMPD library to talk to the mpd server.
- *
- * @see org.bff.javampd.MPD
+ * todo: replace with documentation
  */
-class JavaMDPMpdAdapter implements MpdAdapterIF
+public class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
 {
-    private MPD mpdService;
-    private static final String TAG = JavaMDPMpdAdapter.class.getSimpleName();
+    private static final String TAG = JavaMPDPlayerAdapter.class.getSimpleName();
+
+    private MPDPlayer mpdPlayer;
     private boolean muted;
 
-    public JavaMDPMpdAdapter()
+    public JavaMPDPlayerAdapter(MPDPlayer mpdPlayer)
     {
+        this.mpdPlayer = mpdPlayer;
+        this.mpdPlayer.addPlayerChangeListener(new JavaMPDPlayerChangeListener());
     }
-
 
     public PlayStatus getPlayStatus()
     {
         PlayStatus status = PlayStatus.Stopped;
         try
         {
-            if (mpdService != null)
-            {
-                MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
-                status = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
-            }
+            status = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
         }
         catch (MPDException e)
         {
@@ -51,10 +43,7 @@ class JavaMDPMpdAdapter implements MpdAdapterIF
     {
         try
         {
-            if (mpdService != null)
-            {
-                mpdService.getMPDPlayer().playNext();
-            }
+            mpdPlayer.playNext();
         }
         catch (MPDConnectionException e)
         {
@@ -72,10 +61,7 @@ class JavaMDPMpdAdapter implements MpdAdapterIF
     {
         try
         {
-            if (mpdService != null)
-            {
-                mpdService.getMPDPlayer().playPrev();
-            }
+            mpdPlayer.playPrev();
         }
         catch (MPDConnectionException e)
         {
@@ -94,12 +80,8 @@ class JavaMDPMpdAdapter implements MpdAdapterIF
         Integer currentVolume = 0;
         try
         {
-            if (mpdService != null)
-            {
-                MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
-                mpdPlayer.setVolume(volume);
-                currentVolume = mpdPlayer.getVolume();
-            }
+            mpdPlayer.setVolume(volume);
+            currentVolume = mpdPlayer.getVolume();
         }
         catch (MPDConnectionException e)
         {
@@ -119,10 +101,7 @@ class JavaMDPMpdAdapter implements MpdAdapterIF
         Integer volume = 0;
         try
         {
-            if (mpdService != null)
-            {
-                volume = mpdService.getMPDPlayer().getVolume();
-            }
+            volume = mpdPlayer.getVolume();
         }
         catch (MPDConnectionException e)
         {
@@ -141,7 +120,6 @@ class JavaMDPMpdAdapter implements MpdAdapterIF
     {
         try
         {
-            MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
             if (muted)
             {
                 mpdPlayer.unMute();
@@ -162,131 +140,21 @@ class JavaMDPMpdAdapter implements MpdAdapterIF
         return muted;
     }
 
-    public void connect(String server, int port, String password)
-    {
-        try
-        {
-            if (mpdService != null)
-            {
-                mpdService = new MPD(server, port, password);
-                initializeListeners();
-            }
-        }
-        catch (UnknownHostException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-        catch (MPDConnectionException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-    }
-
-    private void initializeListeners()
-    {
-        mpdService.getMPDPlayer().addPlayerChangeListener(new JavaMPDPlayerChangeListener());
-    }
-
-    public void connect(String server, int port)
-    {
-        try
-        {
-            mpdService = new MPD(server, port);
-            initializeListeners();
-        }
-        catch (UnknownHostException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-        catch (MPDConnectionException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-    }
-
-    public void connect(String server)
-    {
-        try
-        {
-            mpdService = new MPD(server);
-            initializeListeners();
-        }
-        catch (UnknownHostException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-        catch (MPDConnectionException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-    }
-
-    public void disconnect()
-    {
-        try
-        {
-            if (mpdService != null)
-            {
-                mpdService.close();
-            }
-        }
-        catch (MPDConnectionException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-        catch (MPDResponseException e)
-        {
-            e.printStackTrace();
-            Log.e(TAG, "", e);
-        }
-        mpdService = null;
-    }
-
-    public boolean isConnected()
-    {
-        if (mpdService != null)
-        {
-            return mpdService.isConnected();
-        }
-        return false;
-    }
-
-    public String getServerVersion()
-    {
-        String version = null;
-        if (mpdService != null)
-        {
-            version = mpdService.getVersion();
-        }
-        return version;
-    }
-
-    public PlayStatus playOrPause()
+    public MpdPlayerAdapterIF.PlayStatus playOrPause()
     {
         PlayStatus playStatus = PlayStatus.Stopped;
         try
         {
-            if (mpdService != null)
+            MPDPlayer.PlayerStatus status = mpdPlayer.getStatus();
+            if (status.equals(MPDPlayer.PlayerStatus.STATUS_PLAYING))
             {
-                MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
-                MPDPlayer.PlayerStatus status = mpdPlayer.getStatus();
-                if (status.equals(MPDPlayer.PlayerStatus.STATUS_PLAYING))
-                {
-                    mpdPlayer.pause();
-                }
-                else
-                {
-                    mpdPlayer.play();
-                }
-                playStatus = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
+                mpdPlayer.pause();
             }
+            else
+            {
+                mpdPlayer.play();
+            }
+            playStatus = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
         }
         catch (MPDConnectionException e)
         {
