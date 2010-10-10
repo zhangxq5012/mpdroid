@@ -10,6 +10,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import com.bender.mpdroid.mpdService.MpdAdapterFactory;
+import com.bender.mpdroid.mpdService.MpdPlayerAdapterIF;
+import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
 
 /**
  * Main activity for the mpd droid application

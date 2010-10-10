@@ -1,5 +1,10 @@
 package com.bender.mpdroid;
 
+import com.bender.mpdroid.mpdService.MpdPlayerAdapterIF;
+import com.bender.mpdroid.mpdService.MpdPlaylistAdapterIF;
+import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
+import com.bender.mpdroid.mpdService.MpdSongAdapterIF;
+
 /**
  * This is a stubbed mpd adapter. It is meant to be used for testing.
  */

@@ -1,4 +1,4 @@
-package com.bender.mpdroid;
+package com.bender.mpdroid.mpdService;
 
 import android.util.Log;
 

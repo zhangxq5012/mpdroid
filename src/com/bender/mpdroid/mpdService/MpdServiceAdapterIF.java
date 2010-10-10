@@ -1,4 +1,4 @@
-package com.bender.mpdroid;
+package com.bender.mpdroid.mpdService;
 
 /**
  * An adapter interface to control the mpd server.

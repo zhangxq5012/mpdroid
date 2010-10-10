@@ -1,4 +1,4 @@
-package com.bender.mpdroid;
+package com.bender.mpdroid.mpdService;
 
 import android.util.Log;
 import org.bff.javampd.MPDPlayer;
@@ -11,7 +11,7 @@ import org.bff.javampd.exception.MPDPlayerException;
 /**
  * todo: replace with documentation
  */
-public class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
+class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
 {
     private static final String TAG = JavaMPDPlayerAdapter.class.getSimpleName();
 

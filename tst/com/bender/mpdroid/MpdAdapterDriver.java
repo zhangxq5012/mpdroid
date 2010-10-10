@@ -1,5 +1,8 @@
 package com.bender.mpdroid;
 
+import com.bender.mpdroid.mpdService.MpdAdapterFactory;
+import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
+
 /**
  * This is a driver for making a connection to a mpd server on the localhost
  */

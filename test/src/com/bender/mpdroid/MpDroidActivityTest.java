@@ -2,6 +2,8 @@ package com.bender.mpdroid;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
+import com.bender.mpdroid.mpdService.MpdAdapterFactory;
+import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
 
 public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroidActivity>
 {
