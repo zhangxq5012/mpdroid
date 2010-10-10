@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MpDroidActivity</string>
+    <string name="app_name">MPDroid</string>
+    <string name="server">Server</string>
+    <string name="server_summary">Server name or IP</string>
+    <string name="use_port">Use Port?</string>
+    <string name="use_authentication">Use Authentication?</string>
+    <string name="connect">Connect</string>
+    <string name="port">Port</string>
+    <string name="preferences">MPD Server Settings</string>
 </resources>

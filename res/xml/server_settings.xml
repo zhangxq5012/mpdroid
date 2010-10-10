@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference android:key="server"
+                        android:singleLine="true"
+                        android:defaultValue="server"
+                        android:title="@string/server"
+                        android:summary="@string/server_summary"
+            />
+
+    <CheckBoxPreference android:key="use_port"
+                        android:defaultValue="false"
+                        android:title="@string/use_port"
+            />
+    <EditTextPreference android:key="port"
+                        android:defaultValue="6600"
+                        android:title="@string/port"
+                        android:dependency="use_port"
+            />
+    <CheckBoxPreference android:key="use_authentication"
+                        android:defaultValue="false"
+                        android:title="@string/use_authentication"
+            />
+    <EditTextPreference android:key="password"
+                        android:defaultValue=""
+                        android:password="true"
+                        android:singleLine="true"
+                        android:dependency="use_authentication"
+            />
+</PreferenceScreen>
