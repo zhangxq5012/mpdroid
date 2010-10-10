@@ -8,14 +8,18 @@ public class MpdAdapterDriver
 
     public static void main(String[] args)
     {
-        MpdAdapter adapter = new MpdAdapter();
-        adapter.connect("localhost", 6600, "dancured62");
-        System.out.println("Connected: " + adapter.isConnected());
-        adapter.disconnect();
+        final String server = "localhost";
+        System.out.println("Using authentication:");
+        MpdAdapterIF adapterIF = MpdAdapter.createAdapter();
+        adapterIF.connect(server, 6600, "dancured62");
+        System.out.println("Connected: " + adapterIF.isConnected());
+        adapterIF.disconnect();
 
-        adapter = new MpdAdapter();
-        adapter.connect("localhost");
-        System.out.println("Connected: " + adapter.isConnected());
-        adapter.disconnect();
+        System.out.println("No authentication:");
+        adapterIF = MpdAdapter.createAdapter();
+        adapterIF.connect(server);
+        System.out.println("Connected: " + adapterIF.isConnected());
+        System.out.println("Version: " + adapterIF.getServerVersion());
+        adapterIF.disconnect();
     }
 }

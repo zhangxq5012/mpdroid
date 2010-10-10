@@ -1,10 +1,11 @@
 <component name="libraryTable">
   <library name="libs">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/libs" />
+      <root url="jar://$PROJECT_DIR$/libs/javampd-3.3.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
-    <jarDirectory url="file://$PROJECT_DIR$/libs" recursive="false" />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/javampd-src.jar!/" />
+    </SOURCES>
   </library>
 </component>

@@ -24,6 +24,7 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
     private CheckBox useAuthenticationCheckbox;
     private Button connectButton;
     private MpdPreferences myPreferences;
+    private MpdAdapterIF mpdAdapterIF;
 
     /**
      * Called when the activity is first created.
@@ -33,6 +34,7 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.summary);
+        MpdAdapterIF mpdAdapterIF = MpdAdapter.createAdapter();
         myPreferences = new MpdPreferences(this);
         initializeWidgets();
         initializeListeners();
@@ -71,24 +73,24 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
     //todo: wrap in a thread
     private void connect()
     {
-        MpdAdapter mpdAdapter = new MpdAdapter();
         String server = myPreferences.getServer();
         int port = myPreferences.getPort();
         boolean useAuthentication = myPreferences.useAuthentication();
         if (useAuthentication)
         {
             String password = myPreferences.getPassword();
-            mpdAdapter.connect(server, port, password);
+            mpdAdapterIF.connect(server, port, password);
         } else
         {
-            mpdAdapter.connect(server);
+            mpdAdapterIF.connect(server);
         }
-        boolean connected = mpdAdapter.isConnected();
+        boolean connected = mpdAdapterIF.isConnected();
         String connectedText = connected ? "Connected to " + server + "!"
                 : "Unable to Connect to " + server + "!";
         Log.v(TAG, connectedText);
+        Log.v(TAG, "MPD Server version: " + mpdAdapterIF.getServerVersion());
         Toast.makeText(this, connectedText, Toast.LENGTH_SHORT);
-        mpdAdapter.disconnect();
+        mpdAdapterIF.disconnect();
     }
 
     @Override
@@ -108,5 +110,15 @@ public class MpDroidActivity extends Activity implements View.OnClickListener
         portTextView.setText(getText(R.string.port) + ": " + port);
         boolean useAuthentication = myPreferences.useAuthentication();
         useAuthenticationCheckbox.setChecked(useAuthentication);
+    }
+
+    /**
+     * For unit test.
+     *
+     * @return mpd adapter
+     */
+    MpdAdapterIF getMpdAdapterIF()
+    {
+        return mpdAdapterIF;
     }
 }
