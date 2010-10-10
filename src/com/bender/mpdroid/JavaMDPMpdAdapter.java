@@ -35,7 +35,8 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
                 MPDPlayer mpdPlayer = mpdService.getMPDPlayer();
                 status = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
             }
-        } catch (MPDException e)
+        }
+        catch (MPDException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
@@ -51,11 +52,13 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
             {
                 mpdService.getMPDPlayer().playNext();
             }
-        } catch (MPDConnectionException e)
+        }
+        catch (MPDConnectionException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDPlayerException e)
+        }
+        catch (MPDPlayerException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
@@ -70,11 +73,13 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
             {
                 mpdService.getMPDPlayer().playPrev();
             }
-        } catch (MPDConnectionException e)
+        }
+        catch (MPDConnectionException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDPlayerException e)
+        }
+        catch (MPDPlayerException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
@@ -89,11 +94,13 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
             {
                 mpdService = new MPD(server, port, password);
             }
-        } catch (UnknownHostException e)
+        }
+        catch (UnknownHostException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDConnectionException e)
+        }
+        catch (MPDConnectionException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
@@ -105,11 +112,13 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         try
         {
             mpdService = new MPD(server, port);
-        } catch (UnknownHostException e)
+        }
+        catch (UnknownHostException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDConnectionException e)
+        }
+        catch (MPDConnectionException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
@@ -121,11 +130,13 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
         try
         {
             mpdService = new MPD(server);
-        } catch (UnknownHostException e)
+        }
+        catch (UnknownHostException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDConnectionException e)
+        }
+        catch (MPDConnectionException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
@@ -140,11 +151,13 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
             {
                 mpdService.close();
             }
-        } catch (MPDConnectionException e)
+        }
+        catch (MPDConnectionException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDResponseException e)
+        }
+        catch (MPDResponseException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
@@ -183,21 +196,25 @@ public class JavaMDPMpdAdapter implements MpdAdapterIF
                 if (status.equals(MPDPlayer.PlayerStatus.STATUS_PLAYING))
                 {
                     mpdPlayer.pause();
-                } else
+                }
+                else
                 {
                     mpdPlayer.play();
                 }
                 playStatus = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
             }
-        } catch (MPDConnectionException e)
+        }
+        catch (MPDConnectionException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDPlayerException e)
+        }
+        catch (MPDPlayerException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);
-        } catch (MPDException e)
+        }
+        catch (MPDException e)
         {
             e.printStackTrace();
             Log.e(TAG, "", e);

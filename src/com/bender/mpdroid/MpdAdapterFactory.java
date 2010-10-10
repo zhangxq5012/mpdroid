@@ -36,7 +36,8 @@ public class MpdAdapterFactory
             Constructor<MpdAdapterIF> constructor = adapterClass.getConstructor();
             constructor.setAccessible(true);
             mpdAdapterIF = constructor.newInstance();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
             mpdAdapterIF = new NullMpdAdapter();

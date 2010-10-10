@@ -33,7 +33,8 @@ public class MpdPreferences
         if (usePort())
         {
             port = Integer.parseInt(sharedPreferences.getString("port", "6600"));
-        } else
+        }
+        else
         {
             port = getDefaultPort();
         }

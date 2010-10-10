@@ -170,10 +170,12 @@ public class MpDroidActivity extends Activity
             {
                 String password = myPreferences.getPassword();
                 mpdAdapterIF.connect(server, port, password);
-            } else if (usePort)
+            }
+            else if (usePort)
             {
                 mpdAdapterIF.connect(server, port);
-            } else
+            }
+            else
             {
                 mpdAdapterIF.connect(server);
             }
@@ -218,18 +220,22 @@ public class MpDroidActivity extends Activity
                 if (connected)
                 {
                     disconnect();
-                } else
+                }
+                else
                 {
                     connect();
                 }
-            } else if (view == playButton)
+            }
+            else if (view == playButton)
             {
                 play();
-            } else if (view == nextButton)
+            }
+            else if (view == nextButton)
             {
                 NextTask nextTask = new NextTask();
                 nextTask.execute();
-            } else if (view == prevButton)
+            }
+            else if (view == prevButton)
             {
                 PrevTask prevTask = new PrevTask();
                 prevTask.execute();
