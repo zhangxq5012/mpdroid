@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -75,6 +78,36 @@ public class MpDroidActivity extends Activity
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        boolean ret = true;
+        switch (item.getItemId())
+        {
+            case R.id.settings_menu:
+                openPreferences();
+                break;
+            default:
+                ret = super.onOptionsItemSelected(item);
+        }
+        return ret;
+    }
+
+    private void openPreferences()
+    {
+        Intent launchPreferencesIntent = new Intent();
+        launchPreferencesIntent.setClass(MpDroidActivity.this, MpDroidPreferenceActivity.class);
+        startActivityForResult(launchPreferencesIntent, REQUEST_PREFERENCES);
+    }
+
     private void updatePreferencesDisplay()
     {
         String server = myPreferences.getServer();
@@ -138,13 +171,12 @@ public class MpDroidActivity extends Activity
         {
             if (view == preferencesButton)
             {
-                Intent launchPreferencesIntent = new Intent();
-                launchPreferencesIntent.setClass(MpDroidActivity.this, MpDroidPreferenceActivity.class);
-                startActivityForResult(launchPreferencesIntent, REQUEST_PREFERENCES);
+                openPreferences();
             } else if (view == connectButton)
             {
                 connect();
             }
         }
+
     }
 }

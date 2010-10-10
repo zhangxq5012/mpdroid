@@ -8,13 +8,14 @@ public class MpdAdapterDriver
 
     public static void main(String[] args)
     {
-        final String server = "localhost";
+        final String server = "192.168.2.2";
         System.out.println("Using authentication:");
         MpdAdapterIF adapterIF = MpdAdapterFactory.createAdapter();
         adapterIF.connect(server, 6600, "dancured62");
         System.out.println("Connected: " + adapterIF.isConnected());
         adapterIF.disconnect();
 
+        System.out.println();
         System.out.println("No authentication:");
         adapterIF = MpdAdapterFactory.createAdapter();
         adapterIF.connect(server);

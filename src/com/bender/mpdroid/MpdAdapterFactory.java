@@ -22,6 +22,11 @@ public class MpdAdapterFactory
         adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, JavaMDPMpdAdapter.class.getName());
     }
 
+    /**
+     * Create a new instance of the #MpdAdapterIF instance.
+     *
+     * @return new instance or Null object if instantiation fails.
+     */
     public static MpdAdapterIF createAdapter()
     {
         MpdAdapterIF mpdAdapterIF;
