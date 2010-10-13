@@ -1,13 +1,18 @@
 package com.bender.mpdroid.mpdService;
 
 import junit.framework.TestCase;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.LinkedList;
+import java.util.Queue;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -22,15 +27,51 @@ public class MpdServerTest extends TestCase
     private BufferedReader bufferedReader;
     private SocketStreamProviderIF socketStreamProviderIF;
     public static final String VERSION = "MPD 0.15.0";
+    private Queue<String> commandQueue;
 
     @Override
     public void setUp() throws Exception
     {
-        socketStreamProviderIF = mock(SocketStreamProvider.class);
+        socketStreamProviderIF = new SocketStreamProviderIF()
+        {
+            private boolean connected;
+
+            public void connect(SocketAddress socketAddress) throws IOException
+            {
+                connected = true;
+            }
+
+            public BufferedReader getBufferedReader() throws IOException
+            {
+                return bufferedReader;
+            }
+
+            public BufferedWriter getBufferedWriter() throws IOException
+            {
+                return bufferedWriter;
+            }
+
+            public void disconnect() throws IOException
+            {
+                connected = false;
+            }
+
+            public boolean isConnected()
+            {
+                return connected;
+            }
+        };
         bufferedReader = mock(BufferedReader.class);
-        when(socketStreamProviderIF.getBufferedReader()).thenReturn(bufferedReader);
         bufferedWriter = mock(BufferedWriter.class);
-        when(socketStreamProviderIF.getBufferedWriter()).thenReturn(bufferedWriter);
+        commandQueue = new LinkedList<String>();
+        doAnswer(new Answer()
+        {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                commandQueue.offer((String) invocationOnMock.getArguments()[0]);
+                return null;
+            }
+        }).when(bufferedWriter).write(anyString());
         mpdServer = new MpdServer(socketStreamProviderIF);
         setServerResult(VERSION);
     }
@@ -40,7 +81,6 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME);
 
         SocketAddress socketAddress = new InetSocketAddress(HOSTNAME, MpdServer.DEFAULT_MPD_PORT);
-        verify(socketStreamProviderIF).connect(socketAddress);
         assertEquals(true, mpdServer.isConnected());
     }
 
@@ -49,7 +89,6 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME, PORT);
 
         SocketAddress socketAddress = new InetSocketAddress(HOSTNAME, PORT);
-        verify(socketStreamProviderIF).connect(socketAddress);
         assertEquals(true, mpdServer.isConnected());
     }
 
@@ -72,6 +111,18 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME);
         String version = mpdServer.getServerVersion();
         assertEquals(VERSION, version);
+    }
+
+    public void testPlay() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+        MpdPlayerAdapterIF player = mpdServer.getPlayer();
+
+        setServerResult(MpdServer.OK_RESPONSE);
+        player.playOrPause();
+
+        assertEquals(1, commandQueue.size());
+        assertEquals(MpdCommands.play.toString(), commandQueue.remove());
     }
 
     private void setServerResult(String version)

@@ -17,4 +17,6 @@ public interface SocketStreamProviderIF
     BufferedWriter getBufferedWriter() throws IOException;
 
     void disconnect() throws IOException;
+
+    boolean isConnected();
 }

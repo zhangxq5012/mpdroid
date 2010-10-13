@@ -1,5 +1,7 @@
 package com.bender.mpdroid.mpdService;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -14,13 +16,13 @@ public class MpdServer implements MpdServiceAdapterIF
     public static final int DEFAULT_MPD_PORT = 6600;
     public static final String OK_RESPONSE = "OK";
 
-    private boolean connected;
     private SocketStreamProviderIF socketProviderIF;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private String version;
     private MpdPlayerAdapterIF mpdPlayer;
     private MpdPlaylistAdapterIF playlist;
+    private static final String TAG = MpdServer.class.getSimpleName();
 
     public MpdServer()
     {
@@ -55,18 +57,18 @@ public class MpdServer implements MpdServiceAdapterIF
             String line = readLine();
             line = validateResponse(line);
             version = line.trim();
-            connected = true;
             mpdPlayer = new MpdPlayer();
         }
         catch (IOException e)
         {
             e.printStackTrace();
+            Log.e(TAG, "", e);
         }
     }
 
     private String validateResponse(String line) throws IOException
     {
-        boolean valid = line.startsWith(OK_RESPONSE);
+        boolean valid = line != null && line.startsWith(OK_RESPONSE);
         if (!valid)
         {
             throw new IOException("Server returned: " + line);
@@ -77,6 +79,14 @@ public class MpdServer implements MpdServiceAdapterIF
     private String readLine() throws IOException
     {
         return bufferedReader.readLine();
+    }
+
+    private void executeCommand(String command)
+            throws IOException
+    {
+        bufferedWriter.write(command);
+        bufferedWriter.newLine();
+        bufferedWriter.flush();
     }
 
     public void connect(String server, int port)
@@ -98,13 +108,14 @@ public class MpdServer implements MpdServiceAdapterIF
         catch (IOException e)
         {
             e.printStackTrace();
+            Log.e(TAG, "", e);
         }
         mpdPlayer = new NullPlayerAdapter();
     }
 
     public boolean isConnected()
     {
-        return connected;
+        return socketProviderIF.isConnected();
     }
 
     public String getServerVersion()
@@ -156,8 +167,19 @@ public class MpdServer implements MpdServiceAdapterIF
 
         public PlayStatus playOrPause()
         {
+            try
+            {
+                executeCommand(MpdCommands.play.toString());
+                validateResponse(readLine());
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                Log.e(TAG, "", e);
+            }
             return PlayStatus.Stopped;
         }
+
 
         public void stop()
         {
