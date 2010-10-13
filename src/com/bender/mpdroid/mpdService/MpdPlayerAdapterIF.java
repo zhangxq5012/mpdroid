@@ -17,7 +17,7 @@ public interface MpdPlayerAdapterIF
 
     Boolean toggleMute();
 
-    PlayStatus playOrPause();
+    void playOrPause();
 
     void stop();
 

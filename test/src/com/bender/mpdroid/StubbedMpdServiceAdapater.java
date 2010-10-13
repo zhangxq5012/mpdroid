@@ -63,7 +63,7 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
     {
         private Integer volume;
 
-        public PlayStatus playOrPause()
+        public void playOrPause()
         {
             return PlayStatus.Stopped;
         }

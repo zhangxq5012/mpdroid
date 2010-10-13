@@ -149,9 +149,8 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
         return muted;
     }
 
-    public MpdPlayerAdapterIF.PlayStatus playOrPause()
+    public void playOrPause()
     {
-        PlayStatus playStatus = PlayStatus.Stopped;
         try
         {
             MPDPlayer.PlayerStatus status = mpdPlayer.getStatus();
@@ -163,7 +162,6 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
             {
                 mpdPlayer.play();
             }
-            playStatus = JavaMDPPlayStatus.convertFromJavaMDPStatus(mpdPlayer.getStatus());
         }
         catch (MPDConnectionException e)
         {
@@ -180,7 +178,6 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
             e.printStackTrace();
             Log.e(TAG, "", e);
         }
-        return playStatus;
     }
 
     public void stop()

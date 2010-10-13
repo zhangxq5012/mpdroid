@@ -5,6 +5,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -16,27 +17,117 @@ public class MpdServer implements MpdServiceAdapterIF
     public static final int DEFAULT_MPD_PORT = 6600;
     public static final String OK_RESPONSE = "OK";
 
-    private SocketStreamProviderIF socketProviderIF;
-    private BufferedReader bufferedReader;
-    private BufferedWriter bufferedWriter;
     private String version;
     private MpdPlayerAdapterIF mpdPlayer;
     private MpdPlaylistAdapterIF playlist;
     private static final String TAG = MpdServer.class.getSimpleName();
+    private Pipe commandPipe;
+    private Pipe callbackPipe;
+
+    private static class Pipe
+    {
+        private BufferedReader reader;
+        private BufferedWriter writer;
+        private SocketStreamProviderIF streamProvider;
+
+        private Pipe(SocketStreamProviderIF socketStreamProviderIF)
+        {
+            streamProvider = socketStreamProviderIF;
+        }
+
+        public void connect(SocketAddress socketAddress) throws IOException
+        {
+            streamProvider.connect(socketAddress);
+            reader = streamProvider.getBufferedReader();
+            writer = streamProvider.getBufferedWriter();
+        }
+
+        public String readLine() throws IOException
+        {
+            return reader.readLine();
+        }
+
+        public void write(String command) throws IOException
+        {
+            writer.write(command);
+            writer.newLine();
+            writer.flush();
+        }
+
+        public void disconnect() throws IOException
+        {
+            streamProvider.disconnect();
+        }
+
+        public boolean isConnected()
+        {
+            return streamProvider.isConnected();
+        }
+    }
+
+    private class CallbackPipe implements Runnable
+    {
+        private SocketAddress address;
+        private boolean disconnected;
+
+        public CallbackPipe(SocketAddress theAddress)
+        {
+            address = theAddress;
+        }
+
+        public void run()
+        {
+            try
+            {
+                callbackPipe.connect(address);
+                String version = callbackPipe.readLine();
+                while (!disconnected)
+                {
+                    callbackPipe.write(MpdCommands.idle + " player");
+                    String changedLine = callbackPipe.readLine();
+                    String OKLine = callbackPipe.readLine();
+                    validateResponse(OKLine);
+                    playerUpdated();
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Callback method.
+     */
+    private void playerUpdated()
+    {
+        Log.v(TAG, "playerUpdated()");
+    }
 
     public MpdServer()
     {
-        this(new SocketStreamProvider());
+        this(SocketStreamProvider.class);
     }
 
     /**
      * For unit testing only
      *
-     * @param socketStreamProviderIF i/o
+     * @param socketStreamProviderIFClass
      */
-    MpdServer(SocketStreamProviderIF socketStreamProviderIF)
+    MpdServer(Class socketStreamProviderIFClass)
     {
-        socketProviderIF = socketStreamProviderIF;
+        try
+        {
+            Constructor constructor = socketStreamProviderIFClass.getConstructor();
+            SocketStreamProviderIF socketStreamProviderIF = (SocketStreamProviderIF) constructor.newInstance();
+            commandPipe = new Pipe(socketStreamProviderIF);
+            callbackPipe = new Pipe(socketStreamProviderIF);
+        }
+        catch (Exception e)
+        {
+            throw new ExceptionInInitializerError(e);
+        }
         mpdPlayer = new NullPlayerAdapter();
         playlist = new NullPlaylistAdapter();
     }
@@ -51,11 +142,7 @@ public class MpdServer implements MpdServiceAdapterIF
         SocketAddress socketAddress = new InetSocketAddress(server, port);
         try
         {
-            socketProviderIF.connect(socketAddress);
-            bufferedReader = socketProviderIF.getBufferedReader();
-            bufferedWriter = socketProviderIF.getBufferedWriter();
-            String line = readLine();
-            line = validateResponse(line);
+            String line = connect(commandPipe, socketAddress);
             version = line.trim();
             mpdPlayer = new MpdPlayer();
         }
@@ -66,6 +153,15 @@ public class MpdServer implements MpdServiceAdapterIF
         }
     }
 
+    private String connect(Pipe pipe, SocketAddress socketAddress)
+            throws IOException
+    {
+        pipe.connect(socketAddress);
+        String line = pipe.readLine();
+        line = validateResponse(line);
+        return line;
+    }
+
     private String validateResponse(String line) throws IOException
     {
         boolean valid = line != null && line.startsWith(OK_RESPONSE);
@@ -74,19 +170,6 @@ public class MpdServer implements MpdServiceAdapterIF
             throw new IOException("Server returned: " + line);
         }
         return line.substring(OK_RESPONSE.length());
-    }
-
-    private String readLine() throws IOException
-    {
-        return bufferedReader.readLine();
-    }
-
-    private void executeCommand(String command)
-            throws IOException
-    {
-        bufferedWriter.write(command);
-        bufferedWriter.newLine();
-        bufferedWriter.flush();
     }
 
     public void connect(String server, int port)
@@ -103,7 +186,8 @@ public class MpdServer implements MpdServiceAdapterIF
     {
         try
         {
-            socketProviderIF.disconnect();
+            callbackPipe.disconnect();
+            commandPipe.disconnect();
         }
         catch (IOException e)
         {
@@ -115,7 +199,7 @@ public class MpdServer implements MpdServiceAdapterIF
 
     public boolean isConnected()
     {
-        return socketProviderIF.isConnected();
+        return commandPipe.isConnected();
     }
 
     public String getServerVersion()
@@ -165,19 +249,18 @@ public class MpdServer implements MpdServiceAdapterIF
             return false;
         }
 
-        public PlayStatus playOrPause()
+        public void playOrPause()
         {
             try
             {
-                executeCommand(MpdCommands.play.toString());
-                validateResponse(readLine());
+                commandPipe.write(MpdCommands.play.toString());
+                validateResponse(commandPipe.readLine());
             }
             catch (IOException e)
             {
                 e.printStackTrace();
                 Log.e(TAG, "", e);
             }
-            return PlayStatus.Stopped;
         }
 
 

@@ -23,44 +23,14 @@ public class MpdServerTest extends TestCase
     private MpdServer mpdServer;
     public static final String HOSTNAME = "hostname";
     private static final int PORT = 6601;
-    private BufferedWriter bufferedWriter;
-    private BufferedReader bufferedReader;
-    private SocketStreamProviderIF socketStreamProviderIF;
+    private static BufferedWriter bufferedWriter;
+    private static BufferedReader bufferedReader;
     public static final String VERSION = "MPD 0.15.0";
     private Queue<String> commandQueue;
 
     @Override
     public void setUp() throws Exception
     {
-        socketStreamProviderIF = new SocketStreamProviderIF()
-        {
-            private boolean connected;
-
-            public void connect(SocketAddress socketAddress) throws IOException
-            {
-                connected = true;
-            }
-
-            public BufferedReader getBufferedReader() throws IOException
-            {
-                return bufferedReader;
-            }
-
-            public BufferedWriter getBufferedWriter() throws IOException
-            {
-                return bufferedWriter;
-            }
-
-            public void disconnect() throws IOException
-            {
-                connected = false;
-            }
-
-            public boolean isConnected()
-            {
-                return connected;
-            }
-        };
         bufferedReader = mock(BufferedReader.class);
         bufferedWriter = mock(BufferedWriter.class);
         commandQueue = new LinkedList<String>();
@@ -72,7 +42,7 @@ public class MpdServerTest extends TestCase
                 return null;
             }
         }).when(bufferedWriter).write(anyString());
-        mpdServer = new MpdServer(socketStreamProviderIF);
+        mpdServer = new MpdServer(MySocketStreamProviderIF.class);
         setServerResult(VERSION);
     }
 
@@ -129,5 +99,39 @@ public class MpdServerTest extends TestCase
             throws IOException
     {
         when(bufferedReader.readLine()).thenReturn("OK " + version);
+    }
+
+    public static class MySocketStreamProviderIF implements SocketStreamProviderIF
+    {
+        private boolean connected;
+
+        public MySocketStreamProviderIF()
+        {
+        }
+
+        public void connect(SocketAddress socketAddress) throws IOException
+        {
+            connected = true;
+        }
+
+        public BufferedReader getBufferedReader() throws IOException
+        {
+            return bufferedReader;
+        }
+
+        public BufferedWriter getBufferedWriter() throws IOException
+        {
+            return bufferedWriter;
+        }
+
+        public void disconnect() throws IOException
+        {
+            connected = false;
+        }
+
+        public boolean isConnected()
+        {
+            return connected;
+        }
     }
 }

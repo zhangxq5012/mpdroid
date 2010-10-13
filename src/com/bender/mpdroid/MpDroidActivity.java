@@ -338,7 +338,8 @@ public class MpDroidActivity extends Activity
         @Override
         protected MpdPlayerAdapterIF.PlayStatus doInBackground(Object... objects)
         {
-            return mpdPlayerAdapterIF.playOrPause();
+            mpdPlayerAdapterIF.playOrPause();
+            return mpdPlayerAdapterIF.getPlayStatus();
         }
 
         @Override

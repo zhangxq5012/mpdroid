@@ -5,5 +5,5 @@ package com.bender.mpdroid.mpdService;
  */
 public enum MpdCommands
 {
-    play
+    idle, play
 }
