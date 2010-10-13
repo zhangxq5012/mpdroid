@@ -1,6 +1,5 @@
 package com.bender.mpdroid.mpdService;
 
-import java.awt.image.ImagingOpException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -20,6 +19,8 @@ public class MpdServer implements MpdServiceAdapterIF
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private String version;
+    private MpdPlayerAdapterIF mpdPlayer;
+    private MpdPlaylistAdapterIF playlist;
 
     public MpdServer()
     {
@@ -34,6 +35,8 @@ public class MpdServer implements MpdServiceAdapterIF
     MpdServer(SocketStreamProviderIF socketStreamProviderIF)
     {
         socketProviderIF = socketStreamProviderIF;
+        mpdPlayer = new NullPlayerAdapter();
+        playlist = new NullPlaylistAdapter();
     }
 
     public void connect(String server, int port, String password)
@@ -53,6 +56,7 @@ public class MpdServer implements MpdServiceAdapterIF
             line = validateResponse(line);
             version = line.trim();
             connected = true;
+            mpdPlayer = new MpdPlayer();
         }
         catch (IOException e)
         {
@@ -60,12 +64,12 @@ public class MpdServer implements MpdServiceAdapterIF
         }
     }
 
-    private String validateResponse(String line)
+    private String validateResponse(String line) throws IOException
     {
         boolean valid = line.startsWith(OK_RESPONSE);
         if (!valid)
         {
-            throw new ImagingOpException("Server returned: " + line);
+            throw new IOException("Server returned: " + line);
         }
         return line.substring(OK_RESPONSE.length());
     }
@@ -87,6 +91,15 @@ public class MpdServer implements MpdServiceAdapterIF
 
     public void disconnect()
     {
+        try
+        {
+            socketProviderIF.disconnect();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        mpdPlayer = new NullPlayerAdapter();
     }
 
     public boolean isConnected()
@@ -96,21 +109,69 @@ public class MpdServer implements MpdServiceAdapterIF
 
     public String getServerVersion()
     {
-        return null;
+        return version;
     }
 
     public MpdPlayerAdapterIF getPlayer()
     {
-        return null;
+        return mpdPlayer;
     }
 
     public MpdPlaylistAdapterIF getPlaylist()
     {
-        return null;
+        return playlist;
     }
 
-    public String getVersion()
+    private class MpdPlayer implements MpdPlayerAdapterIF
     {
-        return version;
+        public PlayStatus getPlayStatus()
+        {
+            return PlayStatus.Stopped;
+        }
+
+        public void next()
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public void prev()
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public Integer setVolume(Integer volume)
+        {
+            return 0;
+        }
+
+        public Integer getVolume()
+        {
+            return 0;
+        }
+
+        public Boolean toggleMute()
+        {
+            return false;
+        }
+
+        public PlayStatus playOrPause()
+        {
+            return PlayStatus.Stopped;
+        }
+
+        public void stop()
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public MpdSongAdapterIF getCurrentSong()
+        {
+            return new NullSongAdapter();
+        }
+
+        public void addPlayerListener(MpdSongListener listener)
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
     }
 }

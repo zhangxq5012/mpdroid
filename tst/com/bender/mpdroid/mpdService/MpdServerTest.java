@@ -70,7 +70,7 @@ public class MpdServerTest extends TestCase
     public void testVersion() throws Exception
     {
         mpdServer.connect(HOSTNAME);
-        String version = mpdServer.getVersion();
+        String version = mpdServer.getServerVersion();
         assertEquals(VERSION, version);
     }
 

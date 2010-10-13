@@ -17,7 +17,7 @@ public class MpdAdapterFactory
 
     static
     {
-        adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, JavaMDPMpdServiceAdapter.class.getName());
+        adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, MpdServer.class.getName());
     }
 
     /**

@@ -34,4 +34,14 @@ public class SocketStreamProvider implements SocketStreamProviderIF
         }
         return new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
+
+    public void disconnect() throws IOException
+    {
+        if (socket == null)
+        {
+            throw new IllegalStateException("connect() must be called first");
+        }
+        socket.close();
+        socket = null;
+    }
 }

@@ -10,6 +10,6 @@ public class MpdServerDriver
         MpdServer mpdServer = new MpdServer();
         mpdServer.connect("localhost");
 
-        System.out.println("version: " + mpdServer.getVersion());
+        System.out.println("version: " + mpdServer.getServerVersion());
     }
 }
