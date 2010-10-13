@@ -7,7 +7,6 @@ import org.mockito.stubbing.Answer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -49,16 +48,12 @@ public class MpdServerTest extends TestCase
     public void testConnectWithHostname() throws Exception
     {
         mpdServer.connect(HOSTNAME);
-
-        SocketAddress socketAddress = new InetSocketAddress(HOSTNAME, MpdServer.DEFAULT_MPD_PORT);
         assertEquals(true, mpdServer.isConnected());
     }
 
     public void testConnectWithHostnameAndPort() throws Exception
     {
         mpdServer.connect(HOSTNAME, PORT);
-
-        SocketAddress socketAddress = new InetSocketAddress(HOSTNAME, PORT);
         assertEquals(true, mpdServer.isConnected());
     }
 
