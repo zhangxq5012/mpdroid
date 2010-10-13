@@ -82,7 +82,11 @@
             android:layout_height="wrap_content"
             />
     <TextView android:id="@+id/song_name"
-              android:text="@string/song_name"
+              android:textStyle="bold"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+            />
+    <TextView android:id="@+id/song_details"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
             />

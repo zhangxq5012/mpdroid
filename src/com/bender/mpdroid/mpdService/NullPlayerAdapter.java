@@ -20,6 +20,17 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
         Log.e(TAG, "stop() called on NULL object");
     }
 
+    public MpdSongAdapterIF getCurrentSong()
+    {
+        Log.e(TAG, "getCurrentSong() called on NULL object");
+        return new NullSongAdapter();
+    }
+
+    public void addPlayerListener(MpdSongListener listener)
+    {
+        Log.e(TAG, "addPlayerListener() called on NULL object");
+    }
+
     public PlayStatus getPlayStatus()
     {
         Log.e(TAG, "getPlayStatus() called on NULL object");

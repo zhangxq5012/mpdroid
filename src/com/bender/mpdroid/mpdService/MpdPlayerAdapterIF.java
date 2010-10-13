@@ -21,6 +21,10 @@ public interface MpdPlayerAdapterIF
 
     void stop();
 
+    MpdSongAdapterIF getCurrentSong();
+
+    void addPlayerListener(MpdSongListener listener);
+
     public enum PlayStatus
     {
         Playing,

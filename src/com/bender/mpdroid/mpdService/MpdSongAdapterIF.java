@@ -6,4 +6,8 @@ package com.bender.mpdroid.mpdService;
 public interface MpdSongAdapterIF
 {
     String getSongName();
+
+    String getArtist();
+
+    String getAlbumName();
 }

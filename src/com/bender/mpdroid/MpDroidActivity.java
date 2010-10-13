@@ -31,12 +31,12 @@ public class MpDroidActivity extends Activity
     private SeekBar volumeSeekBar;
     private Button muteButton;
     private TextView songNameTextView;
+    private TextView songDetailsTextView;
 
     private MpdPreferences myPreferences;
 
     private MpdServiceAdapterIF mpdServiceAdapterIF;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
-    private MpdPlaylistAdapterIF mpdPlaylistAdapterIF;
 
     /**
      * Called when the activity is first created.
@@ -67,6 +67,7 @@ public class MpDroidActivity extends Activity
         volumeSeekBar = (SeekBar) findViewById(R.id.volume);
         muteButton = (Button) findViewById(R.id.mute);
         songNameTextView = (TextView) findViewById(R.id.song_name);
+        songDetailsTextView = (TextView) findViewById(R.id.song_details);
     }
 
     private void initializeListeners()
@@ -204,6 +205,7 @@ public class MpDroidActivity extends Activity
             boolean connected = mpdServiceAdapterIF.isConnected();
 
             mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
+            mpdPlayerAdapterIF.addPlayerListener(new SongListener());
             MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
             publishProgress(playStatus);
 
@@ -223,7 +225,8 @@ public class MpDroidActivity extends Activity
         protected void onPostExecute(Boolean connected)
         {
             updateConnectedStatusOnUI(connected);
-            Toast.makeText(MpDroidActivity.this, makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
+            Toast.makeText(MpDroidActivity.this,
+                    makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -353,6 +356,8 @@ public class MpDroidActivity extends Activity
         protected Object doInBackground(Object... objects)
         {
             mpdPlayerAdapterIF.next();
+            GetSongTask getSongTask = new GetSongTask();
+            getSongTask.execute();
             return null;
         }
     }
@@ -433,16 +438,44 @@ public class MpDroidActivity extends Activity
         @Override
         protected MpdSongAdapterIF doInBackground(Object... objects)
         {
-            mpdPlaylistAdapterIF = mpdServiceAdapterIF.getPlaylist();
-            MpdSongAdapterIF currentSong = mpdPlaylistAdapterIF.getCurrentSong();
+            MpdSongAdapterIF currentSong = mpdPlayerAdapterIF.getCurrentSong();
             return currentSong;
         }
 
         @Override
         protected void onPostExecute(MpdSongAdapterIF mpdSongAdapterIF)
         {
-            String songName = mpdSongAdapterIF.getSongName();
-            songNameTextView.setText(getString(R.string.song_name) + ": " + songName);
+            updateSongOnUI(mpdSongAdapterIF);
+        }
+
+    }
+
+    private void updateSongOnUI(MpdSongAdapterIF mpdSongAdapterIF)
+    {
+        String songName = mpdSongAdapterIF.getSongName();
+        songNameTextView.setText(songName);
+        String artist = mpdSongAdapterIF.getArtist();
+        String album = mpdSongAdapterIF.getAlbumName();
+        String details = "";
+        if (artist != null && album != null)
+        {
+            details = "by " + artist + " from " + album;
+        }
+        songDetailsTextView.setText(details);
+    }
+
+    private class SongListener implements MpdSongListener
+    {
+        public void songUpdated(final MpdSongAdapterIF song)
+        {
+            Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
+                    updateSongOnUI(song);
+                }
+            };
+            runOnUiThread(runnable);
         }
     }
 }

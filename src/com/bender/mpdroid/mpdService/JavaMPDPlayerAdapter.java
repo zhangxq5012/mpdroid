@@ -7,6 +7,7 @@ import org.bff.javampd.events.PlayerChangeListener;
 import org.bff.javampd.exception.MPDConnectionException;
 import org.bff.javampd.exception.MPDException;
 import org.bff.javampd.exception.MPDPlayerException;
+import org.bff.javampd.objects.MPDSong;
 
 /**
  * JavaMPD implementation of #MpdPlayerAdapterIF
@@ -17,11 +18,19 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
 
     private MPDPlayer mpdPlayer;
     private boolean muted;
+    private JavaMPDPlayerChangeListener playerChangeListener;
+    private MPDSong currentSong;
+    private CurrentSongRunnable currentSongThread;
+    private MpdSongListener myListener;
 
     public JavaMPDPlayerAdapter(MPDPlayer mpdPlayer)
     {
         this.mpdPlayer = mpdPlayer;
-        this.mpdPlayer.addPlayerChangeListener(new JavaMPDPlayerChangeListener());
+        playerChangeListener = new JavaMPDPlayerChangeListener();
+        this.mpdPlayer.addPlayerChangeListener(playerChangeListener);
+        currentSongThread = new CurrentSongRunnable();
+        currentSongThread.start();
+        myListener = new NullMpdSongListener();
     }
 
     public PlayStatus getPlayStatus()
@@ -192,6 +201,44 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
         }
     }
 
+    public MpdSongAdapterIF getCurrentSong()
+    {
+        MpdSongAdapterIF songAdapterIF = new NullSongAdapter();
+        try
+        {
+            if (currentSong != null)
+            {
+                songAdapterIF = new JavaMPDSongAdapter(mpdPlayer.getCurrentSong());
+            }
+        }
+        catch (MPDConnectionException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+        catch (MPDPlayerException e)
+        {
+            e.printStackTrace();
+            Log.e(TAG, "", e);
+        }
+        return songAdapterIF;
+    }
+
+    public void addPlayerListener(MpdSongListener listener)
+    {
+        myListener = listener;
+    }
+
+    void cleanUp()
+    {
+        mpdPlayer.removePlayerChangedListener(playerChangeListener);
+        currentSongThread.disconnected = true;
+        currentSongThread.interrupt();
+        mpdPlayer = null;
+        currentSongThread = null;
+        currentSong = null;
+    }
+
     private static enum JavaMDPPlayStatus
     {
         Playing(MPDPlayer.PlayerStatus.STATUS_PLAYING, PlayStatus.Playing),
@@ -234,6 +281,54 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
                     muted = false;
                     break;
             }
+        }
+    }
+
+    private class CurrentSongRunnable extends Thread
+    {
+        private volatile boolean disconnected;
+
+        public void run()
+        {
+            while (!disconnected)
+            {
+                try
+                {
+                    Thread.sleep(1000L);
+                }
+                catch (InterruptedException e)
+                {
+                    Log.i(TAG, "interrupted");
+                }
+                if (disconnected)
+                {
+                    return;
+                }
+                try
+                {
+                    currentSong = mpdPlayer.getCurrentSong();
+                    myListener.songUpdated(new JavaMPDSongAdapter(currentSong));
+                }
+                catch (MPDConnectionException e)
+                {
+                    e.printStackTrace();
+                    Log.e(TAG, "", e);
+                }
+                catch (MPDPlayerException e)
+                {
+                    e.printStackTrace();
+                    Log.e(TAG, "", e);
+                }
+            }
+        }
+
+    }
+
+    private class NullMpdSongListener implements MpdSongListener
+    {
+        public void songUpdated(MpdSongAdapterIF song)
+        {
+            //no-op
         }
     }
 }

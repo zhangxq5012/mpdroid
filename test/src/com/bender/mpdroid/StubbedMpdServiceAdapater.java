@@ -1,9 +1,6 @@
 package com.bender.mpdroid;
 
-import com.bender.mpdroid.mpdService.MpdPlayerAdapterIF;
-import com.bender.mpdroid.mpdService.MpdPlaylistAdapterIF;
-import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
-import com.bender.mpdroid.mpdService.MpdSongAdapterIF;
+import com.bender.mpdroid.mpdService.*;
 
 /**
  * This is a stubbed mpd adapter. It is meant to be used for testing.
@@ -75,6 +72,15 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
         {
         }
 
+        public MpdSongAdapterIF getCurrentSong()
+        {
+            return null;
+        }
+
+        public void addPlayerListener(MpdSongListener listener)
+        {
+        }
+
         public PlayStatus getPlayStatus()
         {
             return PlayStatus.Stopped;
@@ -117,6 +123,16 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
             public String getSongName()
             {
                 return null;
+            }
+
+            public String getArtist()
+            {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            public String getAlbumName()
+            {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
         }
     }

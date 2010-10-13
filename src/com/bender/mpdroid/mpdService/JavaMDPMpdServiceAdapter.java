@@ -17,6 +17,7 @@ class JavaMDPMpdServiceAdapter implements MpdServiceAdapterIF
     private MPD mpdService;
     private static final String TAG = JavaMDPMpdServiceAdapter.class.getSimpleName();
     private boolean muted;
+    private JavaMPDPlayerAdapter mpdPlayer;
 
     public JavaMDPMpdServiceAdapter()
     {
@@ -100,7 +101,17 @@ class JavaMDPMpdServiceAdapter implements MpdServiceAdapterIF
             e.printStackTrace();
             Log.e(TAG, "", e);
         }
+        cleanUp();
         mpdService = null;
+    }
+
+    private synchronized void cleanUp()
+    {
+        if (mpdPlayer != null)
+        {
+            mpdPlayer.cleanUp();
+            mpdPlayer = null;
+        }
     }
 
     public boolean isConnected()
@@ -126,7 +137,14 @@ class JavaMDPMpdServiceAdapter implements MpdServiceAdapterIF
     {
         if (mpdService != null)
         {
-            return new JavaMPDPlayerAdapter(mpdService.getMPDPlayer());
+            synchronized (this)
+            {
+                if (mpdPlayer == null)
+                {
+                    mpdPlayer = new JavaMPDPlayerAdapter(mpdService.getMPDPlayer());
+                }
+            }
+            return mpdPlayer;
         }
         else
         {
@@ -136,15 +154,7 @@ class JavaMDPMpdServiceAdapter implements MpdServiceAdapterIF
 
     public MpdPlaylistAdapterIF getPlaylist()
     {
-        //todo: implement
-//        if (mpdService != null)
-//        {
-//            return new JavaMPDPlaylistAdapter(mpdService.getMPDPlaylist());
-//        }
-//        else
-//        {
         return new NullPlaylistAdapter();
-//        }
     }
 
 }
