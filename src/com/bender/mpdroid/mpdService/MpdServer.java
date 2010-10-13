@@ -1,10 +1,10 @@
 package com.bender.mpdroid.mpdService;
 
+import java.awt.image.ImagingOpException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketAddress;
 
 /**
@@ -13,25 +13,27 @@ import java.net.SocketAddress;
 public class MpdServer implements MpdServiceAdapterIF
 {
     public static final int DEFAULT_MPD_PORT = 6600;
+    public static final String OK_RESPONSE = "OK";
 
-    private Socket socket;
     private boolean connected;
-    private InputStream inputStream;
-    private OutputStream outputStream;
+    private SocketStreamProviderIF socketProviderIF;
+    private BufferedReader bufferedReader;
+    private BufferedWriter bufferedWriter;
+    private String version;
 
     public MpdServer()
     {
-        this(null);
+        this(new SocketStreamProvider());
     }
 
     /**
      * For unit testing only
      *
-     * @param socket
+     * @param socketStreamProviderIF i/o
      */
-    MpdServer(Socket socket)
+    MpdServer(SocketStreamProviderIF socketStreamProviderIF)
     {
-        this.socket = socket;
+        socketProviderIF = socketStreamProviderIF;
     }
 
     public void connect(String server, int port, String password)
@@ -44,19 +46,33 @@ public class MpdServer implements MpdServiceAdapterIF
         SocketAddress socketAddress = new InetSocketAddress(server, port);
         try
         {
-            if (socket == null)
-            {
-                socket = new Socket();
-            }
-            socket.connect(socketAddress);
-            connected = socket.isConnected();
-            inputStream = socket.getInputStream();
-            outputStream = socket.getOutputStream();
+            socketProviderIF.connect(socketAddress);
+            bufferedReader = socketProviderIF.getBufferedReader();
+            bufferedWriter = socketProviderIF.getBufferedWriter();
+            String line = readLine();
+            line = validateResponse(line);
+            version = line.trim();
+            connected = true;
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+    }
+
+    private String validateResponse(String line)
+    {
+        boolean valid = line.startsWith(OK_RESPONSE);
+        if (!valid)
+        {
+            throw new ImagingOpException("Server returned: " + line);
+        }
+        return line.substring(OK_RESPONSE.length());
+    }
+
+    private String readLine() throws IOException
+    {
+        return bufferedReader.readLine();
     }
 
     public void connect(String server, int port)
@@ -91,5 +107,10 @@ public class MpdServer implements MpdServiceAdapterIF
     public MpdPlaylistAdapterIF getPlaylist()
     {
         return null;
+    }
+
+    public String getVersion()
+    {
+        return version;
     }
 }
