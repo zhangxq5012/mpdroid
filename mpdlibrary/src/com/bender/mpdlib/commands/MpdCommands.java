@@ -16,5 +16,17 @@ public enum MpdCommands
     previous,
     random,
     repeat,
-    close, volume
+    close, volume;
+
+    public static MpdCommands parse(String value)
+    {
+        for (MpdCommands mpdCommands : values())
+        {
+            if (mpdCommands.equals(value))
+            {
+                return mpdCommands;
+            }
+        }
+        return null;
+    }
 }

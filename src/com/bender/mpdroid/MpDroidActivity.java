@@ -135,6 +135,10 @@ public class MpDroidActivity extends Activity
         portTextView.setText(getText(R.string.port) + ": " + port);
         boolean useAuthentication = myPreferences.useAuthentication();
         useAuthenticationCheckbox.setChecked(useAuthentication);
+        if (myPreferences.simulateMpdServer())
+        {
+            System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, SimulatedMpdServerAdapter.class.getName());
+        }
     }
 
     /**
@@ -205,7 +209,7 @@ public class MpDroidActivity extends Activity
             boolean connected = mpdServiceAdapterIF.isConnected();
 
             mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
-            mpdPlayerAdapterIF.addPlayerListener(new SongListener());
+            mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
             MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
             publishProgress(playStatus);
 

@@ -1,6 +1,4 @@
-package com.bender.mpdroid;
-
-import com.bender.mpdroid.mpdService.*;
+package com.bender.mpdroid.mpdService;
 
 /**
  * This is a stubbed mpd adapter. It is meant to be used for testing.
@@ -76,7 +74,7 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
             return null;
         }
 
-        public void addPlayerListener(MpdSongListener listener)
+        public void addSongChangeListener(MpdSongListener listener)
         {
         }
 

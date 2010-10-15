@@ -55,4 +55,9 @@ public class MpdPreferences
     {
         return DEFAULT_MPD_PORT;
     }
+
+    public boolean simulateMpdServer()
+    {
+        return sharedPreferences.getBoolean("simulate", false);
+    }
 }

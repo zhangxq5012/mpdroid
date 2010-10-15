@@ -221,7 +221,7 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
         return songAdapterIF;
     }
 
-    public void addPlayerListener(MpdSongListener listener)
+    public void addSongChangeListener(MpdSongListener listener)
     {
         myListener = listener;
     }

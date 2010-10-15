@@ -23,7 +23,7 @@ public interface MpdPlayerAdapterIF
 
     MpdSongAdapterIF getCurrentSong();
 
-    void addPlayerListener(MpdSongListener listener);
+    void addSongChangeListener(MpdSongListener listener);
 
     public enum PlayStatus
     {

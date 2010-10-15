@@ -14,6 +14,11 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
         mpdServer = new MpdServer();
     }
 
+    void setMpdServer(MpdServer mpdServer)
+    {
+        this.mpdServer = mpdServer;
+    }
+
     public void connect(String server, int port, String password)
     {
         mpdServer.connect(server, port, password);
@@ -93,7 +98,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
                 return new NullSongAdapter();
             }
 
-            public void addPlayerListener(MpdSongListener listener)
+            public void addSongChangeListener(MpdSongListener listener)
             {
                 //To change body of implemented methods use File | Settings | File Templates.
             }

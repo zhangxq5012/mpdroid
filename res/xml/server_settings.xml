@@ -29,4 +29,8 @@
                         android:singleLine="true"
                         android:dependency="use_authentication"
             />
+    <CheckBoxPreference android:key="simulate"
+                        android:defaultValue="false"
+                        android:title="Simulate Mpd Server"
+            />
 </PreferenceScreen>

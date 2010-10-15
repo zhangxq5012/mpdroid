@@ -25,9 +25,9 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
         return new NullSongAdapter();
     }
 
-    public void addPlayerListener(MpdSongListener listener)
+    public void addSongChangeListener(MpdSongListener listener)
     {
-        Log.e(TAG, "addPlayerListener() called on NULL object");
+        Log.e(TAG, "addSongChangeListener() called on NULL object");
     }
 
     public PlayStatus getPlayStatus()

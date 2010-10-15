@@ -28,7 +28,7 @@ public class MpdServer
     /**
      * For unit testing only
      */
-    MpdServer(SocketStreamProviderIF socketStreamProvider, SocketStreamProviderIF socketStreamProvider1)
+    public MpdServer(SocketStreamProviderIF socketStreamProvider, SocketStreamProviderIF socketStreamProvider1)
     {
         commandPipe = new Pipe(socketStreamProvider);
         callbackPipe = new Pipe(socketStreamProvider1);
