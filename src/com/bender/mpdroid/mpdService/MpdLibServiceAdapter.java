@@ -61,7 +61,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public void next()
             {
-                //To change body of implemented methods use File | Settings | File Templates.
+                mpdServer.next();
             }
 
             public void prev()
@@ -91,7 +91,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public void stop()
             {
-                //To change body of implemented methods use File | Settings | File Templates.
+                mpdServer.stop();
             }
 
             public MpdSongAdapterIF getCurrentSong()
