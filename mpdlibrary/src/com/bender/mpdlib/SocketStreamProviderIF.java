@@ -1,4 +1,4 @@
-package com.bender.mpdroid.mpdService;
+package com.bender.mpdlib;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

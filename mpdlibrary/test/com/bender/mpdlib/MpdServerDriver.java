@@ -1,4 +1,4 @@
-package com.bender.mpdroid.mpdService;
+package com.bender.mpdlib;
 
 /**
  * todo: replace with documentation
