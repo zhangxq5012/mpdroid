@@ -13,7 +13,7 @@ import java.util.List;
 public class MpdServer
 {
     public static final int DEFAULT_MPD_PORT = 6600;
-    public static final String OK_RESPONSE = "OK";
+    public static final String OK_RESPONSE = Response.OK.toString();
 
     private String version;
     private static final String TAG = MpdServer.class.getSimpleName();
@@ -80,9 +80,16 @@ public class MpdServer
     }
 
     private static <T> T runCommand(Command<T> command)
-            throws Exception
     {
-        return command.call();
+        try
+        {
+            return command.call();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void connect(String server, int port)
@@ -133,10 +140,8 @@ public class MpdServer
 
     /**
      * Callback method.
-     *
-     * @throws Exception exception
      */
-    private void playerUpdated() throws Exception
+    private void playerUpdated()
     {
         Result<List<StatusTuple>> listResult = runCommand(new GetStatusCommand(callbackPipe));
         processStatuses(listResult.result);
@@ -146,6 +151,16 @@ public class MpdServer
     public PlayStatus getPlayStatus()
     {
         return playState;
+    }
+
+    public void stop()
+    {
+        runCommand(new StopCommand(commandPipe));
+    }
+
+    public void next()
+    {
+        runCommand(new NextCommand(commandPipe));
     }
 
     private class CallbackPipe extends Thread

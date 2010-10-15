@@ -84,6 +84,7 @@ public class MpdServerTest extends TestCase
         assertEquals(true, commandQueue.contains(MpdCommands.play.toString()));
     }
 
+
     public void testDisconnect() throws Exception
     {
         mpdServer.connect(HOSTNAME);
@@ -108,6 +109,33 @@ public class MpdServerTest extends TestCase
         PlayStatus playStatus = mpdServer.getPlayStatus();
 
         assertEquals(PlayStatus.Paused, playStatus);
+    }
+
+    public void testStop() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+
+        commandStreamProvider.appendServerResult(Response.OK.toString());
+        mpdServer.stop();
+
+        assertLastCommandEquals(MpdCommands.stop.toString());
+    }
+
+    public void testNext() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+
+        commandStreamProvider.appendServerResult(Response.OK.toString());
+
+        mpdServer.next();
+
+        assertLastCommandEquals(MpdCommands.next.toString());
+    }
+
+    private void assertLastCommandEquals(String command)
+    {
+        List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
+        assertEquals(command, commandQueue.get(commandQueue.size() - 1));
     }
 
     private void setStatus(StringBuilder stringBuilder)

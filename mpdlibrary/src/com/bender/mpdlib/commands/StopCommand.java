@@ -5,10 +5,11 @@ import com.bender.mpdlib.Pipe;
 /**
  * todo: replace with documentation
  */
-public class PlayCommand extends BasicCommand
+public class StopCommand extends BasicCommand
 {
-    public PlayCommand(Pipe pipe)
+    public StopCommand(Pipe pipe)
     {
-        super(pipe, MpdCommands.play);
+        super(pipe, MpdCommands.stop);
     }
+
 }

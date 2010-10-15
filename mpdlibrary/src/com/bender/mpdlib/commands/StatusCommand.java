@@ -15,7 +15,7 @@ public abstract class StatusCommand extends Command<Status>
     }
 
     @Override
-    public Status readResult() throws IOException
+    public final Status readResult() throws IOException
     {
         String line = pipe.readLine();
         Status status = Status.parse(line);
