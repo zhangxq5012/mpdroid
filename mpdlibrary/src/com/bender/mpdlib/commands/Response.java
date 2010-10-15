@@ -6,5 +6,10 @@ package com.bender.mpdlib.commands;
 public enum Response
 {
     OK,
-    ACK
+    ACK;
+
+    public static boolean isResponseLine(String line)
+    {
+        return line.startsWith(Response.OK.toString()) || line.startsWith(Response.ACK.toString());
+    }
 }

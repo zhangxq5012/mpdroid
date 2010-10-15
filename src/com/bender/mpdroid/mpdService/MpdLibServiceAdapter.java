@@ -1,6 +1,7 @@
 package com.bender.mpdroid.mpdService;
 
 import com.bender.mpdlib.MpdServer;
+import com.bender.mpdlib.PlayStatus;
 
 /**
  * todo: replace with documentation
@@ -55,7 +56,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
         {
             public PlayStatus getPlayStatus()
             {
-                return PlayStatus.Stopped;
+                return MpdLibPlayStatus.convertPlayStatus(mpdServer.getPlayStatus());
             }
 
             public void next()
@@ -108,5 +109,33 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
     public MpdPlaylistAdapterIF getPlaylist()
     {
         return new NullPlaylistAdapter();
+    }
+
+    private static enum MpdLibPlayStatus
+    {
+        Playing(PlayStatus.Playing, MpdPlayerAdapterIF.PlayStatus.Playing),
+        Paused(PlayStatus.Paused, MpdPlayerAdapterIF.PlayStatus.Paused),
+        Stopped(PlayStatus.Stopped, MpdPlayerAdapterIF.PlayStatus.Stopped);
+
+        public final PlayStatus mpdLibStatus;
+        public final MpdPlayerAdapterIF.PlayStatus adapterStatus;
+
+        private MpdLibPlayStatus(PlayStatus playing, MpdPlayerAdapterIF.PlayStatus playing1)
+        {
+            mpdLibStatus = playing;
+            adapterStatus = playing1;
+        }
+
+        static MpdPlayerAdapterIF.PlayStatus convertPlayStatus(PlayStatus mpdLibPlayStatus)
+        {
+            for (MpdLibPlayStatus libPlayStatus : values())
+            {
+                if (libPlayStatus.mpdLibStatus.equals(mpdLibPlayStatus))
+                {
+                    return libPlayStatus.adapterStatus;
+                }
+            }
+            return null;
+        }
     }
 }

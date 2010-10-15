@@ -5,6 +5,7 @@ import com.bender.mpdlib.commands.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.List;
 
 /**
  * todo: replace with documentation
@@ -19,6 +20,8 @@ public class MpdServer
     private Pipe commandPipe;
     private Pipe callbackPipe;
     private CallbackPipe callbackThread;
+
+    private PlayStatus playState;
 
     public MpdServer()
     {
@@ -45,8 +48,14 @@ public class MpdServer
         try
         {
             ConnectCommand connectCommand = new ConnectCommand(commandPipe, socketAddress);
+
             Result<String> result = runCommand(connectCommand);
             version = result.result;
+
+            GetStatusCommand statusCommand = new GetStatusCommand(commandPipe);
+            Result<List<StatusTuple>> listResult = runCommand(statusCommand);
+            processStatuses(listResult.result);
+
 
             callbackThread = new CallbackPipe(socketAddress);
             callbackThread.start();
@@ -54,6 +63,19 @@ public class MpdServer
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private void processStatuses(List<StatusTuple> result)
+    {
+        for (StatusTuple statusTuple : result)
+        {
+            switch (statusTuple.first())
+            {
+                case state:
+                    playState = PlayStatus.parse(statusTuple.second());
+                    break;
+            }
         }
     }
 
@@ -111,9 +133,19 @@ public class MpdServer
 
     /**
      * Callback method.
+     *
+     * @throws Exception exception
      */
-    private void playerUpdated()
+    private void playerUpdated() throws Exception
     {
+        Result<List<StatusTuple>> listResult = runCommand(new GetStatusCommand(callbackPipe));
+        processStatuses(listResult.result);
+        // todo: notify listener
+    }
+
+    public PlayStatus getPlayStatus()
+    {
+        return playState;
     }
 
     private class CallbackPipe extends Thread

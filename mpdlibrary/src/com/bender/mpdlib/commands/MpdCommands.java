@@ -16,6 +16,7 @@ public enum MpdCommands
     previous,
     random,
     repeat,
+    status,
     close, volume;
 
     public static MpdCommands parse(String value)
