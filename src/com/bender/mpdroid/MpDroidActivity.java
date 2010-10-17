@@ -210,6 +210,7 @@ public class MpDroidActivity extends Activity
 
             mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
             mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
+            mpdPlayerAdapterIF.addPlayStatusListener(new PlayListener());
             MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
             publishProgress(playStatus);
 
@@ -478,6 +479,21 @@ public class MpDroidActivity extends Activity
                 public void run()
                 {
                     updateSongOnUI(song);
+                }
+            };
+            runOnUiThread(runnable);
+        }
+    }
+
+    private class PlayListener implements MpdPlayerAdapterIF.MpdPlayStatusListener
+    {
+        public void playStatusUpdated(final MpdPlayerAdapterIF.PlayStatus playStatus)
+        {
+            Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
+                    updatePlayStatusOnUI(playStatus);
                 }
             };
             runOnUiThread(runnable);

@@ -22,6 +22,7 @@ public class MpdServer
     private CallbackPipe callbackThread;
 
     private PlayStatus playState;
+    private PlayStatusListener myListener = new NullPlayStatusListener();
 
     public MpdServer()
     {
@@ -29,7 +30,20 @@ public class MpdServer
     }
 
     /**
-     * For unit testing only
+     * For testing only.
+     *
+     * @param socketStreamProviderIF stream provider to use for both pipes
+     */
+    public MpdServer(SocketStreamProviderIF socketStreamProviderIF)
+    {
+        this(socketStreamProviderIF, socketStreamProviderIF);
+    }
+
+    /**
+     * For testing only
+     *
+     * @param socketStreamProvider  stream provider for command pipe
+     * @param socketStreamProvider1 stream provider for callback pipe
      */
     public MpdServer(SocketStreamProviderIF socketStreamProvider, SocketStreamProviderIF socketStreamProvider1)
     {
@@ -145,7 +159,7 @@ public class MpdServer
     {
         Result<List<StatusTuple>> listResult = runCommand(new GetStatusCommand(callbackPipe));
         processStatuses(listResult.result);
-        // todo: notify listener
+        myListener.playStatusChanged();
     }
 
     public PlayStatus getPlayStatus()
@@ -161,6 +175,16 @@ public class MpdServer
     public void next()
     {
         runCommand(new NextCommand(commandPipe));
+    }
+
+    public void pause()
+    {
+        runCommand(new PauseCommand(commandPipe));
+    }
+
+    public void addPlayStatusListener(PlayStatusListener listener)
+    {
+        myListener = listener;
     }
 
     private class CallbackPipe extends Thread
@@ -211,6 +235,13 @@ public class MpdServer
                 e.printStackTrace();
             }
             super.interrupt();
+        }
+    }
+
+    private class NullPlayStatusListener implements PlayStatusListener
+    {
+        public void playStatusChanged()
+        {
         }
     }
 }

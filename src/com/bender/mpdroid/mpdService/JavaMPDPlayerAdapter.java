@@ -226,6 +226,11 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
         myListener = listener;
     }
 
+    public void addPlayStatusListener(MpdPlayStatusListener listener)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     void cleanUp()
     {
         mpdPlayer.removePlayerChangedListener(playerChangeListener);

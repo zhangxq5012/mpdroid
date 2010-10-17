@@ -78,6 +78,11 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
         {
         }
 
+        public void addPlayStatusListener(MpdPlayStatusListener listener)
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
         public PlayStatus getPlayStatus()
         {
             return PlayStatus.Stopped;

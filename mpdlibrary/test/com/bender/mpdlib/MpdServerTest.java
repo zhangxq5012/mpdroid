@@ -36,6 +36,7 @@ public class MpdServerTest extends TestCase
         callbackStreamProvider = new CallbackStreamProvider();
         mpdServer = new MpdServer(commandStreamProvider, callbackStreamProvider);
         commandStreamProvider.appendServerResult(Response.OK + " " + VERSION);
+        callbackStreamProvider.appendResponse(Response.OK + " " + VERSION);
         StringBuilder stringBuilder = new StringBuilder();
         setStatus(stringBuilder);
     }
@@ -132,6 +133,31 @@ public class MpdServerTest extends TestCase
         assertLastCommandEquals(MpdCommands.next.toString());
     }
 
+    public void testPlayListener() throws Exception
+    {
+        MyPlayStatusListener listener = new MyPlayStatusListener();
+        mpdServer.addPlayStatusListener(listener);
+
+        mpdServer.connect(HOSTNAME);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(MpdStatus.state).append(": ");
+        stringBuilder.append(PlayStatus.Playing.serverString);
+        callbackStreamProvider.appendResponse("changed: player");
+        callbackStreamProvider.appendResponse(Response.OK.toString());
+        callbackStreamProvider.appendResponse(stringBuilder.toString());
+        callbackStreamProvider.appendResponse(Response.OK.toString());
+
+        callbackStreamProvider.changeEvent();
+        synchronized (this)
+        {
+            wait(1000L);
+        }
+
+        assertEquals(true, listener.playStatusUpdated);
+        assertEquals(PlayStatus.Playing, listener.playStatus);
+    }
+
     private void assertLastCommandEquals(String command)
     {
         List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
@@ -220,6 +246,8 @@ public class MpdServerTest extends TestCase
     private class CallbackStreamProvider implements SocketStreamProviderIF
     {
         private boolean connected;
+        private BufferedReader reader;
+        private Queue<String> responseQueue = new LinkedList<String>();
 
         public void connect(SocketAddress socketAddress) throws IOException
         {
@@ -228,8 +256,15 @@ public class MpdServerTest extends TestCase
 
         public BufferedReader getBufferedReader() throws IOException
         {
-            BufferedReader mock = mock(BufferedReader.class);
-            return mock;
+            reader = mock(BufferedReader.class);
+            when(reader.readLine()).thenAnswer(new Answer<String>()
+            {
+                public String answer(InvocationOnMock invocationOnMock) throws Throwable
+                {
+                    return responseQueue.remove();
+                }
+            });
+            return reader;
         }
 
         public BufferedWriter getBufferedWriter() throws IOException
@@ -239,9 +274,12 @@ public class MpdServerTest extends TestCase
             {
                 public Object answer(InvocationOnMock invocationOnMock) throws Throwable
                 {
-                    synchronized (this)
+                    if (invocationOnMock.getArguments()[0].equals(MpdCommands.idle.toString()))
                     {
-                        wait();
+                        synchronized (this)
+                        {
+                            CallbackStreamProvider.this.wait();
+                        }
                     }
                     return null;
                 }
@@ -257,6 +295,31 @@ public class MpdServerTest extends TestCase
         public boolean isConnected()
         {
             return connected;
+        }
+
+        public void changeEvent()
+        {
+            synchronized (this)
+            {
+                notifyAll();
+            }
+        }
+
+        public void appendResponse(String string)
+        {
+            responseQueue.offer(string);
+        }
+    }
+
+    private class MyPlayStatusListener implements PlayStatusListener
+    {
+        private boolean playStatusUpdated;
+        private PlayStatus playStatus;
+
+        public void playStatusChanged()
+        {
+            playStatusUpdated = true;
+            playStatus = mpdServer.getPlayStatus();
         }
     }
 }

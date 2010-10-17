@@ -25,10 +25,20 @@ public interface MpdPlayerAdapterIF
 
     void addSongChangeListener(MpdSongListener listener);
 
+    void addPlayStatusListener(MpdPlayStatusListener listener);
+
     public enum PlayStatus
     {
         Playing,
         Paused,
         Stopped
+    }
+
+    /**
+     * todo: replace with documentation
+     */
+    interface MpdPlayStatusListener
+    {
+        void playStatusUpdated(PlayStatus playStatus);
     }
 }

@@ -30,6 +30,11 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
         Log.e(TAG, "addSongChangeListener() called on NULL object");
     }
 
+    public void addPlayStatusListener(MpdPlayStatusListener listener)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public PlayStatus getPlayStatus()
     {
         Log.e(TAG, "getPlayStatus() called on NULL object");

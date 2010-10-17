@@ -14,8 +14,6 @@ import java.util.StringTokenizer;
  */
 public class MpdServerSimulator
 {
-    private CommandStreamProvider commandStreamProviderIF;
-
     private PipedReader clientPipedReader;
     private BufferedWriter simBufferedWriter;
     private BufferedReader simBufferedReader;
@@ -26,8 +24,7 @@ public class MpdServerSimulator
 
     public SocketStreamProviderIF createMpdSocket()
     {
-        commandStreamProviderIF = new CommandStreamProvider();
-        return commandStreamProviderIF;
+        return new CommandStreamProvider();
     }
 
     private void process(String line) throws IOException
@@ -35,7 +32,23 @@ public class MpdServerSimulator
         StringTokenizer stringTokenizer = new StringTokenizer(line);
         MpdCommands command = MpdCommands.parse(stringTokenizer.nextToken());
         Log.v(TAG, "process(): " + command);
-        writeLine(Response.OK.toString());
+        switch (command)
+        {
+            case idle:
+                try
+                {
+                    wait(10000L);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                writeLine(Response.OK.toString());
+                break;
+            default:
+                writeLine(Response.OK.toString());
+        }
+        Log.v(TAG, "process DONE: " + command);
     }
 
     private void writeLine(String s) throws IOException
@@ -60,7 +73,7 @@ public class MpdServerSimulator
             simBufferedReader = new BufferedReader(simPipedReader);
             clientPipedWriter = new PipedWriter(simPipedReader);
             connected = true;
-            serverThread = new ServerThread();
+            serverThread = new ServerThread(this);
             serverThread.start();
             Log.v(TAG, "connect()");
         }
@@ -90,6 +103,13 @@ public class MpdServerSimulator
 
     private class ServerThread extends Thread
     {
+        private CommandStreamProvider provider;
+
+        public ServerThread(CommandStreamProvider commandStreamProvider)
+        {
+            provider = commandStreamProvider;
+        }
+
         @Override
         public void run()
         {
@@ -114,7 +134,7 @@ public class MpdServerSimulator
 
         private boolean connected()
         {
-            return commandStreamProviderIF.connected;
+            return provider.isConnected();
         }
     }
 

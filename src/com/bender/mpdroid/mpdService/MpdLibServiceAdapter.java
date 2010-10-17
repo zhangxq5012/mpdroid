@@ -1,7 +1,9 @@
 package com.bender.mpdroid.mpdService;
 
+import android.util.Log;
 import com.bender.mpdlib.MpdServer;
 import com.bender.mpdlib.PlayStatus;
+import com.bender.mpdlib.PlayStatusListener;
 
 /**
  * todo: replace with documentation
@@ -9,6 +11,7 @@ import com.bender.mpdlib.PlayStatus;
 public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 {
     private MpdServer mpdServer;
+    private static final String TAG = MpdLibServiceAdapter.class.getSimpleName();
 
     public MpdLibServiceAdapter()
     {
@@ -54,6 +57,8 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
     {
         return new MpdPlayerAdapterIF()
         {
+            public MpdPlayStatusListener playStatusListener = new NullMpdPlayStatusListener();
+
             public PlayStatus getPlayStatus()
             {
                 return MpdLibPlayStatus.convertPlayStatus(mpdServer.getPlayStatus());
@@ -66,7 +71,6 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public void prev()
             {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
 
             public Integer setVolume(Integer volume)
@@ -86,7 +90,16 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public void playOrPause()
             {
-                mpdServer.play();
+                switch (getPlayStatus())
+                {
+                    case Playing:
+                        mpdServer.pause();
+                        break;
+                    case Paused:
+                    case Stopped:
+                        mpdServer.play();
+                        break;
+                }
             }
 
             public void stop()
@@ -102,6 +115,40 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
             public void addSongChangeListener(MpdSongListener listener)
             {
                 //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            public void addPlayStatusListener(MpdPlayStatusListener listener)
+            {
+                playStatusListener = new PlayStatusWrapper(listener);
+                mpdServer.addPlayStatusListener((PlayStatusListener) playStatusListener);
+            }
+
+            class PlayStatusWrapper implements MpdPlayStatusListener, PlayStatusListener
+            {
+                private MpdPlayStatusListener theListener;
+
+                public PlayStatusWrapper(MpdPlayStatusListener listener)
+                {
+                    theListener = listener;
+                }
+
+                public void playStatusUpdated(PlayStatus playStatus)
+                {
+                    theListener.playStatusUpdated(playStatus);
+                }
+
+                public final void playStatusChanged()
+                {
+                    playStatusUpdated(getPlayStatus());
+                }
+            }
+
+            class NullMpdPlayStatusListener implements MpdPlayStatusListener
+            {
+                public void playStatusUpdated(PlayStatus playStatus)
+                {
+                    Log.v(TAG, "playStatusUpdated() on NULL object");
+                }
             }
         };
     }
@@ -138,4 +185,5 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
             return null;
         }
     }
+
 }
