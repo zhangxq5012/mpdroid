@@ -187,6 +187,11 @@ public class MpdServer
         myListener = listener;
     }
 
+    public void previous()
+    {
+        runCommand(new PreviousCommand(commandPipe));
+    }
+
     private class CallbackPipe extends Thread
     {
         private SocketAddress address;

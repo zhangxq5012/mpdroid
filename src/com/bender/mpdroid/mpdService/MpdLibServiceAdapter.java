@@ -71,6 +71,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public void prev()
             {
+                mpdServer.previous();
             }
 
             public Integer setVolume(Integer volume)

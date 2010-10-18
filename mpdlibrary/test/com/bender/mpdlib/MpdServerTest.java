@@ -133,6 +133,17 @@ public class MpdServerTest extends TestCase
         assertLastCommandEquals(MpdCommands.next.toString());
     }
 
+
+    public void testPrev() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+
+        commandStreamProvider.appendServerResult(Response.OK.toString());
+        mpdServer.previous();
+
+        assertLastCommandEquals(MpdCommands.previous.toString());
+    }
+
     public void testPlayListener() throws Exception
     {
         MyPlayStatusListener listener = new MyPlayStatusListener();
