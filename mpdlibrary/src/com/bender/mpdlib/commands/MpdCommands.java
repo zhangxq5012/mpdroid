@@ -23,7 +23,7 @@ public enum MpdCommands
     {
         for (MpdCommands mpdCommands : values())
         {
-            if (mpdCommands.equals(value))
+            if (mpdCommands.toString().equals(value))
             {
                 return mpdCommands;
             }

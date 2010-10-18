@@ -13,17 +13,18 @@ import java.util.List;
 public class MpdServer
 {
     public static final int DEFAULT_MPD_PORT = 6600;
+
+    @Deprecated
     public static final String OK_RESPONSE = Response.OK.toString();
 
     private String version;
-    private static final String TAG = MpdServer.class.getSimpleName();
     private Pipe commandPipe;
     private Pipe callbackPipe;
     private CallbackPipe callbackThread;
 
     private PlayStatus playState;
     private PlayStatusListener myListener = new NullPlayStatusListener();
-    private Integer volume;
+    private Integer volume = 0;
 
     public MpdServer()
     {

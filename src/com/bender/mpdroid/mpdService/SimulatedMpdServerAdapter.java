@@ -1,7 +1,7 @@
 package com.bender.mpdroid.mpdService;
 
 import com.bender.mpdlib.MpdServer;
-import com.bender.mpdroid.simulator.MpdServerSimulator;
+import com.bender.mpdlib.simulator.MpdServerSimulator;
 
 /**
  * todo: replace with documentation

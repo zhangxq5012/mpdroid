@@ -34,7 +34,7 @@ public class ConnectCommand extends Command<Result<String>>
         {
             version = line.substring(Response.OK.toString().length()).trim();
         }
-        Result result = new Result<String>();
+        Result<String> result = new Result<String>();
         result.status = status;
         result.result = version;
         return result;
