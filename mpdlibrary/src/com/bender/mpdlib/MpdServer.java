@@ -23,6 +23,7 @@ public class MpdServer
 
     private PlayStatus playState;
     private PlayStatusListener myListener = new NullPlayStatusListener();
+    private Integer volume;
 
     public MpdServer()
     {
@@ -89,6 +90,8 @@ public class MpdServer
                 case state:
                     playState = PlayStatus.parse(statusTuple.second());
                     break;
+                case volume:
+                    volume = Integer.parseInt(statusTuple.second());
             }
         }
     }
@@ -192,6 +195,11 @@ public class MpdServer
         runCommand(new PreviousCommand(commandPipe));
     }
 
+    public Integer getVolume()
+    {
+        return volume;
+    }
+
     private class CallbackPipe extends Thread
     {
         private SocketAddress address;
@@ -214,10 +222,17 @@ public class MpdServer
                 }
                 while (!disconnected)
                 {
-                    Result<String[]> idleResult = runCommand(new IdleCommand(callbackPipe, new String[]{"player"}));
+                    Result<List<Subsystem>> idleResult = runCommand(new IdleCommand(callbackPipe, new Subsystem[]{}));
                     if (idleResult.status.success)
                     {
-                        playerUpdated();
+                        List<Subsystem> result = idleResult.result;
+                        for (Subsystem subsystem : result)
+                        {
+                            if (subsystem.equals(Subsystem.player))
+                            {
+                                playerUpdated();
+                            }
+                        }
                     }
                 }
             }

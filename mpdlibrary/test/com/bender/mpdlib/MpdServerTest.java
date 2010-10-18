@@ -144,6 +144,22 @@ public class MpdServerTest extends TestCase
         assertLastCommandEquals(MpdCommands.previous.toString());
     }
 
+    public void testGetVolume() throws Exception
+    {
+        final Integer VOLUME = 75;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(MpdStatus.volume).append(": ");
+        stringBuilder.append(VOLUME);
+        commandStreamProvider.removeLastCommand();
+        setStatus(stringBuilder);
+
+        mpdServer.connect(HOSTNAME);
+
+        Integer volume = mpdServer.getVolume();
+
+        assertEquals(VOLUME, volume);
+    }
+
     public void testPlayListener() throws Exception
     {
         MyPlayStatusListener listener = new MyPlayStatusListener();
@@ -154,15 +170,19 @@ public class MpdServerTest extends TestCase
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(MpdStatus.state).append(": ");
         stringBuilder.append(PlayStatus.Playing.serverString);
-        callbackStreamProvider.appendResponse("changed: player");
+        callbackStreamProvider.appendResponse("changed: " + Subsystem.player);
         callbackStreamProvider.appendResponse(Response.OK.toString());
         callbackStreamProvider.appendResponse(stringBuilder.toString());
         callbackStreamProvider.appendResponse(Response.OK.toString());
 
+        synchronized (this)
+        {
+            wait(100L);
+        }
         callbackStreamProvider.changeEvent();
         synchronized (this)
         {
-            wait(1000L);
+            wait(100L);
         }
 
         assertEquals(true, listener.playStatusUpdated);
@@ -287,7 +307,7 @@ public class MpdServerTest extends TestCase
                 {
                     if (invocationOnMock.getArguments()[0].equals(MpdCommands.idle.toString()))
                     {
-                        synchronized (this)
+                        synchronized (CallbackStreamProvider.this)
                         {
                             CallbackStreamProvider.this.wait();
                         }

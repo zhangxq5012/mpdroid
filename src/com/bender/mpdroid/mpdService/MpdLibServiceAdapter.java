@@ -81,7 +81,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public Integer getVolume()
             {
-                return 0;
+                return mpdServer.getVolume();
             }
 
             public Boolean toggleMute()

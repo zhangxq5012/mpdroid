@@ -1,42 +1,50 @@
 package com.bender.mpdlib.commands;
 
 import com.bender.mpdlib.Pipe;
+import com.bender.mpdlib.Subsystem;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * todo: replace with documentation
  */
-public class IdleCommand extends Command<Result<String[]>>
+public class IdleCommand extends Command<Result<List<Subsystem>>>
 {
-    private String[] strings;
+    private Subsystem[] subsystems;
 
-    public IdleCommand(Pipe pipe, String[] strings)
+    public IdleCommand(Pipe pipe, Subsystem[] subsystems)
     {
         super(pipe);
-        this.strings = strings;
+        this.subsystems = subsystems;
     }
 
     @Override
     public void executeCommand() throws IOException
     {
-        StringBuffer arguments = new StringBuffer();
-        for (String string : strings)
+        StringBuffer arguments = new StringBuffer("");
+        for (Subsystem subsystem : subsystems)
         {
-            arguments.append(" ").append(string);
+            arguments.append(" ").append(subsystem.toString());
         }
         pipe.write(MpdCommands.idle.toString() + arguments.toString());
     }
 
     @Override
-    public Result<String[]> readResult() throws IOException
+    public Result<List<Subsystem>> readResult() throws IOException
     {
-        String changedLine = pipe.readLine();
-        String okLine = pipe.readLine();
-        Status status = Status.parse(okLine);
-        Result<String[]> result = new Result<String[]>();
+        String line;
+        List<Subsystem> ret = new ArrayList<Subsystem>();
+        while (!Response.isResponseLine(line = pipe.readLine()))
+        {
+            Subsystem subsystem = Subsystem.parse(line);
+            ret.add(subsystem);
+        }
+        Status status = Status.parse(line);
+        Result<List<Subsystem>> result = new Result<List<Subsystem>>();
         result.status = status;
-        result.result = new String[]{changedLine};
+        result.result = ret;
         return result;
     }
 }
