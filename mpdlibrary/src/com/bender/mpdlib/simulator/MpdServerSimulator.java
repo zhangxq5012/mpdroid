@@ -36,6 +36,7 @@ public class MpdServerSimulator
 
         public void connect(SocketAddress socketAddress) throws IOException
         {
+            System.out.println("connect(addr=" + socketAddress + ")");
             clientPipedReader = new PipedReader();
             PipedWriter simPipedWriter = new PipedWriter(clientPipedReader);
             simBufferedWriter = new BufferedWriter(simPipedWriter)
@@ -44,8 +45,11 @@ public class MpdServerSimulator
                 public void write(String s) throws IOException
                 {
                     super.write(s);
-                    super.newLine();
-                    super.flush();
+                    if (!s.equals("\n"))
+                    {
+                        newLine();
+                        flush();
+                    }
                 }
             };
             PipedReader simPipedReader = new PipedReader();
@@ -72,6 +76,10 @@ public class MpdServerSimulator
         {
             connected = false;
             serverThread.interrupt();
+            clientPipedReader.close();
+            clientPipedWriter.close();
+            simBufferedWriter.close();
+            simBufferedReader.close();
             System.out.println("disconnect()");
         }
 
@@ -90,7 +98,7 @@ public class MpdServerSimulator
 
         public ServerThread(CommandStreamProvider commandStreamProvider)
         {
-            super("Sim-" + count++);
+            super("Sim-" + count++ + ":");
             provider = commandStreamProvider;
             simBufferedReader = provider.simBufferedReader;
             simBufferedWriter = provider.simBufferedWriter;
@@ -99,9 +107,9 @@ public class MpdServerSimulator
         @Override
         public void run()
         {
-            try
+            while (connected())
             {
-                while (connected())
+                try
                 {
                     String line = simBufferedReader.readLine();
                     if (!connected())
@@ -110,20 +118,29 @@ public class MpdServerSimulator
                     }
                     process(line);
                 }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
 
         private void process(String line) throws IOException
         {
             StringTokenizer stringTokenizer = new StringTokenizer(line);
-            MpdCommands command = MpdCommands.parse(stringTokenizer.nextToken().trim());
-            System.out.println("process(): " + command);
+            String commandString = stringTokenizer.nextToken().trim();
+            MpdCommands command = MpdCommands.parse(commandString);
+            if (command == null)
+            {
+                simBufferedWriter.write(Response.ACK + " [5@0] {} unknown command \"" + commandString + "\"");
+                return;
+            }
+            System.out.println(getName() + "process(): " + command);
             switch (command)
             {
+                case close:
+                    provider.disconnect();
+                    break;
                 case idle:
                     IdleSimCommand idleSimCommand = new IdleSimCommand(simBufferedWriter);
                     idleSimCommand.run();
@@ -146,13 +163,50 @@ public class MpdServerSimulator
                     break;
                 default:
                     simBufferedWriter.write(Response.OK.toString());
+                    break;
             }
-            System.out.println("process DONE: " + command);
+            System.out.println(getName() + command + " DONE");
         }
 
         private boolean connected()
         {
             return provider.isConnected();
+        }
+    }
+
+    public static void main(String[] args) throws Exception
+    {
+        MpdServerSimulator mpdServerSimulator = new MpdServerSimulator();
+        SocketStreamProviderIF mpdSocket = mpdServerSimulator.createMpdSocket();
+
+        mpdSocket.connect(null);
+        BufferedWriter bufferedWriter = mpdSocket.getBufferedWriter();
+        final BufferedReader bufferedReader = mpdSocket.getBufferedReader();
+        Thread thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    while (true)
+                    {
+                        System.err.println(bufferedReader.readLine());
+                    }
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        while (true)
+        {
+            bufferedWriter.write(reader.readLine());
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
         }
     }
 
