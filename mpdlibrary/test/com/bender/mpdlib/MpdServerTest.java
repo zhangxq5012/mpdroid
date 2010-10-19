@@ -78,7 +78,7 @@ public class MpdServerTest extends TestCase
     {
         mpdServer.connect(HOSTNAME);
 
-        commandStreamProvider.appendServerResult(MpdServer.OK_RESPONSE);
+        commandStreamProvider.appendServerResult(Response.OK.toString());
         mpdServer.play();
 
         List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
@@ -90,7 +90,7 @@ public class MpdServerTest extends TestCase
     {
         mpdServer.connect(HOSTNAME);
 
-        commandStreamProvider.appendServerResult(MpdServer.OK_RESPONSE);
+        commandStreamProvider.appendServerResult(Response.OK.toString());
         mpdServer.disconnect();
 
         List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
@@ -160,6 +160,48 @@ public class MpdServerTest extends TestCase
         assertEquals(VOLUME, volume);
     }
 
+    public void testSetVolume() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+
+        Integer volume = 75;
+
+        commandStreamProvider.appendServerResult(Response.OK.toString());
+        mpdServer.setVolume(volume);
+
+        assertLastCommandEquals("setvol " + volume);
+    }
+
+    public void testVolumeListener() throws Exception
+    {
+        MyVolumeListener listener = new MyVolumeListener();
+        mpdServer.addVolumeListener(listener);
+
+        final Integer volume = 75;
+        mpdServer.connect(HOSTNAME);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(MpdStatus.volume).append(": ");
+        stringBuilder.append(volume);
+        callbackStreamProvider.appendResponse("changed: " + Subsystem.mixer);
+        callbackStreamProvider.appendResponse(Response.OK.toString());
+        callbackStreamProvider.appendResponse(stringBuilder.toString());
+        callbackStreamProvider.appendResponse(Response.OK.toString());
+
+        synchronized (this)
+        {
+            wait(100L);
+        }
+        callbackStreamProvider.changeEvent();
+        synchronized (this)
+        {
+            wait(100L);
+        }
+
+        assertEquals(true, listener.volumeChanged);
+        assertEquals(volume, listener.newVolume);
+    }
+
     public void testPlayListener() throws Exception
     {
         MyPlayStatusListener listener = new MyPlayStatusListener();
@@ -203,6 +245,18 @@ public class MpdServerTest extends TestCase
             commandStreamProvider.appendServerResult(s);
         }
         commandStreamProvider.appendServerResult(Response.OK.toString());
+    }
+
+    private static class MyVolumeListener implements VolumeListener
+    {
+        private boolean volumeChanged;
+        private Integer newVolume;
+
+        public void volumeChanged(Integer volume)
+        {
+            volumeChanged = true;
+            newVolume = volume;
+        }
     }
 
     public class CommandStreamProvider implements SocketStreamProviderIF

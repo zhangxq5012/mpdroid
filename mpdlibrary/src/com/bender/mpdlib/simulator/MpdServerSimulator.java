@@ -161,6 +161,10 @@ public class MpdServerSimulator
                     StopSimCommand stopSimCommand = new StopSimCommand(simBufferedWriter);
                     stopSimCommand.run();
                     break;
+                case setvol:
+                    VolumeSimCommand volumeSimCommand = new VolumeSimCommand(simBufferedWriter, stringTokenizer);
+                    volumeSimCommand.run();
+                    break;
                 default:
                     simBufferedWriter.write(Response.OK.toString());
                     break;

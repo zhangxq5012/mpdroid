@@ -14,5 +14,5 @@ public abstract class SimCommand
         this.writer = writer;
     }
 
-    protected abstract void run() throws Exception;
+    public abstract void run();
 }

@@ -23,6 +23,8 @@ public class StatusSimCommand extends SimCommand
         {
             StatusTuple statusTuple = PlayerSimCommand.getStatus();
             write(statusTuple);
+            statusTuple = VolumeSimCommand.getStatus();
+            write(statusTuple);
             writer.write(Response.OK.toString());
         }
         catch (Exception e)

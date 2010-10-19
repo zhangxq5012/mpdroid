@@ -211,6 +211,7 @@ public class MpDroidActivity extends Activity
             mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
             mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
             mpdPlayerAdapterIF.addPlayStatusListener(new PlayListener());
+            mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
             MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
             publishProgress(playStatus);
 
@@ -494,6 +495,21 @@ public class MpDroidActivity extends Activity
                 public void run()
                 {
                     updatePlayStatusOnUI(playStatus);
+                }
+            };
+            runOnUiThread(runnable);
+        }
+    }
+
+    private class UiVolumeListener implements MpdPlayerAdapterIF.MpdVolumeListener
+    {
+        public void volumeUpdated(final Integer volume)
+        {
+            Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
+                    volumeSeekBar.setProgress(volume);
                 }
             };
             runOnUiThread(runnable);

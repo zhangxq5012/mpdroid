@@ -231,6 +231,11 @@ class JavaMPDPlayerAdapter implements MpdPlayerAdapterIF
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public void addVolumeListener(MpdVolumeListener listener)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     void cleanUp()
     {
         mpdPlayer.removePlayerChangedListener(playerChangeListener);

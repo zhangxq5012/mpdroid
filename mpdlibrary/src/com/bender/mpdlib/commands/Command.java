@@ -19,8 +19,11 @@ public abstract class Command<T> implements Callable<T>
 
     public T call() throws Exception
     {
-        executeCommand();
-        return readResult();
+        synchronized (pipe)
+        {
+            executeCommand();
+            return readResult();
+        }
     }
 
     public abstract void executeCommand() throws IOException;

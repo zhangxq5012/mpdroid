@@ -4,6 +4,7 @@ import android.util.Log;
 import com.bender.mpdlib.MpdServer;
 import com.bender.mpdlib.PlayStatus;
 import com.bender.mpdlib.PlayStatusListener;
+import com.bender.mpdlib.VolumeListener;
 
 /**
  * todo: replace with documentation
@@ -76,7 +77,8 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public Integer setVolume(Integer volume)
             {
-                return 0;
+                mpdServer.setVolume(volume);
+                return null;
             }
 
             public Integer getVolume()
@@ -122,6 +124,17 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
             {
                 playStatusListener = new PlayStatusWrapper(listener);
                 mpdServer.addPlayStatusListener((PlayStatusListener) playStatusListener);
+            }
+
+            public void addVolumeListener(final MpdVolumeListener listener)
+            {
+                mpdServer.addVolumeListener(new VolumeListener()
+                {
+                    public void volumeChanged(Integer volume)
+                    {
+                        listener.volumeUpdated(volume);
+                    }
+                });
             }
 
             class PlayStatusWrapper implements MpdPlayStatusListener, PlayStatusListener

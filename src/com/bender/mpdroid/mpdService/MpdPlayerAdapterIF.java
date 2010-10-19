@@ -27,6 +27,8 @@ public interface MpdPlayerAdapterIF
 
     void addPlayStatusListener(MpdPlayStatusListener listener);
 
+    void addVolumeListener(MpdVolumeListener listener);
+
     public enum PlayStatus
     {
         Playing,
@@ -40,5 +42,10 @@ public interface MpdPlayerAdapterIF
     interface MpdPlayStatusListener
     {
         void playStatusUpdated(PlayStatus playStatus);
+    }
+
+    interface MpdVolumeListener
+    {
+        void volumeUpdated(Integer volume);
     }
 }
