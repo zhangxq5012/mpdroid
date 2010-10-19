@@ -5,8 +5,18 @@ package com.bender.mpdlib.commands;
  */
 public class Status
 {
-    public boolean success;
-    public String resultString;
+    private boolean success;
+    private String resultString;
+
+    public boolean isSuccessful()
+    {
+        return success;
+    }
+
+    public String getResultString()
+    {
+        return resultString;
+    }
 
     public static Status parse(String line)
     {

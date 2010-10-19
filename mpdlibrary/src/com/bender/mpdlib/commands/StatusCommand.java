@@ -7,11 +7,16 @@ import java.io.IOException;
 /**
  * todo: replace with documentation
  */
-public abstract class StatusCommand extends Command<Status>
+public abstract class StatusCommand<V> extends Command<V, Status>
 {
     public StatusCommand(Pipe pipe)
     {
         super(pipe);
+    }
+
+    public StatusCommand(Pipe pipe, V arg)
+    {
+        super(pipe, arg);
     }
 
     @Override

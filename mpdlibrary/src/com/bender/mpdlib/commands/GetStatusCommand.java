@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * todo: replace with documentation
  */
-public class GetStatusCommand extends Command<Result<List<StatusTuple>>>
+public class GetStatusCommand extends Command<NullArg, Result<List<StatusTuple>>>
 {
     public GetStatusCommand(Pipe pipe)
     {
@@ -18,13 +18,13 @@ public class GetStatusCommand extends Command<Result<List<StatusTuple>>>
     }
 
     @Override
-    public void executeCommand() throws IOException
+    protected void executeCommand(NullArg arg) throws IOException
     {
         pipe.write(MpdCommands.status.toString());
     }
 
     @Override
-    public Result<List<StatusTuple>> readResult() throws IOException
+    protected Result<List<StatusTuple>> readResult() throws IOException
     {
         List<StatusTuple> statuses = new ArrayList<StatusTuple>();
         String line;

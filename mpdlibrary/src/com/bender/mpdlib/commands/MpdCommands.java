@@ -7,17 +7,17 @@ public enum MpdCommands
 {
     idle,
     play,
-    crossfade,
-    currentsong,
     next,
     pause,
     stop,
-    ping,
     previous,
-    random,
-    repeat,
     status,
     close,
+    ping,
+    crossfade,
+    currentsong,
+    random,
+    repeat,
     setvol;
 
     public static MpdCommands parse(String value)

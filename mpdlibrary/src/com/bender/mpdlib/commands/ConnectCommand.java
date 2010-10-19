@@ -8,18 +8,15 @@ import java.net.SocketAddress;
 /**
  * todo: replace with documentation
  */
-public class ConnectCommand extends Command<Result<String>>
+public class ConnectCommand extends Command<SocketAddress, Result<String>>
 {
-    private SocketAddress address;
-
     public ConnectCommand(Pipe pipe, SocketAddress theAddress)
     {
-        super(pipe);
-        address = theAddress;
+        super(pipe, theAddress);
     }
 
     @Override
-    public void executeCommand() throws IOException
+    public void executeCommand(SocketAddress address) throws IOException
     {
         pipe.connect(address);
     }
@@ -30,7 +27,7 @@ public class ConnectCommand extends Command<Result<String>>
         String version = null;
         String line = pipe.readLine();
         Status status = Status.parse(line);
-        if (status.success)
+        if (status.isSuccessful())
         {
             version = line.substring(Response.OK.toString().length()).trim();
         }

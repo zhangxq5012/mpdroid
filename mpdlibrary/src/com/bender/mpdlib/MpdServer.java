@@ -18,11 +18,12 @@ public class MpdServer
     private String version;
     private Pipe commandPipe;
     private Pipe callbackPipe;
-    private CallbackPipe callbackThread;
+    private CallbackThread callbackThread;
     private Integer volume = 0;
     private VolumeListener volumeListener = new NullVolumeListener();
     private AtomicInteger ignoreVolumeUpdate = new AtomicInteger(0);
     private MpdPlayer player;
+    private static final String TAG = MpdServer.class.getSimpleName();
 
     public MpdServer()
     {
@@ -71,7 +72,7 @@ public class MpdServer
             processStatuses(listResult.result);
 
 
-            callbackThread = new CallbackPipe(socketAddress);
+            callbackThread = new CallbackThread(socketAddress);
             callbackThread.start();
         }
         catch (Exception e)
@@ -164,14 +165,14 @@ public class MpdServer
         volumeListener = listener;
     }
 
-    private class CallbackPipe extends Thread
+    private class CallbackThread extends Thread
     {
         private SocketAddress address;
         private volatile boolean disconnected;
 
-        public CallbackPipe(SocketAddress theAddress)
+        public CallbackThread(SocketAddress theAddress)
         {
-            super("MpdServer.CallbackPipe");
+            super("MpdServer.CallbackThread");
             address = theAddress;
         }
 
@@ -180,8 +181,9 @@ public class MpdServer
             try
             {
                 Result<String> connectResult = CommandRunner.runCommand(new ConnectCommand(callbackPipe, address));
-                if (!connectResult.status.success)
+                if (!connectResult.status.isSuccessful())
                 {
+                    System.out.println(TAG + "connect unsuccessful: " + connectResult.status.getResultString());
                     return;
                 }
                 while (!disconnected)
@@ -191,7 +193,7 @@ public class MpdServer
                     {
                         return;
                     }
-                    if (idleResult.status.success)
+                    if (idleResult.status.isSuccessful())
                     {
                         List<Subsystem> result = idleResult.result;
                         for (Subsystem subsystem : result)
@@ -206,6 +208,10 @@ public class MpdServer
                                     break;
                             }
                         }
+                    }
+                    else
+                    {
+                        System.out.println(TAG + "idle unsuccessful: " + idleResult.status.getResultString());
                     }
                 }
             }

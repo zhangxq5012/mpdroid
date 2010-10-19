@@ -7,7 +7,7 @@ import com.bender.mpdlib.commands.Command;
  */
 class CommandRunner
 {
-    public static <T> T runCommand(Command<T> command)
+    public static <K, T> T runCommand(Command<K, T> command)
     {
         try
         {

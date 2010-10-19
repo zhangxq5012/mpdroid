@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * todo: replace with documentation
  */
-public class BasicCommand extends StatusCommand
+public class BasicCommand extends StatusCommand<NullArg>
 {
     private MpdCommands command;
 
@@ -18,7 +18,7 @@ public class BasicCommand extends StatusCommand
     }
 
     @Override
-    public final void executeCommand() throws IOException
+    public final void executeCommand(NullArg nullArg) throws IOException
     {
         pipe.write(command.toString());
     }

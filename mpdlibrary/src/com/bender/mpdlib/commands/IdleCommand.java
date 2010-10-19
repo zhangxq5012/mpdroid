@@ -10,21 +10,23 @@ import java.util.List;
 /**
  * todo: replace with documentation
  */
-public class IdleCommand extends Command<Result<List<Subsystem>>>
+public class IdleCommand extends Command<Subsystem[], Result<List<Subsystem>>>
 {
-    private Subsystem[] subsystems;
+    public IdleCommand(Pipe pipe)
+    {
+        this(pipe, new Subsystem[]{});
+    }
 
     public IdleCommand(Pipe pipe, Subsystem[] subsystems)
     {
-        super(pipe);
-        this.subsystems = subsystems;
+        super(pipe, subsystems);
     }
 
     @Override
-    public void executeCommand() throws IOException
+    protected void executeCommand(Subsystem[] arg) throws IOException
     {
         StringBuffer arguments = new StringBuffer("");
-        for (Subsystem subsystem : subsystems)
+        for (Subsystem subsystem : arg)
         {
             arguments.append(" ").append(subsystem.toString());
         }
@@ -32,7 +34,7 @@ public class IdleCommand extends Command<Result<List<Subsystem>>>
     }
 
     @Override
-    public Result<List<Subsystem>> readResult() throws IOException
+    protected Result<List<Subsystem>> readResult() throws IOException
     {
         String line;
         List<Subsystem> ret = new ArrayList<Subsystem>();
