@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * todo: replace with documentation
@@ -23,6 +24,7 @@ public class MpdServer
     private PlayStatusListener myListener = new NullPlayStatusListener();
     private Integer volume = 0;
     private VolumeListener volumeListener = new NullVolumeListener();
+    private AtomicInteger ignoreVolumeUpdate = new AtomicInteger(0);
 
     public MpdServer()
     {
@@ -87,10 +89,25 @@ public class MpdServer
             switch (statusTuple.first())
             {
                 case state:
-                    playState = PlayStatus.parse(statusTuple.second());
+                    PlayStatus newPlayStatus = PlayStatus.parse(statusTuple.second());
+                    boolean changed = !newPlayStatus.equals(playState);
+                    if (changed)
+                    {
+                        playState = newPlayStatus;
+                        myListener.playStatusChanged();
+                    }
                     break;
                 case volume:
-                    volume = Integer.parseInt(statusTuple.second());
+                    Integer newVolume = Integer.parseInt(statusTuple.second());
+                    if (!newVolume.equals(volume))
+                    {
+                        volume = newVolume;
+                        if (ignoreVolumeUpdate.decrementAndGet() < 0)
+                        {
+                            ignoreVolumeUpdate.incrementAndGet();
+                            volumeListener.volumeChanged(volume);
+                        }
+                    }
             }
         }
     }
@@ -192,6 +209,7 @@ public class MpdServer
 
     public void setVolume(Integer volume)
     {
+        ignoreVolumeUpdate.incrementAndGet();
         runCommand(new SetVolumeCommand(commandPipe, volume));
     }
 
@@ -258,14 +276,12 @@ public class MpdServer
         {
             Result<List<StatusTuple>> listResult = runCommand(new GetStatusCommand(callbackPipe));
             processStatuses(listResult.result);
-            myListener.playStatusChanged();
         }
 
         private void volumeUpdated()
         {
             Result<List<StatusTuple>> listResult = runCommand(new GetStatusCommand(callbackPipe));
             processStatuses(listResult.result);
-            volumeListener.volumeChanged(volume);
         }
 
         @Override
