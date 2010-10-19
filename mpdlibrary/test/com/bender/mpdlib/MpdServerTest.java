@@ -79,7 +79,8 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME);
 
         commandStreamProvider.appendServerResult(Response.OK.toString());
-        mpdServer.play();
+        Player player = mpdServer.getPlayer();
+        player.play();
 
         List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
         assertEquals(true, commandQueue.contains(MpdCommands.play.toString()));
@@ -107,7 +108,8 @@ public class MpdServerTest extends TestCase
 
         mpdServer.connect(HOSTNAME);
 
-        PlayStatus playStatus = mpdServer.getPlayStatus();
+        Player player = mpdServer.getPlayer();
+        PlayStatus playStatus = player.getPlayStatus();
 
         assertEquals(PlayStatus.Paused, playStatus);
     }
@@ -117,7 +119,8 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME);
 
         commandStreamProvider.appendServerResult(Response.OK.toString());
-        mpdServer.stop();
+        Player player = mpdServer.getPlayer();
+        player.stop();
 
         assertLastCommandEquals(MpdCommands.stop.toString());
     }
@@ -127,8 +130,9 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME);
 
         commandStreamProvider.appendServerResult(Response.OK.toString());
+        Player player = mpdServer.getPlayer();
 
-        mpdServer.next();
+        player.next();
 
         assertLastCommandEquals(MpdCommands.next.toString());
     }
@@ -139,7 +143,8 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME);
 
         commandStreamProvider.appendServerResult(Response.OK.toString());
-        mpdServer.previous();
+        Player player = mpdServer.getPlayer();
+        player.previous();
 
         assertLastCommandEquals(MpdCommands.previous.toString());
     }
@@ -205,9 +210,10 @@ public class MpdServerTest extends TestCase
     public void testPlayListener() throws Exception
     {
         MyPlayStatusListener listener = new MyPlayStatusListener();
-        mpdServer.addPlayStatusListener(listener);
 
         mpdServer.connect(HOSTNAME);
+        Player player = mpdServer.getPlayer();
+        player.addPlayStatusListener(listener);
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(MpdStatus.state).append(": ");
@@ -404,7 +410,7 @@ public class MpdServerTest extends TestCase
         public void playStatusChanged()
         {
             playStatusUpdated = true;
-            playStatus = mpdServer.getPlayStatus();
+            playStatus = mpdServer.getPlayer().getPlayStatus();
         }
     }
 }

@@ -1,10 +1,7 @@
 package com.bender.mpdroid.mpdService;
 
 import android.util.Log;
-import com.bender.mpdlib.MpdServer;
-import com.bender.mpdlib.PlayStatus;
-import com.bender.mpdlib.PlayStatusListener;
-import com.bender.mpdlib.VolumeListener;
+import com.bender.mpdlib.*;
 
 /**
  * todo: replace with documentation
@@ -56,115 +53,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
     public MpdPlayerAdapterIF getPlayer()
     {
-        return new MpdPlayerAdapterIF()
-        {
-            public MpdPlayStatusListener playStatusListener = new NullMpdPlayStatusListener();
-
-            public PlayStatus getPlayStatus()
-            {
-                return MpdLibPlayStatus.convertPlayStatus(mpdServer.getPlayStatus());
-            }
-
-            public void next()
-            {
-                mpdServer.next();
-            }
-
-            public void prev()
-            {
-                mpdServer.previous();
-            }
-
-            public Integer setVolume(Integer volume)
-            {
-                mpdServer.setVolume(volume);
-                return null;
-            }
-
-            public Integer getVolume()
-            {
-                return mpdServer.getVolume();
-            }
-
-            public Boolean toggleMute()
-            {
-                return true;
-            }
-
-            public void playOrPause()
-            {
-                switch (getPlayStatus())
-                {
-                    case Playing:
-                        mpdServer.pause();
-                        break;
-                    case Paused:
-                    case Stopped:
-                        mpdServer.play();
-                        break;
-                }
-            }
-
-            public void stop()
-            {
-                mpdServer.stop();
-            }
-
-            public MpdSongAdapterIF getCurrentSong()
-            {
-                return new NullSongAdapter();
-            }
-
-            public void addSongChangeListener(MpdSongListener listener)
-            {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-
-            public void addPlayStatusListener(MpdPlayStatusListener listener)
-            {
-                playStatusListener = new PlayStatusWrapper(listener);
-                mpdServer.addPlayStatusListener((PlayStatusListener) playStatusListener);
-            }
-
-            public void addVolumeListener(final MpdVolumeListener listener)
-            {
-                mpdServer.addVolumeListener(new VolumeListener()
-                {
-                    public void volumeChanged(Integer volume)
-                    {
-                        listener.volumeUpdated(volume);
-                    }
-                });
-            }
-
-            class PlayStatusWrapper implements MpdPlayStatusListener, PlayStatusListener
-            {
-                private MpdPlayStatusListener theListener;
-
-                public PlayStatusWrapper(MpdPlayStatusListener listener)
-                {
-                    theListener = listener;
-                }
-
-                public void playStatusUpdated(PlayStatus playStatus)
-                {
-                    theListener.playStatusUpdated(playStatus);
-                }
-
-                public final void playStatusChanged()
-                {
-                    playStatusUpdated(getPlayStatus());
-                }
-            }
-
-            class NullMpdPlayStatusListener implements MpdPlayStatusListener
-            {
-                public void playStatusUpdated(PlayStatus playStatus)
-                {
-                    Log.v(TAG, "playStatusUpdated() on NULL object");
-                }
-            }
-        };
+        return new MyMpdPlayerAdapter(mpdServer.getPlayer());
     }
 
     public MpdPlaylistAdapterIF getPlaylist()
@@ -200,4 +89,120 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
         }
     }
 
+    private class MyMpdPlayerAdapter implements MpdPlayerAdapterIF
+    {
+        public MpdPlayStatusListener playStatusListener = new NullMpdPlayStatusListener();
+        private Player player;
+
+        public MyMpdPlayerAdapter(Player player)
+        {
+            this.player = player;
+        }
+
+
+        public PlayStatus getPlayStatus()
+        {
+            return MpdLibPlayStatus.convertPlayStatus(player.getPlayStatus());
+        }
+
+        public void next()
+        {
+            player.next();
+        }
+
+        public void prev()
+        {
+            player.previous();
+        }
+
+        public Integer setVolume(Integer volume)
+        {
+            mpdServer.setVolume(volume);
+            return null;
+        }
+
+        public Integer getVolume()
+        {
+            return mpdServer.getVolume();
+        }
+
+        public Boolean toggleMute()
+        {
+            return true;
+        }
+
+        public void playOrPause()
+        {
+            switch (getPlayStatus())
+            {
+                case Playing:
+                    player.pause();
+                    break;
+                case Paused:
+                case Stopped:
+                    player.play();
+                    break;
+            }
+        }
+
+        public void stop()
+        {
+            player.stop();
+        }
+
+        public MpdSongAdapterIF getCurrentSong()
+        {
+            return new NullSongAdapter();
+        }
+
+        public void addSongChangeListener(MpdSongListener listener)
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public void addPlayStatusListener(MpdPlayStatusListener listener)
+        {
+            playStatusListener = new PlayStatusWrapper(listener);
+            player.addPlayStatusListener((PlayStatusListener) playStatusListener);
+        }
+
+        public void addVolumeListener(final MpdVolumeListener listener)
+        {
+            mpdServer.addVolumeListener(new VolumeListener()
+            {
+                public void volumeChanged(Integer volume)
+                {
+                    listener.volumeUpdated(volume);
+                }
+            });
+        }
+
+        class PlayStatusWrapper implements MpdPlayStatusListener, PlayStatusListener
+        {
+            private MpdPlayStatusListener theListener;
+
+            public PlayStatusWrapper(MpdPlayStatusListener listener)
+            {
+                theListener = listener;
+            }
+
+            public void playStatusUpdated(PlayStatus playStatus)
+            {
+                theListener.playStatusUpdated(playStatus);
+            }
+
+            public final void playStatusChanged()
+            {
+                playStatusUpdated(getPlayStatus());
+            }
+        }
+
+        class NullMpdPlayStatusListener implements MpdPlayStatusListener
+        {
+            public void playStatusUpdated(PlayStatus playStatus)
+            {
+                Log.v(TAG, "playStatusUpdated() on NULL object");
+            }
+        }
+    }
 }

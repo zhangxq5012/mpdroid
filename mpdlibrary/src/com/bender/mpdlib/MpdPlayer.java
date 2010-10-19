@@ -1,67 +1,90 @@
 package com.bender.mpdlib;
 
+import com.bender.mpdlib.commands.*;
+
+import java.util.List;
+
 /**
  * todo: replace with documentation
  */
-public class MpdPlayer
+class MpdPlayer implements Player
 {
     private Pipe commandPipe;
-    private MpdServer mpdServer;
-    private static final String TAG = MpdPlayer.class.getSimpleName();
+    private PlayStatus playState;
+    private PlayStatusListener myListener = new NullPlayStatusListener();
 
-    public MpdPlayer(MpdServer mpdServer, Pipe commandPipe)
+    public MpdPlayer(Pipe commandPipe)
     {
-        this.mpdServer = mpdServer;
         this.commandPipe = commandPipe;
     }
 
-//    public PlayStatus getPlayStatus()
-//    {
-//        return PlayStatus.Stopped;
-//    }
-
-    public void next()
+    public void play()
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        try
+        {
+            CommandRunner.runCommand(new PlayCommand(commandPipe));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    public void prev()
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
-    public Integer setVolume(Integer volume)
+    public PlayStatus getPlayStatus()
     {
-        return 0;
+        return playState;
     }
-
-    public Integer getVolume()
-    {
-        return 0;
-    }
-
-    public Boolean toggleMute()
-    {
-        return false;
-    }
-
-    public void playOrPause()
-    {
-    }
-
 
     public void stop()
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        CommandRunner.runCommand(new StopCommand(commandPipe));
     }
 
-//    public MpdSongAdapterIF getCurrentSong()
-//    {
-//        return new NullSongAdapter();
-//    }
+    public void next()
+    {
+        CommandRunner.runCommand(new NextCommand(commandPipe));
+    }
 
-//    public void addPlayerListener(MpdSongListener listener)
-//    {
-    //To change body of implemented methods use File | Settings | File Templates.
-//    }
+    public void pause()
+    {
+        CommandRunner.runCommand(new PauseCommand(commandPipe));
+    }
+
+    public void addPlayStatusListener(PlayStatusListener listener)
+    {
+        myListener = listener;
+    }
+
+    public void previous()
+    {
+        CommandRunner.runCommand(new PreviousCommand(commandPipe));
+    }
+
+    void processStatus(List<StatusTuple> statusTupleList)
+    {
+        for (StatusTuple statusTuple : statusTupleList)
+        {
+            switch (statusTuple.first())
+            {
+                case state:
+                    PlayStatus newPlayStatus = PlayStatus.parse(statusTuple.second());
+                    boolean changed = !newPlayStatus.equals(playState);
+                    if (changed)
+                    {
+                        playState = newPlayStatus;
+                        myListener.playStatusChanged();
+                    }
+                    break;
+            }
+        }
+    }
+
+    private class NullPlayStatusListener implements PlayStatusListener
+    {
+        public void playStatusChanged()
+        {
+            System.out.println(getClass().getSimpleName() + "playStatusChanged()");
+        }
+    }
 }

@@ -19,12 +19,10 @@ public class MpdServer
     private Pipe commandPipe;
     private Pipe callbackPipe;
     private CallbackPipe callbackThread;
-
-    private PlayStatus playState;
-    private PlayStatusListener myListener = new NullPlayStatusListener();
     private Integer volume = 0;
     private VolumeListener volumeListener = new NullVolumeListener();
     private AtomicInteger ignoreVolumeUpdate = new AtomicInteger(0);
+    private MpdPlayer player;
 
     public MpdServer()
     {
@@ -65,11 +63,11 @@ public class MpdServer
         {
             ConnectCommand connectCommand = new ConnectCommand(commandPipe, socketAddress);
 
-            Result<String> result = runCommand(connectCommand);
+            Result<String> result = CommandRunner.runCommand(connectCommand);
             version = result.result;
 
             GetStatusCommand statusCommand = new GetStatusCommand(commandPipe);
-            Result<List<StatusTuple>> listResult = runCommand(statusCommand);
+            Result<List<StatusTuple>> listResult = CommandRunner.runCommand(statusCommand);
             processStatuses(listResult.result);
 
 
@@ -84,19 +82,12 @@ public class MpdServer
 
     private void processStatuses(List<StatusTuple> result)
     {
+        getPlayer();
+        player.processStatus(result);
         for (StatusTuple statusTuple : result)
         {
             switch (statusTuple.first())
             {
-                case state:
-                    PlayStatus newPlayStatus = PlayStatus.parse(statusTuple.second());
-                    boolean changed = !newPlayStatus.equals(playState);
-                    if (changed)
-                    {
-                        playState = newPlayStatus;
-                        myListener.playStatusChanged();
-                    }
-                    break;
                 case volume:
                     Integer newVolume = Integer.parseInt(statusTuple.second());
                     if (!newVolume.equals(volume))
@@ -112,18 +103,6 @@ public class MpdServer
         }
     }
 
-    private static <T> T runCommand(Command<T> command)
-    {
-        try
-        {
-            return command.call();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public void connect(String server, int port)
     {
@@ -139,7 +118,7 @@ public class MpdServer
     {
         try
         {
-            runCommand(new DisconnectCommand(commandPipe));
+            CommandRunner.runCommand(new DisconnectCommand(commandPipe));
             commandPipe.disconnect();
             callbackThread.interrupt();
         }
@@ -159,48 +138,15 @@ public class MpdServer
         return version;
     }
 
-    public void play()
+    public Player getPlayer()
     {
-        try
+        if (player == null)
         {
-            runCommand(new PlayCommand(commandPipe));
+            player = new MpdPlayer(commandPipe);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        return player;
     }
 
-
-    public PlayStatus getPlayStatus()
-    {
-        return playState;
-    }
-
-    public void stop()
-    {
-        runCommand(new StopCommand(commandPipe));
-    }
-
-    public void next()
-    {
-        runCommand(new NextCommand(commandPipe));
-    }
-
-    public void pause()
-    {
-        runCommand(new PauseCommand(commandPipe));
-    }
-
-    public void addPlayStatusListener(PlayStatusListener listener)
-    {
-        myListener = listener;
-    }
-
-    public void previous()
-    {
-        runCommand(new PreviousCommand(commandPipe));
-    }
 
     public Integer getVolume()
     {
@@ -210,7 +156,7 @@ public class MpdServer
     public void setVolume(Integer volume)
     {
         ignoreVolumeUpdate.incrementAndGet();
-        runCommand(new SetVolumeCommand(commandPipe, volume));
+        CommandRunner.runCommand(new SetVolumeCommand(commandPipe, volume));
     }
 
     public void addVolumeListener(VolumeListener listener)
@@ -233,14 +179,14 @@ public class MpdServer
         {
             try
             {
-                Result<String> connectResult = runCommand(new ConnectCommand(callbackPipe, address));
+                Result<String> connectResult = CommandRunner.runCommand(new ConnectCommand(callbackPipe, address));
                 if (!connectResult.status.success)
                 {
                     return;
                 }
                 while (!disconnected)
                 {
-                    Result<List<Subsystem>> idleResult = runCommand(new IdleCommand(callbackPipe, new Subsystem[]{}));
+                    Result<List<Subsystem>> idleResult = CommandRunner.runCommand(new IdleCommand(callbackPipe, new Subsystem[]{}));
                     if (disconnected)
                     {
                         return;
@@ -274,13 +220,13 @@ public class MpdServer
          */
         private void playerUpdated()
         {
-            Result<List<StatusTuple>> listResult = runCommand(new GetStatusCommand(callbackPipe));
+            Result<List<StatusTuple>> listResult = CommandRunner.runCommand(new GetStatusCommand(callbackPipe));
             processStatuses(listResult.result);
         }
 
         private void volumeUpdated()
         {
-            Result<List<StatusTuple>> listResult = runCommand(new GetStatusCommand(callbackPipe));
+            Result<List<StatusTuple>> listResult = CommandRunner.runCommand(new GetStatusCommand(callbackPipe));
             processStatuses(listResult.result);
         }
 
@@ -300,12 +246,6 @@ public class MpdServer
         }
     }
 
-    private class NullPlayStatusListener implements PlayStatusListener
-    {
-        public void playStatusChanged()
-        {
-        }
-    }
 
     private class NullVolumeListener implements VolumeListener
     {
