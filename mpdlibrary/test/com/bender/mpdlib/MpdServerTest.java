@@ -3,19 +3,6 @@ package com.bender.mpdlib;
 import com.bender.mpdlib.commands.MpdCommands;
 import com.bender.mpdlib.commands.Response;
 import junit.framework.TestCase;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.net.SocketAddress;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 
 /**
  * todo: replace with documentation
@@ -26,14 +13,14 @@ public class MpdServerTest extends TestCase
     public static final String HOSTNAME = "hostname";
     private static final int PORT = 6601;
     public static final String VERSION = "MPD 0.15.0";
-    private CommandStreamProvider commandStreamProvider;
-    private CallbackStreamProvider callbackStreamProvider;
+    private MockCommandStreamProvider commandStreamProvider;
+    private MockCallbackStreamProvider callbackStreamProvider;
 
     @Override
     public void setUp() throws Exception
     {
-        commandStreamProvider = new CommandStreamProvider();
-        callbackStreamProvider = new CallbackStreamProvider();
+        commandStreamProvider = new MockCommandStreamProvider();
+        callbackStreamProvider = new MockCallbackStreamProvider();
         mpdServer = new MpdServer(commandStreamProvider, callbackStreamProvider);
         commandStreamProvider.appendServerResult(Response.OK + " " + VERSION);
         callbackStreamProvider.appendResponse(Response.OK + " " + VERSION);
@@ -82,8 +69,7 @@ public class MpdServerTest extends TestCase
         Player player = mpdServer.getPlayer();
         player.play();
 
-        List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
-        assertEquals(true, commandQueue.contains(MpdCommands.play.toString()));
+        assertLastCommandEquals(MpdCommands.play.toString());
     }
 
 
@@ -94,8 +80,7 @@ public class MpdServerTest extends TestCase
         commandStreamProvider.appendServerResult(Response.OK.toString());
         mpdServer.disconnect();
 
-        List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
-        assertEquals(MpdCommands.close.toString(), commandQueue.get(commandQueue.size() - 1));
+        assertLastCommandEquals(MpdCommands.close.toString());
     }
 
     public void testStatus() throws Exception
@@ -239,8 +224,7 @@ public class MpdServerTest extends TestCase
 
     private void assertLastCommandEquals(String command)
     {
-        List<String> commandQueue = (List<String>) commandStreamProvider.commandQueue;
-        assertEquals(command, commandQueue.get(commandQueue.size() - 1));
+        commandStreamProvider.assertLastCommandEquals(command);
     }
 
     private void setStatus(StringBuilder stringBuilder)
@@ -262,143 +246,6 @@ public class MpdServerTest extends TestCase
         {
             volumeChanged = true;
             newVolume = volume;
-        }
-    }
-
-    public class CommandStreamProvider implements SocketStreamProviderIF
-    {
-        private BufferedWriter bufferedWriter;
-        private BufferedReader bufferedReader;
-        private Queue<String> commandQueue;
-        private Queue<String> responseQueue;
-
-        private boolean connected;
-
-        public CommandStreamProvider() throws IOException
-        {
-            bufferedReader = mock(BufferedReader.class);
-            bufferedWriter = mock(BufferedWriter.class);
-            commandQueue = new LinkedList<String>();
-            responseQueue = new LinkedList<String>();
-            when(bufferedReader.readLine()).thenAnswer(new Answer<String>()
-            {
-                public String answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    return responseQueue.remove();
-                }
-            });
-            doAnswer(new Answer()
-            {
-                public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    commandQueue.offer((String) invocationOnMock.getArguments()[0]);
-                    return null;
-                }
-            }).when(bufferedWriter).write(anyString());
-        }
-
-        public void connect(SocketAddress socketAddress) throws IOException
-        {
-            connected = true;
-        }
-
-        public BufferedReader getBufferedReader() throws IOException
-        {
-            return bufferedReader;
-        }
-
-        public BufferedWriter getBufferedWriter() throws IOException
-        {
-            return bufferedWriter;
-        }
-
-        public void disconnect() throws IOException
-        {
-            connected = false;
-        }
-
-        public boolean isConnected()
-        {
-            return connected;
-        }
-
-        public void appendServerResult(String s)
-        {
-            responseQueue.offer(s);
-        }
-
-        public void removeLastCommand()
-        {
-            List<String> list = (List<String>) responseQueue;
-            list.remove(list.size() - 1);
-        }
-    }
-
-    private class CallbackStreamProvider implements SocketStreamProviderIF
-    {
-        private boolean connected;
-        private BufferedReader reader;
-        private Queue<String> responseQueue = new LinkedList<String>();
-
-        public void connect(SocketAddress socketAddress) throws IOException
-        {
-            connected = true;
-        }
-
-        public BufferedReader getBufferedReader() throws IOException
-        {
-            reader = mock(BufferedReader.class);
-            when(reader.readLine()).thenAnswer(new Answer<String>()
-            {
-                public String answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    return responseQueue.remove();
-                }
-            });
-            return reader;
-        }
-
-        public BufferedWriter getBufferedWriter() throws IOException
-        {
-            BufferedWriter mock = mock(BufferedWriter.class);
-            doAnswer(new Answer()
-            {
-                public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    if (invocationOnMock.getArguments()[0].equals(MpdCommands.idle.toString()))
-                    {
-                        synchronized (CallbackStreamProvider.this)
-                        {
-                            CallbackStreamProvider.this.wait();
-                        }
-                    }
-                    return null;
-                }
-            }).when(mock).write(anyString());
-            return mock;
-        }
-
-        public void disconnect() throws IOException
-        {
-            connected = false;
-        }
-
-        public boolean isConnected()
-        {
-            return connected;
-        }
-
-        public void changeEvent()
-        {
-            synchronized (this)
-            {
-                notifyAll();
-            }
-        }
-
-        public void appendResponse(String string)
-        {
-            responseQueue.offer(string);
         }
     }
 
