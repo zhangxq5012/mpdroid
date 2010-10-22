@@ -165,8 +165,11 @@ public class MpdServerSimulator
                     VolumeSimCommand volumeSimCommand = new VolumeSimCommand(simBufferedWriter, stringTokenizer);
                     volumeSimCommand.run();
                     break;
-                default:
+                case ping:
                     simBufferedWriter.write(Response.OK.toString());
+                    break;
+                default:
+                    simBufferedWriter.write(Response.ACK + "[5@0] \"" + commandString + "\" not implemented");
                     break;
             }
             System.out.println(getName() + command + " DONE");
@@ -184,7 +187,7 @@ public class MpdServerSimulator
         SocketStreamProviderIF mpdSocket = mpdServerSimulator.createMpdSocket();
 
         mpdSocket.connect(null);
-        BufferedWriter bufferedWriter = mpdSocket.getBufferedWriter();
+        final BufferedWriter bufferedWriter = mpdSocket.getBufferedWriter();
         final BufferedReader bufferedReader = mpdSocket.getBufferedReader();
         Thread thread = new Thread()
         {
@@ -193,9 +196,10 @@ public class MpdServerSimulator
             {
                 try
                 {
-                    while (true)
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null)
                     {
-                        System.err.println(bufferedReader.readLine());
+                        System.err.println(line);
                     }
                 }
                 catch (IOException e)
@@ -205,13 +209,34 @@ public class MpdServerSimulator
             }
         };
         thread.start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        while (true)
+        Runnable runnable = new Runnable()
         {
-            bufferedWriter.write(reader.readLine());
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        }
+            BufferedReader reader;
+
+            public void run()
+            {
+                reader = new BufferedReader(new InputStreamReader(System.in));
+                String line;
+                try
+                {
+                    while ((line = reader.readLine()) != null)
+                    {
+                        bufferedWriter.write(line);
+                        bufferedWriter.newLine();
+                        bufferedWriter.flush();
+                    }
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread readThread = new Thread(runnable);
+        readThread.start();
+
+        thread.join();
+        System.exit(0);
     }
 
 }

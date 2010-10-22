@@ -217,7 +217,10 @@ public class MpdServer
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                if (!disconnected)
+                {
+                    e.printStackTrace();
+                }
             }
         }
 
