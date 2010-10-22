@@ -10,15 +10,18 @@ import java.io.PrintWriter;
  */
 public class CurrentSongSimCommand extends SimCommand
 {
-    public CurrentSongSimCommand(PrintWriter simBufferedWriter)
+    private Playlist playlist;
+
+    public CurrentSongSimCommand(PrintWriter simBufferedWriter, Playlist playlist)
     {
         super(simBufferedWriter);
+        this.playlist = playlist;
     }
 
     @Override
     public void run() throws Exception
     {
-        SongInfo currentSong = Playlist.getCurrentSong();
+        SongInfo currentSong = playlist.getCurrentSong();
         for (SongInfo.SongAttributeType songAttributeType : SongInfo.SongAttributeType.values())
         {
             String value = currentSong.getValue(songAttributeType);

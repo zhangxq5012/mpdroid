@@ -64,7 +64,7 @@ public class MpdServer
         {
             ConnectCommand connectCommand = new ConnectCommand(commandPipe, socketAddress);
 
-            Result<String> result = CommandRunner.runCommand(connectCommand);
+            Result<String> result = CommandRunner.callCommand(connectCommand);
             version = result.result;
 
             GetStatusCommand statusCommand = new GetStatusCommand(commandPipe);
@@ -87,10 +87,10 @@ public class MpdServer
         player.processStatus(result);
         for (StatusTuple statusTuple : result)
         {
-            switch (statusTuple.first())
+            switch (statusTuple.getStatus())
             {
                 case volume:
-                    Integer newVolume = Integer.parseInt(statusTuple.second());
+                    Integer newVolume = Integer.parseInt(statusTuple.getValue());
                     if (!newVolume.equals(volume))
                     {
                         volume = newVolume;
@@ -120,6 +120,8 @@ public class MpdServer
     {
         try
         {
+            player.disconnect();
+            player = null;
             CommandRunner.runCommand(new DisconnectCommand(commandPipe));
             commandPipe.disconnect();
             callbackThread.interrupt();
@@ -140,7 +142,7 @@ public class MpdServer
         return version;
     }
 
-    public Player getPlayer()
+    public synchronized Player getPlayer()
     {
         if (player == null)
         {
@@ -189,25 +191,19 @@ public class MpdServer
                 }
                 while (!disconnected)
                 {
-                    Result<List<Subsystem>> idleResult = CommandRunner.runCommand(new IdleCommand(callbackPipe, new Subsystem[]{}));
+                    Result<List<Subsystem>> idleResult = CommandRunner.runCommand(new IdleCommand(callbackPipe));
                     if (disconnected)
                     {
+                        System.out.println("CallbackThread disconnected");
                         return;
                     }
                     if (idleResult.status.isSuccessful())
                     {
+                        System.out.println("CallbackThread: idle successful");
                         List<Subsystem> result = idleResult.result;
-                        for (Subsystem subsystem : result)
+                        if (result.contains(Subsystem.mixer) || result.contains(Subsystem.player))
                         {
-                            switch (subsystem)
-                            {
-                                case player:
-                                    playerUpdated();
-                                    break;
-                                case mixer:
-                                    volumeUpdated();
-                                    break;
-                            }
+                            getAndProcessStatus();
                         }
                     }
                     else
@@ -220,23 +216,17 @@ public class MpdServer
             {
                 if (!disconnected)
                 {
-                    e.printStackTrace();
+                    System.out.println("CallbackThread ERROR" + e.getMessage());
+                    e.printStackTrace(System.out);
                 }
             }
+            System.out.println(TAG + "CallbackThread DONE");
         }
 
-        /**
-         * Callback method.
-         */
-        private void playerUpdated()
+        private void getAndProcessStatus()
         {
             Result<List<StatusTuple>> listResult = CommandRunner.runCommand(new GetStatusCommand(callbackPipe));
-            processStatuses(listResult.result);
-        }
-
-        private void volumeUpdated()
-        {
-            Result<List<StatusTuple>> listResult = CommandRunner.runCommand(new GetStatusCommand(callbackPipe));
+            System.out.println("CallbackThread.getAndProcessStatus " + listResult.result.size());
             processStatuses(listResult.result);
         }
 
@@ -246,6 +236,7 @@ public class MpdServer
             disconnected = true;
             try
             {
+//                CommandRunner.runCommand(new DisconnectCommand(callbackPipe));
                 callbackPipe.write(MpdCommands.close);
                 callbackPipe.disconnect();
             }

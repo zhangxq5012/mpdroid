@@ -191,9 +191,9 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
                 theListener.playStatusUpdated(playStatus);
             }
 
-            public final void playStatusChanged()
+            public void playStatusChanged(com.bender.mpdlib.PlayStatus playStatus)
             {
-                playStatusUpdated(getPlayStatus());
+                playStatusUpdated(MpdLibPlayStatus.convertPlayStatus(playStatus));
             }
         }
 

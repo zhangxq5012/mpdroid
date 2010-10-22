@@ -4,15 +4,14 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.*;
  */
 public class MockCommandStreamProvider implements SocketStreamProviderIF
 {
-    private BufferedWriter bufferedWriter;
+    private PrintWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private List<String> commandQueue;
     private Queue<String> responseQueue;
@@ -30,7 +29,7 @@ public class MockCommandStreamProvider implements SocketStreamProviderIF
     public MockCommandStreamProvider() throws IOException
     {
         bufferedReader = mock(BufferedReader.class);
-        bufferedWriter = mock(BufferedWriter.class);
+        bufferedWriter = mock(PrintWriter.class);
         commandQueue = new LinkedList<String>();
         responseQueue = new LinkedList<String>();
         when(bufferedReader.readLine()).thenAnswer(new Answer<String>()
@@ -47,7 +46,7 @@ public class MockCommandStreamProvider implements SocketStreamProviderIF
                 commandQueue.add((String) invocationOnMock.getArguments()[0]);
                 return null;
             }
-        }).when(bufferedWriter).write(anyString());
+        }).when(bufferedWriter).println(anyObject());
     }
 
     public void connect(SocketAddress socketAddress) throws IOException
@@ -60,7 +59,7 @@ public class MockCommandStreamProvider implements SocketStreamProviderIF
         return bufferedReader;
     }
 
-    public BufferedWriter getBufferedWriter() throws IOException
+    public PrintWriter getPrintWriter() throws IOException
     {
         return bufferedWriter;
     }

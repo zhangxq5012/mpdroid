@@ -23,7 +23,7 @@ public class Pipe
     {
         streamProvider.connect(socketAddress);
         reader = streamProvider.getBufferedReader();
-        writer = new PrintWriter(streamProvider.getBufferedWriter(), true);
+        writer = streamProvider.getPrintWriter();
     }
 
     public String readLine() throws IOException
@@ -43,6 +43,8 @@ public class Pipe
 
     public void disconnect() throws IOException
     {
+        reader.close();
+        writer.close();
         streamProvider.disconnect();
     }
 

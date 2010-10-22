@@ -14,8 +14,6 @@ public class MpdAdapterFactory
 
     public static final String MPD_ADAPTER_CLASSNAME_PROPERTY = "MPD_ADAPTER";
 
-    public static final String SIMULATED_ADAPTER = SimulatedMpdServerAdapter.class.getName();
-
     public static final String DEFAULT_ADAPTER = MpdLibServiceAdapter.class.getName();
 
     static

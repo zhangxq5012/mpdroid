@@ -15,6 +15,7 @@ class MpdPlayer implements Player
     private SongInfo currentSongInfo = new NullSongInfo();
     private Integer songId;
     private CurrentSongListener currentSongListener = new NullCurrentSongListener();
+    private static final String TAG = MpdPlayer.class.getSimpleName();
 
     public MpdPlayer(Pipe commandPipe)
     {
@@ -23,34 +24,31 @@ class MpdPlayer implements Player
 
     public void play()
     {
-        try
-        {
-            CommandRunner.runCommand(new PlayCommand(commandPipe));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        System.out.println(TAG + ": play()");
+        CommandRunner.runCommand(new PlayCommand(commandPipe));
     }
 
 
-    public PlayStatus getPlayStatus()
+    public synchronized PlayStatus getPlayStatus()
     {
         return playState;
     }
 
     public void stop()
     {
+        System.out.println(TAG + ": stop()");
         CommandRunner.runCommand(new StopCommand(commandPipe));
     }
 
     public void next()
     {
+        System.out.println(TAG + ": next()");
         CommandRunner.runCommand(new NextCommand(commandPipe));
     }
 
     public void pause()
     {
+        System.out.println(TAG + ": pause()");
         CommandRunner.runCommand(new PauseCommand(commandPipe));
     }
 
@@ -61,6 +59,7 @@ class MpdPlayer implements Player
 
     public void previous()
     {
+        System.out.println(TAG + ": previous()");
         CommandRunner.runCommand(new PreviousCommand(commandPipe));
     }
 
@@ -81,36 +80,65 @@ class MpdPlayer implements Player
             switch (statusTuple.first())
             {
                 case state:
-                    PlayStatus newPlayStatus = PlayStatus.parse(statusTuple.second());
-                    boolean changed = !newPlayStatus.equals(playState);
-                    if (changed)
-                    {
-                        playState = newPlayStatus;
-                        myListener.playStatusChanged();
-                    }
+                    stateUpdated(statusTuple);
                     break;
                 case songid:
-                    Integer newSongId = Integer.parseInt(statusTuple.getValue());
-                    if (!newSongId.equals(songId))
-                    {
-                        songId = newSongId;
-                        Result<SongInfo> result = CommandRunner.runCommand(new GetCurrentSongCommand(commandPipe));
-                        if (result.status.isSuccessful())
-                        {
-                            currentSongInfo = result.result;
-                            currentSongListener.songUpdated(currentSongInfo);
-                        }
-                    }
+                    songUpdated(statusTuple);
                     break;
             }
         }
     }
 
+    private void songUpdated(StatusTuple statusTuple)
+    {
+        Integer newSongId = Integer.parseInt(statusTuple.getValue());
+        boolean changed;
+        synchronized (this)
+        {
+            changed = !newSongId.equals(songId);
+            songId = newSongId;
+        }
+        if (changed)
+        {
+            songId = newSongId;
+            System.out.println(TAG + ": GetCurrentSongCommand");
+            Result<SongInfo> result = CommandRunner.runCommand(new GetCurrentSongCommand(commandPipe));
+            if (result.status.isSuccessful())
+            {
+                currentSongInfo = result.result;
+                currentSongListener.songUpdated(result.result);
+                System.out.println(TAG + ": songUpdated(): " + result.result.getValue(SongInfo.SongAttributeType.Id));
+            }
+        }
+    }
+
+    private void stateUpdated(StatusTuple statusTuple)
+    {
+        PlayStatus newPlayStatus = PlayStatus.parse(statusTuple.second());
+        boolean changed;
+        synchronized (this)
+        {
+            changed = !newPlayStatus.equals(playState);
+            playState = newPlayStatus;
+        }
+        if (changed)
+        {
+            myListener.playStatusChanged(newPlayStatus);
+            System.out.println(TAG + ": playStatusChanged: " + newPlayStatus);
+        }
+    }
+
+    public void disconnect()
+    {
+        myListener = new NullPlayStatusListener();
+        currentSongListener = new NullCurrentSongListener();
+    }
+
     private class NullPlayStatusListener implements PlayStatusListener
     {
-        public void playStatusChanged()
+        public void playStatusChanged(PlayStatus playStatus)
         {
-            System.out.println(getClass().getSimpleName() + "playStatusChanged()");
+            System.out.println(getClass().getSimpleName() + "playStatusChanged()" + playStatus);
         }
     }
 

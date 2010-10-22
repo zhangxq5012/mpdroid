@@ -12,18 +12,23 @@ import java.io.PrintWriter;
 public class StatusSimCommand extends SimCommand
 {
 
-    public StatusSimCommand(PrintWriter simBufferedWriter)
+    private SimPlayer simPlayer;
+    private Playlist playlist;
+
+    public StatusSimCommand(PrintWriter simBufferedWriter, SimPlayer simPlayer, Playlist playlist)
     {
         super(simBufferedWriter);
+        this.simPlayer = simPlayer;
+        this.playlist = playlist;
     }
 
     public void run() throws Exception
     {
-        StatusTuple statusTuple = PlayerSimCommand.getStatus();
+        StatusTuple statusTuple = simPlayer.getPlayStatus();
         write(statusTuple);
-        statusTuple = VolumeSimCommand.getStatus();
+        statusTuple = simPlayer.getVolumeStatus();
         write(statusTuple);
-        statusTuple = Playlist.getStatus();
+        statusTuple = playlist.getStatus();
         write(statusTuple);
         writer.println(Response.OK);
     }

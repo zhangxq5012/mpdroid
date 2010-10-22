@@ -1,10 +1,7 @@
 package com.bender.mpdlib.simulator.commands;
 
-import com.bender.mpdlib.MpdStatus;
 import com.bender.mpdlib.PlayStatus;
-import com.bender.mpdlib.Subsystem;
 import com.bender.mpdlib.commands.Response;
-import com.bender.mpdlib.commands.StatusTuple;
 
 import java.io.PrintWriter;
 
@@ -13,21 +10,20 @@ import java.io.PrintWriter;
  */
 public abstract class PlayerSimCommand extends SimCommand
 {
-    private static PlayStatus currentPlayStatus = PlayStatus.Stopped;
 
-    public PlayerSimCommand(PrintWriter writer)
+    private SimPlayer simPlayer;
+
+    public PlayerSimCommand(PrintWriter writer, SimPlayer simPlayer)
     {
         super(writer);
+        this.simPlayer = simPlayer;
     }
 
     public void run()
     {
         try
         {
-            if (updatePlayStatus(getPlayStatus()))
-            {
-                IdleSimCommand.subsystemUpdated(Subsystem.player);
-            }
+            updatePlayStatus(getPlayStatus());
             writer.println(Response.OK);
         }
         catch (Exception e)
@@ -36,18 +32,11 @@ public abstract class PlayerSimCommand extends SimCommand
         }
     }
 
-    private static synchronized boolean updatePlayStatus(PlayStatus playStatus)
+    private void updatePlayStatus(PlayStatus playStatus)
     {
-        boolean changed = !currentPlayStatus.equals(playStatus);
-        currentPlayStatus = playStatus;
-        return changed;
+        simPlayer.updatePlayStatus(playStatus);
     }
 
     protected abstract PlayStatus getPlayStatus();
-
-    public static synchronized StatusTuple getStatus()
-    {
-        return new StatusTuple(MpdStatus.state, currentPlayStatus.serverString);
-    }
 
 }

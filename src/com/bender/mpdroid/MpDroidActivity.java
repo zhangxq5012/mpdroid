@@ -204,16 +204,19 @@ public class MpDroidActivity extends Activity
             }
             boolean connected = mpdServiceAdapterIF.isConnected();
 
-            mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
-            mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
-            mpdPlayerAdapterIF.addPlayStatusListener(new PlayListener());
-            mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
-            MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
-            publishProgress(playStatus);
+            if (connected)
+            {
+                mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
+                mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
+                mpdPlayerAdapterIF.addPlayStatusListener(new PlayListener());
+                mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
+                MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
+                publishProgress(playStatus);
 
+                Log.v(TAG, "MPD Server version: " + mpdServiceAdapterIF.getServerVersion());
+            }
             String connectedText = makeConnectedText(server, connected);
             Log.v(TAG, connectedText);
-            Log.v(TAG, "MPD Server version: " + mpdServiceAdapterIF.getServerVersion());
             return connected;
         }
 

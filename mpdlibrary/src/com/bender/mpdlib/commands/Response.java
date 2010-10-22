@@ -10,6 +10,6 @@ public enum Response
 
     public static boolean isResponseLine(String line)
     {
-        return line.startsWith(Response.OK.toString()) || line.startsWith(Response.ACK.toString());
+        return line != null && (line.startsWith(Response.OK.toString()) || line.startsWith(Response.ACK.toString()));
     }
 }

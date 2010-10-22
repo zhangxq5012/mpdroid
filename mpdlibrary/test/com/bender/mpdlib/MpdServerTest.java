@@ -1,7 +1,7 @@
 package com.bender.mpdlib;
 
-import com.bender.mpdlib.commands.MpdCommands;
-import com.bender.mpdlib.commands.Response;
+import com.bender.mpdlib.simulator.MpdServerSimulator;
+import com.bender.mpdlib.simulator.commands.SubSystemSupport;
 import junit.framework.TestCase;
 
 /**
@@ -10,22 +10,31 @@ import junit.framework.TestCase;
 public class MpdServerTest extends TestCase
 {
     private MpdServer mpdServer;
-    public static final String HOSTNAME = "hostname";
+    public static final String HOSTNAME = "localhost";
     private static final int PORT = 6601;
-    public static final String VERSION = "MPD 0.15.0";
-    private MockCommandStreamProvider commandStreamProvider;
-    private MockCallbackStreamProvider callbackStreamProvider;
+    public static final String VERSION = MpdServerSimulator.VERSION;
+    private MpdServerSimulator mpdServerSimulator;
 
     @Override
     public void setUp() throws Exception
     {
-        commandStreamProvider = new MockCommandStreamProvider();
-        callbackStreamProvider = new MockCallbackStreamProvider();
-        mpdServer = new MpdServer(commandStreamProvider, callbackStreamProvider);
-        commandStreamProvider.appendServerResult(Response.OK + " " + VERSION);
-        callbackStreamProvider.appendResponse(Response.OK + " " + VERSION);
-        StringBuilder stringBuilder = new StringBuilder();
-        setStatus(stringBuilder);
+        mpdServerSimulator = new MpdServerSimulator();
+        mpdServerSimulator.getSubSystemSupport().setIdleStrategy(new SubSystemSupport.IdleStrategy()
+        {
+            public void execute(Runnable runnable)
+            {
+                runnable.run();
+            }
+        });
+        SocketStreamProviderIF mpdSocket = mpdServerSimulator.createMpdSocket();
+        SocketStreamProviderIF mpdSocket1 = mpdServerSimulator.createMpdSocket();
+        mpdServer = new MpdServer(mpdSocket, mpdSocket1);
+    }
+
+    @Override
+    public void tearDown() throws Exception
+    {
+        mpdServer.disconnect();
     }
 
     public void testConnectWithHostname() throws Exception
@@ -65,84 +74,107 @@ public class MpdServerTest extends TestCase
     {
         mpdServer.connect(HOSTNAME);
 
-        commandStreamProvider.appendServerResult(Response.OK.toString());
         Player player = mpdServer.getPlayer();
+        //wait for idle
+        smallWait();
         player.play();
+        // wait for callback
+        smallWait();
+        PlayStatus playStatus = player.getPlayStatus();
 
-        assertLastCommandEquals(MpdCommands.play.toString());
+        assertEquals(PlayStatus.Playing, mpdServerSimulator.getSimPlayer().getCurrentPlayStatus());
+        assertEquals(PlayStatus.Playing, playStatus);
     }
 
 
-    public void testDisconnect() throws Exception
-    {
-        mpdServer.connect(HOSTNAME);
+//    public void testDisconnect() throws Exception
+//    {
+//        mpdServer.connect(HOSTNAME);
 
-        commandStreamProvider.appendServerResult(Response.OK.toString());
-        mpdServer.disconnect();
-
-        assertLastCommandEquals(MpdCommands.close.toString());
-    }
+    //todo: how to test?
+//        commandStreamProvider.appendServerResult(Response.OK.toString());
+//        mpdServer.disconnect();
+//
+//        assertEquals(false,mpdServer.isConnected());
+//    }
 
     public void testStatus() throws Exception
     {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(MpdStatus.state).append(": ");
-        stringBuilder.append(PlayStatus.Paused.serverString);
-        commandStreamProvider.removeLastCommand();
-        setStatus(stringBuilder);
-
         mpdServer.connect(HOSTNAME);
 
         Player player = mpdServer.getPlayer();
+        smallWait();
+        player.play();
+        smallWait();
+        player.pause();
+        smallWait();
         PlayStatus playStatus = player.getPlayStatus();
 
         assertEquals(PlayStatus.Paused, playStatus);
     }
 
+    private void smallWait()
+            throws InterruptedException
+    {
+        synchronized (this)
+        {
+            wait(100);
+        }
+    }
+
     public void testStop() throws Exception
     {
         mpdServer.connect(HOSTNAME);
+        smallWait();
 
-        commandStreamProvider.appendServerResult(Response.OK.toString());
         Player player = mpdServer.getPlayer();
+        player.play();
+        smallWait();
         player.stop();
+        smallWait();
 
-        assertLastCommandEquals(MpdCommands.stop.toString());
+        PlayStatus playStatus = player.getPlayStatus();
+
+        assertEquals(PlayStatus.Stopped, playStatus);
     }
 
     public void testNext() throws Exception
     {
         mpdServer.connect(HOSTNAME);
+        smallWait();
 
-        commandStreamProvider.appendServerResult(Response.OK.toString());
         Player player = mpdServer.getPlayer();
-
         player.next();
+        smallWait();
 
-        assertLastCommandEquals(MpdCommands.next.toString());
+        int simId = Integer.valueOf(mpdServerSimulator.getPlaylist().getCurrentSong().getValue(SongInfo.SongAttributeType.Id));
+        int id = Integer.valueOf(player.getCurrentSongInfo().getValue(SongInfo.SongAttributeType.Id));
+        assertEquals(2, simId);
+        assertEquals(2, id);
     }
 
 
     public void testPrev() throws Exception
     {
         mpdServer.connect(HOSTNAME);
+        smallWait();
 
-        commandStreamProvider.appendServerResult(Response.OK.toString());
         Player player = mpdServer.getPlayer();
         player.previous();
+        smallWait();
 
-        assertLastCommandEquals(MpdCommands.previous.toString());
+
+        int simId = Integer.valueOf(mpdServerSimulator.getPlaylist().getCurrentSong().getValue(SongInfo.SongAttributeType.Id));
+        int id = Integer.valueOf(player.getCurrentSongInfo().getValue(SongInfo.SongAttributeType.Id));
+        assertEquals(10, simId);
+        assertEquals(10, id);
     }
 
     public void testGetVolume() throws Exception
     {
         final Integer VOLUME = 75;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(MpdStatus.volume).append(": ");
-        stringBuilder.append(VOLUME);
-        commandStreamProvider.removeLastCommand();
-        setStatus(stringBuilder);
 
+        mpdServerSimulator.getSimPlayer().setVolume(VOLUME);
         mpdServer.connect(HOSTNAME);
 
         Integer volume = mpdServer.getVolume();
@@ -152,96 +184,68 @@ public class MpdServerTest extends TestCase
 
     public void testSongName() throws Exception
     {
-        Integer songId = 1;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(MpdStatus.songid).append(": ");
-        stringBuilder.append(songId);
-        commandStreamProvider.removeLastCommand();
-        setStatus(stringBuilder);
-
         final String name = "Song title";
-        commandStreamProvider.appendServerResult(SongInfo.SongAttributeType.Title + ": " + name);
-        commandStreamProvider.appendServerResult(Response.OK);
+        mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Title, name);
         mpdServer.connect(HOSTNAME);
 
         SongInfo songInfo = mpdServer.getPlayer().getCurrentSongInfo();
-        assertLastCommandEquals(MpdCommands.currentsong.toString());
         assertNotNull(songInfo);
         assertEquals(name, songInfo.getValue(SongInfo.SongAttributeType.Title));
     }
 
     public void testSongListener() throws Exception
     {
+
         mpdServer.connect(HOSTNAME);
+        smallWait();
+
+        final Integer songId = 0;
+        final String songTitle = "Test Song Title";
+        SongInfo currentSong = mpdServerSimulator.getPlaylist().getCurrentSong();
+        currentSong.updateValue(SongInfo.SongAttributeType.Title, songTitle);
+        currentSong.updateValue(SongInfo.SongAttributeType.Id, songId.toString());
 
         MyCurrentSongListener currentSongListener = new MyCurrentSongListener();
         mpdServer.getPlayer().addCurrentSongListener(currentSongListener);
+        smallWait();
 
-        final Integer songId = 1;
-        final String songTitle = "Test Song Title";
-        // idle
-        callbackStreamProvider.appendResponse("changed: " + Subsystem.player);
-        callbackStreamProvider.appendResponse(Response.OK);
-        //status
-        callbackStreamProvider.appendResponse(MpdStatus.songid + ": " + songId);
-        callbackStreamProvider.appendResponse(Response.OK);
-        // currentsong
-        commandStreamProvider.appendServerResult(SongInfo.SongAttributeType.Id + ": " + songId);
-        commandStreamProvider.appendServerResult(SongInfo.SongAttributeType.Title + ": " + songTitle);
-        commandStreamProvider.appendServerResult(Response.OK);
+        mpdServerSimulator.getSubSystemSupport().updateSubSystemChanged(Subsystem.player);
+        smallWait();
 
-        synchronized (this)
-        {
-            wait(100);
-        }
-        callbackStreamProvider.changeEvent();
-        synchronized (this)
-        {
-            wait(100);
-        }
         assertEquals(true, currentSongListener.songUpdated);
-        assertEquals(songId.toString(), currentSongListener.currentSong.getValue(SongInfo.SongAttributeType.Id));
         assertEquals(songTitle, currentSongListener.currentSong.getValue(SongInfo.SongAttributeType.Title));
     }
 
     public void testSetVolume() throws Exception
     {
         mpdServer.connect(HOSTNAME);
+        smallWait();
 
         Integer volume = 75;
 
-        commandStreamProvider.appendServerResult(Response.OK.toString());
         mpdServer.setVolume(volume);
+        smallWait();
 
-        assertLastCommandEquals("setvol " + volume);
+        assertEquals(volume, mpdServerSimulator.getSimPlayer().getVolume());
+        assertEquals(volume, mpdServer.getVolume());
     }
 
 
     public void testVolumeListener() throws Exception
     {
-        MyVolumeListener listener = new MyVolumeListener();
-        mpdServer.addVolumeListener(listener);
 
         final Integer volume = 75;
         mpdServer.connect(HOSTNAME);
+        smallWait();
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(MpdStatus.volume).append(": ");
-        stringBuilder.append(volume);
-        callbackStreamProvider.appendResponse("changed: " + Subsystem.mixer);
-        callbackStreamProvider.appendResponse(Response.OK.toString());
-        callbackStreamProvider.appendResponse(stringBuilder.toString());
-        callbackStreamProvider.appendResponse(Response.OK.toString());
+        mpdServerSimulator.getSimPlayer().setVolume(volume);
 
-        synchronized (this)
-        {
-            wait(100L);
-        }
-        callbackStreamProvider.changeEvent();
-        synchronized (this)
-        {
-            wait(100L);
-        }
+        MyVolumeListener listener = new MyVolumeListener();
+        mpdServer.addVolumeListener(listener);
+        smallWait();
+
+        mpdServerSimulator.getSubSystemSupport().updateSubSystemChanged(Subsystem.mixer);
+        smallWait();
 
         assertEquals(true, listener.volumeChanged);
         assertEquals(volume, listener.newVolume);
@@ -255,41 +259,15 @@ public class MpdServerTest extends TestCase
         Player player = mpdServer.getPlayer();
         player.addPlayStatusListener(listener);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(MpdStatus.state).append(": ");
-        stringBuilder.append(PlayStatus.Playing.serverString);
-        callbackStreamProvider.appendResponse("changed: " + Subsystem.player);
-        callbackStreamProvider.appendResponse(Response.OK.toString());
-        callbackStreamProvider.appendResponse(stringBuilder.toString());
-        callbackStreamProvider.appendResponse(Response.OK.toString());
+        smallWait();
+        final PlayStatus playStatus = PlayStatus.Playing;
+        mpdServerSimulator.getSimPlayer().updatePlayStatus(playStatus);
 
-        synchronized (this)
-        {
-            wait(100L);
-        }
-        callbackStreamProvider.changeEvent();
-        synchronized (this)
-        {
-            wait(100L);
-        }
+        mpdServerSimulator.getSubSystemSupport().updateSubSystemChanged(Subsystem.player);
+        smallWait();
 
         assertEquals(true, listener.playStatusUpdated);
-        assertEquals(PlayStatus.Playing, listener.playStatus);
-    }
-
-    private void assertLastCommandEquals(String command)
-    {
-        commandStreamProvider.assertLastCommandEquals(command);
-    }
-
-    private void setStatus(StringBuilder stringBuilder)
-    {
-        String s = stringBuilder.toString();
-        if (!s.equals(""))
-        {
-            commandStreamProvider.appendServerResult(s);
-        }
-        commandStreamProvider.appendServerResult(Response.OK.toString());
+        assertEquals(playStatus, listener.playStatus);
     }
 
     private static class MyVolumeListener implements VolumeListener
@@ -321,10 +299,10 @@ public class MpdServerTest extends TestCase
         private boolean playStatusUpdated;
         private PlayStatus playStatus;
 
-        public void playStatusChanged()
+        public void playStatusChanged(PlayStatus playStatus)
         {
             playStatusUpdated = true;
-            playStatus = mpdServer.getPlayer().getPlayStatus();
+            this.playStatus = playStatus;
         }
     }
 }

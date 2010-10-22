@@ -1,9 +1,6 @@
 package com.bender.mpdlib.simulator.commands;
 
-import com.bender.mpdlib.MpdStatus;
-import com.bender.mpdlib.Subsystem;
 import com.bender.mpdlib.commands.Response;
-import com.bender.mpdlib.commands.StatusTuple;
 
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
@@ -13,12 +10,13 @@ import java.util.StringTokenizer;
  */
 public class VolumeSimCommand extends SimCommand
 {
-    private static Integer currentVolume = 100;
     private StringTokenizer stringTokenizer;
+    private SimPlayer simPlayer;
 
-    public VolumeSimCommand(PrintWriter writer, StringTokenizer tokenizer)
+    public VolumeSimCommand(PrintWriter writer, StringTokenizer tokenizer, SimPlayer simPlayer)
     {
         super(writer);
+        this.simPlayer = simPlayer;
         stringTokenizer = tokenizer;
     }
 
@@ -31,11 +29,7 @@ public class VolumeSimCommand extends SimCommand
             try
             {
                 volume = Integer.parseInt(stringTokenizer.nextToken());
-                if (setVolume(volume))
-                {
-                    System.out.println(getClass().getSimpleName() + ": volume= " + currentVolume);
-                    IdleSimCommand.subsystemUpdated(Subsystem.mixer);
-                }
+                setVolume(volume);
                 writer.println(Response.OK);
             }
             catch (NumberFormatException e)
@@ -50,15 +44,8 @@ public class VolumeSimCommand extends SimCommand
         }
     }
 
-    private static synchronized boolean setVolume(Integer volume)
+    private void setVolume(Integer volume)
     {
-        boolean changed = currentVolume != volume;
-        currentVolume = volume;
-        return changed;
-    }
-
-    public static synchronized StatusTuple getStatus()
-    {
-        return new StatusTuple(MpdStatus.volume, currentVolume.toString());
+        simPlayer.setVolume(volume);
     }
 }

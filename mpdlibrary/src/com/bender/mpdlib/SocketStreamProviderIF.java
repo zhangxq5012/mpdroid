@@ -1,8 +1,8 @@
 package com.bender.mpdlib;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.SocketAddress;
 
 /**
@@ -14,7 +14,7 @@ public interface SocketStreamProviderIF
 
     BufferedReader getBufferedReader() throws IOException;
 
-    BufferedWriter getBufferedWriter() throws IOException;
+    PrintWriter getPrintWriter() throws IOException;
 
     void disconnect() throws IOException;
 

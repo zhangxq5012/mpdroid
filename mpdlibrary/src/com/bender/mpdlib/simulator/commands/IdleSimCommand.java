@@ -9,49 +9,28 @@ import java.io.PrintWriter;
  */
 public class IdleSimCommand extends SimCommand
 {
-    private static Subsystem subsystem;
-    private IdleThread idleThread;
+    private SubSystemSupport subSystemSupport;
+    private IdleRunnable idleRunnable;
 
-    public IdleSimCommand(PrintWriter pipe)
+    public IdleSimCommand(PrintWriter pipe, SubSystemSupport subSystemSupport)
     {
         super(pipe);
+        idleRunnable = new IdleRunnable();
+        this.subSystemSupport = subSystemSupport;
     }
 
     public void run()
     {
-        idleThread = new IdleThread();
-        idleThread.start();
+        subSystemSupport.getIdleStrategy().execute(idleRunnable);
     }
 
-    public static void subsystemUpdated(Subsystem sub)
+    private class IdleRunnable implements Runnable
     {
-        synchronized (IdleSimCommand.class)
-        {
-            subsystem = sub;
-            IdleSimCommand.class.notifyAll();
-        }
-    }
-
-    private class IdleThread extends Thread
-    {
-        @Override
         public void run()
         {
-            Subsystem changedSubsystem;
-            try
-            {
-                synchronized (IdleSimCommand.class)
-                {
-                    IdleSimCommand.class.wait();
-                    changedSubsystem = subsystem;
-                }
-                writer.println("changed: " + changedSubsystem);
-                writer.println("OK");
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+            Subsystem changedSubsystem = subSystemSupport.waitForSubSystemChange();
+            writer.println("changed: " + changedSubsystem);
+            writer.println("OK");
         }
     }
 }

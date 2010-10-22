@@ -9,15 +9,18 @@ import java.io.PrintWriter;
  */
 public class PreviousSimCommand extends SimCommand
 {
-    public PreviousSimCommand(PrintWriter simBufferedWriter)
+    private Playlist playlist;
+
+    public PreviousSimCommand(PrintWriter simBufferedWriter, Playlist playlist)
     {
         super(simBufferedWriter);
+        this.playlist = playlist;
     }
 
     @Override
     public void run() throws Exception
     {
-        Playlist.previous();
         writer.println(Response.OK);
+        playlist.previous();
     }
 }

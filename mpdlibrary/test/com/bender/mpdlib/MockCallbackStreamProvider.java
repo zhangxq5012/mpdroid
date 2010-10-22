@@ -5,13 +5,12 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -41,9 +40,9 @@ class MockCallbackStreamProvider implements SocketStreamProviderIF
         return reader;
     }
 
-    public BufferedWriter getBufferedWriter() throws IOException
+    public PrintWriter getPrintWriter() throws IOException
     {
-        BufferedWriter mock = mock(BufferedWriter.class);
+        PrintWriter mock = mock(PrintWriter.class);
         doAnswer(new Answer()
         {
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
@@ -57,7 +56,7 @@ class MockCallbackStreamProvider implements SocketStreamProviderIF
                 }
                 return null;
             }
-        }).when(mock).write(anyString());
+        }).when(mock).println(anyObject());
         return mock;
     }
 

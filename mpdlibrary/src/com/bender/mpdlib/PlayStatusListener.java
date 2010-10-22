@@ -5,5 +5,5 @@ package com.bender.mpdlib;
  */
 public interface PlayStatusListener
 {
-    void playStatusChanged();
+    void playStatusChanged(PlayStatus playStatus);
 }

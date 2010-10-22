@@ -9,9 +9,9 @@ import java.io.PrintWriter;
  */
 public class PlaySimSimCommand extends PlayerSimCommand
 {
-    public PlaySimSimCommand(PrintWriter writer)
+    public PlaySimSimCommand(PrintWriter writer, SimPlayer simPlayer)
     {
-        super(writer);
+        super(writer, simPlayer);
     }
 
     @Override

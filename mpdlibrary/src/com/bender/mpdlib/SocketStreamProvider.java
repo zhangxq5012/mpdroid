@@ -43,13 +43,13 @@ public class SocketStreamProvider implements SocketStreamProviderIF
         return new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
     }
 
-    public BufferedWriter getBufferedWriter() throws IOException
+    public PrintWriter getPrintWriter() throws IOException
     {
         if (socket == null)
         {
             throw new IllegalStateException("connect() must be called first");
         }
-        return new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+        return new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
     }
 
     public void disconnect() throws IOException

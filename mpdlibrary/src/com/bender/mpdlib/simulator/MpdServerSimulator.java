@@ -1,29 +1,51 @@
 package com.bender.mpdlib.simulator;
 
 import com.bender.mpdlib.SocketStreamProviderIF;
-import com.bender.mpdlib.commands.MpdCommands;
-import com.bender.mpdlib.commands.Response;
-import com.bender.mpdlib.simulator.commands.*;
+import com.bender.mpdlib.simulator.commands.Playlist;
+import com.bender.mpdlib.simulator.commands.SimPlayer;
+import com.bender.mpdlib.simulator.commands.SubSystemSupport;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.StringTokenizer;
 
 /**
  * todo: replace with documentation
  */
 public class MpdServerSimulator
 {
+    public static final String VERSION = "sim v1.0";
+    private SimPlayer simPlayer;
+    private Playlist playlist;
+    private SubSystemSupport subSystemSupport;
 
-    private static final String VERSION = "sim v1.0";
+    public MpdServerSimulator()
+    {
+        subSystemSupport = new SubSystemSupport();
+        simPlayer = new SimPlayer(subSystemSupport);
+        playlist = new Playlist(subSystemSupport);
+    }
 
     public SocketStreamProviderIF createMpdSocket()
     {
         return new CommandStreamProvider();
     }
 
+    public SimPlayer getSimPlayer()
+    {
+        return simPlayer;
+    }
+
+    public Playlist getPlaylist()
+    {
+        return playlist;
+    }
+
+    public SubSystemSupport getSubSystemSupport()
+    {
+        return subSystemSupport;
+    }
 
     private class CommandStreamProvider implements SocketStreamProviderIF
     {
@@ -32,28 +54,16 @@ public class MpdServerSimulator
         private ServerThread serverThread;
 
         private PipedReader clientPipedReader;
-        private BufferedWriter simBufferedWriter;
+        private PrintWriter simBufferedWriter;
         private BufferedReader simBufferedReader;
         private PipedWriter clientPipedWriter;
 
         public void connect(SocketAddress socketAddress) throws IOException
         {
-            System.out.println("connect(addr=" + socketAddress + ")");
+            System.out.println("SIM connect(addr=" + socketAddress + ")");
             clientPipedReader = new PipedReader();
             PipedWriter simPipedWriter = new PipedWriter(clientPipedReader);
-            simBufferedWriter = new BufferedWriter(simPipedWriter)
-            {
-                @Override
-                public void write(String s) throws IOException
-                {
-                    super.write(s);
-                    if (!s.equals("\n"))
-                    {
-                        newLine();
-                        flush();
-                    }
-                }
-            };
+            simBufferedWriter = new PrintWriter(simPipedWriter, true);
             PipedReader simPipedReader = new PipedReader();
             simBufferedReader = new BufferedReader(simPipedReader);
             clientPipedWriter = new PipedWriter(simPipedReader);
@@ -69,7 +79,7 @@ public class MpdServerSimulator
                     return simBufferedReader;
                 }
 
-                public BufferedWriter getBufferedWriter() throws IOException
+                public PrintWriter getPrintWriter() throws IOException
                 {
                     return simBufferedWriter;
                 }
@@ -80,11 +90,11 @@ public class MpdServerSimulator
 
                 public boolean isConnected()
                 {
-                    return false;  //To change body of implemented methods use File | Settings | File Templates.
+                    return CommandStreamProvider.this.isConnected();
                 }
-            });
+            }, playlist, simPlayer, subSystemSupport);
             serverThread.start();
-            System.out.println("connect()");
+            System.out.println("SIM connect()");
         }
 
         public BufferedReader getBufferedReader() throws IOException
@@ -92,149 +102,25 @@ public class MpdServerSimulator
             return new BufferedReader(clientPipedReader);
         }
 
-        public BufferedWriter getBufferedWriter() throws IOException
+        public PrintWriter getPrintWriter() throws IOException
         {
-            return new BufferedWriter(clientPipedWriter);
+            return new PrintWriter(clientPipedWriter, true);
         }
 
         public void disconnect() throws IOException
         {
             connected = false;
-            serverThread.interrupt();
             clientPipedReader.close();
             clientPipedWriter.close();
             simBufferedWriter.close();
             simBufferedReader.close();
+            serverThread.interrupt();
             System.out.println("disconnect()");
         }
 
         public boolean isConnected()
         {
             return connected;
-        }
-    }
-
-    private static class ServerThread extends Thread
-    {
-        private SocketStreamProviderIF provider;
-        private PrintWriter printWriter;
-        private BufferedReader simBufferedReader;
-        private static int count;
-
-        public ServerThread(SocketStreamProviderIF commandStreamProvider)
-        {
-            super("Sim-" + count++ + ":");
-            provider = commandStreamProvider;
-            try
-            {
-                simBufferedReader = provider.getBufferedReader();
-                printWriter = new PrintWriter(provider.getBufferedWriter(), true);
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run()
-        {
-            if (connected())
-            {
-                printWriter.println(Response.OK + " " + VERSION);
-            }
-            while (connected())
-            {
-                try
-                {
-                    String line = simBufferedReader.readLine();
-                    if (!connected())
-                    {
-                        return;
-                    }
-                    process(line);
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        private void process(String line) throws IOException
-        {
-            StringTokenizer stringTokenizer = new StringTokenizer(line);
-            String commandString = stringTokenizer.nextToken().trim();
-            MpdCommands command = MpdCommands.parse(commandString);
-            if (command == null)
-            {
-                printWriter.println(Response.ACK + " [5@0] {} unknown command \"" + commandString + "\"");
-                return;
-            }
-            System.out.println(getName() + "process(): " + command);
-            switch (command)
-            {
-                case close:
-                    provider.disconnect();
-                    break;
-                case idle:
-                    IdleSimCommand idleSimCommand = new IdleSimCommand(printWriter);
-                    idleSimCommand.run();
-                    break;
-                case status:
-                    runSimCommand(new StatusSimCommand(printWriter));
-                    break;
-                case play:
-                    PlaySimSimCommand playSimCommand = new PlaySimSimCommand(printWriter);
-                    playSimCommand.run();
-                    break;
-                case pause:
-                    PauseSimCommand pauseSimCommand = new PauseSimCommand(printWriter);
-                    pauseSimCommand.run();
-                    break;
-                case stop:
-                    StopSimCommand stopSimCommand = new StopSimCommand(printWriter);
-                    stopSimCommand.run();
-                    break;
-                case next:
-                    runSimCommand(new NextSimCommand(printWriter));
-                    break;
-                case previous:
-                    runSimCommand(new PreviousSimCommand(printWriter));
-                    break;
-                case setvol:
-                    VolumeSimCommand volumeSimCommand = new VolumeSimCommand(printWriter, stringTokenizer);
-                    volumeSimCommand.run();
-                    break;
-                case ping:
-                    printWriter.println(Response.OK.toString());
-                    break;
-                case currentsong:
-                    runSimCommand(new CurrentSongSimCommand(printWriter));
-                    break;
-                default:
-                    printWriter.write(Response.ACK + "[5@0] \"" + commandString + "\" not implemented");
-                    break;
-            }
-            System.out.println(getName() + command + " DONE");
-        }
-
-        private void runSimCommand(SimCommand simCommand) throws IOException
-        {
-            try
-            {
-                simCommand.run();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                printWriter.write(Response.ACK + "[5@0] Unhandled Exception");
-            }
-        }
-
-        private boolean connected()
-        {
-            return provider.isConnected();
         }
     }
 
@@ -250,7 +136,7 @@ public class MpdServerSimulator
         SocketStreamProviderIF mpdSocket = mpdServerSimulator.createMpdSocket();
 
         mpdSocket.connect(null);
-        final BufferedWriter bufferedWriter = mpdSocket.getBufferedWriter();
+        final PrintWriter bufferedWriter = mpdSocket.getPrintWriter();
         final BufferedReader bufferedReader = mpdSocket.getBufferedReader();
         Thread thread = new Thread()
         {
@@ -284,9 +170,7 @@ public class MpdServerSimulator
                 {
                     while ((line = reader.readLine()) != null)
                     {
-                        bufferedWriter.write(line);
-                        bufferedWriter.newLine();
-                        bufferedWriter.flush();
+                        bufferedWriter.println(line);
                     }
                 }
                 catch (IOException e)
@@ -306,6 +190,9 @@ public class MpdServerSimulator
     {
         int port = Integer.parseInt(args[0]);
         ServerSocket serverSocket = new ServerSocket(port);
+        SubSystemSupport systemSupport = new SubSystemSupport();
+        Playlist playlist = new Playlist(systemSupport);
+        SimPlayer simPlayer = new SimPlayer(systemSupport);
 
         while (true)
         {
@@ -322,9 +209,9 @@ public class MpdServerSimulator
                     return new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 }
 
-                public BufferedWriter getBufferedWriter() throws IOException
+                public PrintWriter getPrintWriter() throws IOException
                 {
-                    return new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                    return new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
                 }
 
                 public void disconnect() throws IOException
@@ -336,7 +223,7 @@ public class MpdServerSimulator
                 {
                     return clientSocket.isConnected() && !clientSocket.isClosed();
                 }
-            });
+            }, playlist, simPlayer, systemSupport);
             serverThread.start();
         }
     }

@@ -13,9 +13,10 @@ import java.util.List;
  */
 public class Playlist
 {
-    private static SongInfo currentSong;
+    private SongInfo currentSong;
 
     private static List<SongInfo> library;
+    private SubSystemSupport subSystemSupport;
 
     static
     {
@@ -28,26 +29,31 @@ public class Playlist
             songInfo.updateValue(SongInfo.SongAttributeType.Id, id.toString());
             library.add(songInfo);
         }
+    }
+
+    public Playlist(SubSystemSupport subSystemSupport)
+    {
+        this.subSystemSupport = subSystemSupport;
         currentSong = library.get(0);
     }
 
-    public static SongInfo getCurrentSong()
+    public SongInfo getCurrentSong()
     {
         return currentSong;
     }
 
-    public static StatusTuple getStatus()
+    public StatusTuple getStatus()
     {
         return new StatusTuple(MpdStatus.songid, currentSong.getValue(SongInfo.SongAttributeType.Id));
     }
 
-    public static void next()
+    public void next()
     {
         int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
         gotoSongIndex(index);
     }
 
-    private static void gotoSongIndex(int index)
+    private void gotoSongIndex(int index)
     {
         if (index >= library.size())
         {
@@ -58,10 +64,10 @@ public class Playlist
             index = library.size() - 1;
         }
         currentSong = library.get(index);
-        IdleSimCommand.subsystemUpdated(Subsystem.player);
+        subSystemSupport.updateSubSystemChanged(Subsystem.player);
     }
 
-    public static void previous()
+    public void previous()
     {
         int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
         gotoSongIndex(index - 2);
