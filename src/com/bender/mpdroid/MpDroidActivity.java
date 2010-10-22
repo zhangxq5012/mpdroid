@@ -135,18 +135,6 @@ public class MpDroidActivity extends Activity
         portTextView.setText(getText(R.string.port) + ": " + port);
         boolean useAuthentication = myPreferences.useAuthentication();
         useAuthenticationCheckbox.setChecked(useAuthentication);
-        if (myPreferences.simulateMpdServer())
-        {
-            System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, MpdAdapterFactory.SIMULATED_ADAPTER);
-        }
-        else
-        {
-            System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, MpdAdapterFactory.DEFAULT_ADAPTER);
-        }
-        if (!mpdServiceAdapterIF.isConnected())
-        {
-            mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
-        }
     }
 
     /**

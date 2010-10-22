@@ -6,7 +6,7 @@ import com.bender.mpdlib.Subsystem;
 import com.bender.mpdlib.commands.Response;
 import com.bender.mpdlib.commands.StatusTuple;
 
-import java.io.BufferedWriter;
+import java.io.PrintWriter;
 
 /**
  * todo: replace with documentation
@@ -15,7 +15,7 @@ public abstract class PlayerSimCommand extends SimCommand
 {
     private static PlayStatus currentPlayStatus = PlayStatus.Stopped;
 
-    public PlayerSimCommand(BufferedWriter writer)
+    public PlayerSimCommand(PrintWriter writer)
     {
         super(writer);
     }
@@ -28,7 +28,7 @@ public abstract class PlayerSimCommand extends SimCommand
             {
                 IdleSimCommand.subsystemUpdated(Subsystem.player);
             }
-            writer.write(Response.OK.toString());
+            writer.println(Response.OK);
         }
         catch (Exception e)
         {

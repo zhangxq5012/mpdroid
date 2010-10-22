@@ -1,8 +1,8 @@
 package com.bender.mpdlib;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.SocketAddress;
 
 /**
@@ -11,7 +11,7 @@ import java.net.SocketAddress;
 public class Pipe
 {
     private BufferedReader reader;
-    private BufferedWriter writer;
+    private PrintWriter writer;
     private SocketStreamProviderIF streamProvider;
 
     public Pipe(SocketStreamProviderIF socketStreamProviderIF)
@@ -23,7 +23,7 @@ public class Pipe
     {
         streamProvider.connect(socketAddress);
         reader = streamProvider.getBufferedReader();
-        writer = streamProvider.getBufferedWriter();
+        writer = new PrintWriter(streamProvider.getBufferedWriter(), true);
     }
 
     public String readLine() throws IOException
@@ -31,16 +31,14 @@ public class Pipe
         return reader.readLine();
     }
 
-    public void write(Object command) throws IOException
+    public void write(Object command)
     {
         write(command.toString());
     }
 
-    public void write(String command) throws IOException
+    public void write(String command)
     {
-        writer.write(command);
-        writer.newLine();
-        writer.flush();
+        writer.println(command);
     }
 
     public void disconnect() throws IOException

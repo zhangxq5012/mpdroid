@@ -1,15 +1,15 @@
 package com.bender.mpdlib.simulator.commands;
 
-import java.io.BufferedWriter;
+import java.io.PrintWriter;
 
 /**
  * todo: replace with documentation
  */
 public abstract class SimCommand
 {
-    protected final BufferedWriter writer;
+    protected final PrintWriter writer;
 
-    protected SimCommand(BufferedWriter writer)
+    protected SimCommand(PrintWriter writer)
     {
         this.writer = writer;
     }

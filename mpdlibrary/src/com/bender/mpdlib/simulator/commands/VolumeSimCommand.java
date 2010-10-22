@@ -5,8 +5,7 @@ import com.bender.mpdlib.Subsystem;
 import com.bender.mpdlib.commands.Response;
 import com.bender.mpdlib.commands.StatusTuple;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
 /**
@@ -17,7 +16,7 @@ public class VolumeSimCommand extends SimCommand
     private static Integer currentVolume = 100;
     private StringTokenizer stringTokenizer;
 
-    public VolumeSimCommand(BufferedWriter writer, StringTokenizer tokenizer)
+    public VolumeSimCommand(PrintWriter writer, StringTokenizer tokenizer)
     {
         super(writer);
         stringTokenizer = tokenizer;
@@ -26,34 +25,28 @@ public class VolumeSimCommand extends SimCommand
     @Override
     public void run()
     {
-        try
+        if (stringTokenizer.hasMoreTokens())
         {
-            if (stringTokenizer.hasMoreTokens())
+            Integer volume;
+            try
             {
-                Integer volume;
-                try
+                volume = Integer.parseInt(stringTokenizer.nextToken());
+                if (setVolume(volume))
                 {
-                    volume = Integer.parseInt(stringTokenizer.nextToken());
-                    if (setVolume(volume))
-                    {
-                        IdleSimCommand.subsystemUpdated(Subsystem.mixer);
-                    }
-                    writer.write(Response.OK.toString());
+                    System.out.println(getClass().getSimpleName() + ": volume= " + currentVolume);
+                    IdleSimCommand.subsystemUpdated(Subsystem.mixer);
                 }
-                catch (NumberFormatException e)
-                {
-                    e.printStackTrace();
-                    writer.write(Response.ACK.toString() + " [2@0] {setvol} need an integer");
-                }
+                writer.println(Response.OK);
             }
-            else
+            catch (NumberFormatException e)
             {
-                writer.write(Response.ACK.toString() + " [2@0] {setvol} wrong number of arguments for \"volume\"");
+                e.printStackTrace();
+                writer.println(Response.ACK + " [2@0] {setvol} need an integer");
             }
         }
-        catch (IOException e)
+        else
         {
-            e.printStackTrace();
+            writer.println(Response.ACK + " [2@0] {setvol} wrong number of arguments for \"volume\"");
         }
     }
 

@@ -7,9 +7,9 @@ import java.io.PrintWriter;
 /**
  * todo: replace with documentation
  */
-public class NextSimCommand extends SimCommand
+public class PreviousSimCommand extends SimCommand
 {
-    public NextSimCommand(PrintWriter simBufferedWriter)
+    public PreviousSimCommand(PrintWriter simBufferedWriter)
     {
         super(simBufferedWriter);
     }
@@ -17,7 +17,7 @@ public class NextSimCommand extends SimCommand
     @Override
     public void run() throws Exception
     {
-        Playlist.next();
+        Playlist.previous();
         writer.println(Response.OK);
     }
 }

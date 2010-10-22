@@ -3,8 +3,8 @@ package com.bender.mpdlib.simulator.commands;
 import com.bender.mpdlib.commands.Response;
 import com.bender.mpdlib.commands.StatusTuple;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * todo: replace with documentation
@@ -12,7 +12,7 @@ import java.io.IOException;
 public class StatusSimCommand extends SimCommand
 {
 
-    public StatusSimCommand(BufferedWriter simBufferedWriter)
+    public StatusSimCommand(PrintWriter simBufferedWriter)
     {
         super(simBufferedWriter);
     }
@@ -25,11 +25,13 @@ public class StatusSimCommand extends SimCommand
         write(statusTuple);
         statusTuple = Playlist.getStatus();
         write(statusTuple);
-        writer.write(Response.OK.toString());
+        writer.println(Response.OK);
     }
 
     private void write(StatusTuple statusTuple) throws IOException
     {
-        writer.write(statusTuple.first() + ": " + statusTuple.second());
+        String string = statusTuple.first() + ": " + statusTuple.second();
+        System.out.println(getClass().getSimpleName() + "   " + string);
+        writer.println(string);
     }
 }

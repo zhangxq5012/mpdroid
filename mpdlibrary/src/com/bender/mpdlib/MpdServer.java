@@ -246,6 +246,7 @@ public class MpdServer
             disconnected = true;
             try
             {
+                callbackPipe.write(MpdCommands.close);
                 callbackPipe.disconnect();
             }
             catch (IOException e)

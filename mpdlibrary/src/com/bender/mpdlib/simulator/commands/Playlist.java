@@ -44,11 +44,26 @@ public class Playlist
     public static void next()
     {
         int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
+        gotoSongIndex(index);
+    }
+
+    private static void gotoSongIndex(int index)
+    {
         if (index >= library.size())
         {
             index = 0;
         }
+        else if (index < 0)
+        {
+            index = library.size() - 1;
+        }
         currentSong = library.get(index);
         IdleSimCommand.subsystemUpdated(Subsystem.player);
+    }
+
+    public static void previous()
+    {
+        int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
+        gotoSongIndex(index - 2);
     }
 }
