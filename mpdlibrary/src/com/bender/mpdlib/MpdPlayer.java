@@ -12,6 +12,9 @@ class MpdPlayer implements Player
     private Pipe commandPipe;
     private PlayStatus playState;
     private PlayStatusListener myListener = new NullPlayStatusListener();
+    private SongInfo currentSongInfo = new NullSongInfo();
+    private Integer songId;
+    private CurrentSongListener currentSongListener = new NullCurrentSongListener();
 
     public MpdPlayer(Pipe commandPipe)
     {
@@ -61,6 +64,16 @@ class MpdPlayer implements Player
         CommandRunner.runCommand(new PreviousCommand(commandPipe));
     }
 
+    public SongInfo getCurrentSongInfo()
+    {
+        return currentSongInfo;
+    }
+
+    public void addCurrentSongListener(CurrentSongListener currentSongListener)
+    {
+        this.currentSongListener = currentSongListener;
+    }
+
     void processStatus(List<StatusTuple> statusTupleList)
     {
         for (StatusTuple statusTuple : statusTupleList)
@@ -76,6 +89,19 @@ class MpdPlayer implements Player
                         myListener.playStatusChanged();
                     }
                     break;
+                case songid:
+                    Integer newSongId = Integer.parseInt(statusTuple.getValue());
+                    if (!newSongId.equals(songId))
+                    {
+                        songId = newSongId;
+                        Result<SongInfo> result = CommandRunner.runCommand(new GetCurrentSongCommand(commandPipe));
+                        if (result.status.isSuccessful())
+                        {
+                            currentSongInfo = result.result;
+                            currentSongListener.songUpdated(currentSongInfo);
+                        }
+                    }
+                    break;
             }
         }
     }
@@ -85,6 +111,22 @@ class MpdPlayer implements Player
         public void playStatusChanged()
         {
             System.out.println(getClass().getSimpleName() + "playStatusChanged()");
+        }
+    }
+
+    private class NullSongInfo extends SongInfo
+    {
+        @Override
+        public String getValue(SongAttributeType songAttributeType)
+        {
+            return "";
+        }
+    }
+
+    private class NullCurrentSongListener implements CurrentSongListener
+    {
+        public void songUpdated(SongInfo songInfo)
+        {
         }
     }
 }

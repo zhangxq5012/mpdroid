@@ -18,4 +18,8 @@ public interface Player
     void addPlayStatusListener(PlayStatusListener listener);
 
     void previous();
+
+    SongInfo getCurrentSongInfo();
+
+    void addCurrentSongListener(CurrentSongListener currentSongListener);
 }

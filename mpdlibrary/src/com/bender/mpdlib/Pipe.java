@@ -31,6 +31,11 @@ public class Pipe
         return reader.readLine();
     }
 
+    public void write(Object command) throws IOException
+    {
+        write(command.toString());
+    }
+
     public void write(String command) throws IOException
     {
         writer.write(command);

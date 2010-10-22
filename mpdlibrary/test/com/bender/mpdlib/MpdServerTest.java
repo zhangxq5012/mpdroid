@@ -150,6 +150,60 @@ public class MpdServerTest extends TestCase
         assertEquals(VOLUME, volume);
     }
 
+    public void testSongName() throws Exception
+    {
+        Integer songId = 1;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(MpdStatus.songid).append(": ");
+        stringBuilder.append(songId);
+        commandStreamProvider.removeLastCommand();
+        setStatus(stringBuilder);
+
+        final String name = "Song title";
+        commandStreamProvider.appendServerResult(SongInfo.SongAttributeType.Title + ": " + name);
+        commandStreamProvider.appendServerResult(Response.OK);
+        mpdServer.connect(HOSTNAME);
+
+        SongInfo songInfo = mpdServer.getPlayer().getCurrentSongInfo();
+        assertLastCommandEquals(MpdCommands.currentsong.toString());
+        assertNotNull(songInfo);
+        assertEquals(name, songInfo.getValue(SongInfo.SongAttributeType.Title));
+    }
+
+    public void testSongListener() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+
+        MyCurrentSongListener currentSongListener = new MyCurrentSongListener();
+        mpdServer.getPlayer().addCurrentSongListener(currentSongListener);
+
+        final Integer songId = 1;
+        final String songTitle = "Test Song Title";
+        // idle
+        callbackStreamProvider.appendResponse("changed: " + Subsystem.player);
+        callbackStreamProvider.appendResponse(Response.OK);
+        //status
+        callbackStreamProvider.appendResponse(MpdStatus.songid + ": " + songId);
+        callbackStreamProvider.appendResponse(Response.OK);
+        // currentsong
+        commandStreamProvider.appendServerResult(SongInfo.SongAttributeType.Id + ": " + songId);
+        commandStreamProvider.appendServerResult(SongInfo.SongAttributeType.Title + ": " + songTitle);
+        commandStreamProvider.appendServerResult(Response.OK);
+
+        synchronized (this)
+        {
+            wait(100);
+        }
+        callbackStreamProvider.changeEvent();
+        synchronized (this)
+        {
+            wait(100);
+        }
+        assertEquals(true, currentSongListener.songUpdated);
+        assertEquals(songId.toString(), currentSongListener.currentSong.getValue(SongInfo.SongAttributeType.Id));
+        assertEquals(songTitle, currentSongListener.currentSong.getValue(SongInfo.SongAttributeType.Title));
+    }
+
     public void testSetVolume() throws Exception
     {
         mpdServer.connect(HOSTNAME);
@@ -161,6 +215,7 @@ public class MpdServerTest extends TestCase
 
         assertLastCommandEquals("setvol " + volume);
     }
+
 
     public void testVolumeListener() throws Exception
     {
@@ -246,6 +301,18 @@ public class MpdServerTest extends TestCase
         {
             volumeChanged = true;
             newVolume = volume;
+        }
+    }
+
+    private class MyCurrentSongListener implements CurrentSongListener
+    {
+        private boolean songUpdated;
+        private SongInfo currentSong;
+
+        public void songUpdated(SongInfo songInfo)
+        {
+            songUpdated = true;
+            currentSong = songInfo;
         }
     }
 

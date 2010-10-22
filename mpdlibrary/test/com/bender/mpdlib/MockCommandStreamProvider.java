@@ -80,6 +80,11 @@ public class MockCommandStreamProvider implements SocketStreamProviderIF
         responseQueue.offer(s);
     }
 
+    public void appendServerResult(Object value)
+    {
+        appendServerResult(value == null ? "null" : value.toString());
+    }
+
     public void removeLastCommand()
     {
         List<String> list = (List<String>) responseQueue;

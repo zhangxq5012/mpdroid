@@ -17,20 +17,15 @@ public class StatusSimCommand extends SimCommand
         super(simBufferedWriter);
     }
 
-    public void run()
+    public void run() throws Exception
     {
-        try
-        {
-            StatusTuple statusTuple = PlayerSimCommand.getStatus();
-            write(statusTuple);
-            statusTuple = VolumeSimCommand.getStatus();
-            write(statusTuple);
-            writer.write(Response.OK.toString());
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        StatusTuple statusTuple = PlayerSimCommand.getStatus();
+        write(statusTuple);
+        statusTuple = VolumeSimCommand.getStatus();
+        write(statusTuple);
+        statusTuple = Playlist.getStatus();
+        write(statusTuple);
+        writer.write(Response.OK.toString());
     }
 
     private void write(StatusTuple statusTuple) throws IOException

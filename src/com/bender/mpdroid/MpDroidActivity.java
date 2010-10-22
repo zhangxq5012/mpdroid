@@ -137,7 +137,15 @@ public class MpDroidActivity extends Activity
         useAuthenticationCheckbox.setChecked(useAuthentication);
         if (myPreferences.simulateMpdServer())
         {
-            System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, SimulatedMpdServerAdapter.class.getName());
+            System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, MpdAdapterFactory.SIMULATED_ADAPTER);
+        }
+        else
+        {
+            System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, MpdAdapterFactory.DEFAULT_ADAPTER);
+        }
+        if (!mpdServiceAdapterIF.isConnected())
+        {
+            mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
         }
     }
 
@@ -363,8 +371,6 @@ public class MpDroidActivity extends Activity
         protected Object doInBackground(Object... objects)
         {
             mpdPlayerAdapterIF.next();
-            GetSongTask getSongTask = new GetSongTask();
-            getSongTask.execute();
             return null;
         }
     }

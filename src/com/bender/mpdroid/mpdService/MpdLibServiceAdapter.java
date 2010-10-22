@@ -152,12 +152,12 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
         public MpdSongAdapterIF getCurrentSong()
         {
-            return new NullSongAdapter();
+            return new MpdLibSongAdapter(player.getCurrentSongInfo());
         }
 
         public void addSongChangeListener(MpdSongListener listener)
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            player.addCurrentSongListener(new SongChangeWrapper(listener));
         }
 
         public void addPlayStatusListener(MpdPlayStatusListener listener)
@@ -202,6 +202,47 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
             public void playStatusUpdated(PlayStatus playStatus)
             {
                 Log.v(TAG, "playStatusUpdated() on NULL object");
+            }
+        }
+
+        private class MpdLibSongAdapter implements MpdSongAdapterIF
+        {
+
+            private SongInfo songInfo;
+
+            public MpdLibSongAdapter(SongInfo songInfo)
+            {
+                this.songInfo = songInfo;
+            }
+
+            public String getSongName()
+            {
+                return songInfo.getValue(SongInfo.SongAttributeType.Title);
+            }
+
+            public String getArtist()
+            {
+                return null;
+            }
+
+            public String getAlbumName()
+            {
+                return null;
+            }
+        }
+
+        private class SongChangeWrapper implements CurrentSongListener
+        {
+            private MpdSongListener listener;
+
+            public SongChangeWrapper(MpdSongListener listener)
+            {
+                this.listener = listener;
+            }
+
+            public void songUpdated(SongInfo songInfo)
+            {
+                listener.songUpdated(new MpdLibSongAdapter(songInfo));
             }
         }
     }

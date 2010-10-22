@@ -83,4 +83,9 @@ class MockCallbackStreamProvider implements SocketStreamProviderIF
     {
         responseQueue.offer(string);
     }
+
+    public void appendResponse(Object value)
+    {
+        responseQueue.offer(value == null ? "null" : value.toString());
+    }
 }

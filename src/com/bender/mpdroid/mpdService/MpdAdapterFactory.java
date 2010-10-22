@@ -11,14 +11,16 @@ import java.lang.reflect.Constructor;
 public class MpdAdapterFactory
 {
     private static final String TAG = MpdAdapterFactory.class.getSimpleName();
-    private static String adapterClassName;
 
     public static final String MPD_ADAPTER_CLASSNAME_PROPERTY = "MPD_ADAPTER";
 
+    public static final String SIMULATED_ADAPTER = SimulatedMpdServerAdapter.class.getName();
+
+    public static final String DEFAULT_ADAPTER = MpdLibServiceAdapter.class.getName();
+
     static
     {
-//        adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, MpdLibServiceAdapter.class.getName());
-        adapterClassName = System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, SimulatedMpdServerAdapter.class.getName());
+        System.setProperty(MPD_ADAPTER_CLASSNAME_PROPERTY, DEFAULT_ADAPTER);
     }
 
     /**
@@ -31,7 +33,7 @@ public class MpdAdapterFactory
         MpdServiceAdapterIF mpdServiceAdapterIF;
         try
         {
-            @SuppressWarnings({"unchecked"}) Class<MpdServiceAdapterIF> adapterClass = (Class<MpdServiceAdapterIF>) Class.forName(adapterClassName);
+            @SuppressWarnings({"unchecked"}) Class<MpdServiceAdapterIF> adapterClass = (Class<MpdServiceAdapterIF>) Class.forName(System.getProperty(MPD_ADAPTER_CLASSNAME_PROPERTY));
             Constructor<MpdServiceAdapterIF> constructor = adapterClass.getConstructor();
             constructor.setAccessible(true);
             mpdServiceAdapterIF = constructor.newInstance();

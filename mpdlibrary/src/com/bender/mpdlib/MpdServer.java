@@ -100,6 +100,7 @@ public class MpdServer
                             volumeListener.volumeChanged(volume);
                         }
                     }
+                    break;
             }
         }
     }

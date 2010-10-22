@@ -11,4 +11,14 @@ public class StatusTuple extends Tuple<MpdStatus, String>
     {
         super(val1, val2);
     }
+
+    public MpdStatus getStatus()
+    {
+        return first();
+    }
+
+    public String getValue()
+    {
+        return second();
+    }
 }

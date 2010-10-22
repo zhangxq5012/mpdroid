@@ -146,8 +146,7 @@ public class MpdServerSimulator
                     idleSimCommand.run();
                     break;
                 case status:
-                    StatusSimCommand statusSimCommand = new StatusSimCommand(simBufferedWriter);
-                    statusSimCommand.run();
+                    runSimCommand(new StatusSimCommand(simBufferedWriter));
                     break;
                 case play:
                     PlaySimSimCommand playSimCommand = new PlaySimSimCommand(simBufferedWriter);
@@ -161,12 +160,18 @@ public class MpdServerSimulator
                     StopSimCommand stopSimCommand = new StopSimCommand(simBufferedWriter);
                     stopSimCommand.run();
                     break;
+                case next:
+                    runSimCommand(new NextSimCommand(simBufferedWriter));
+                    break;
                 case setvol:
                     VolumeSimCommand volumeSimCommand = new VolumeSimCommand(simBufferedWriter, stringTokenizer);
                     volumeSimCommand.run();
                     break;
                 case ping:
                     simBufferedWriter.write(Response.OK.toString());
+                    break;
+                case currentsong:
+                    runSimCommand(new CurrentSongSimCommand(simBufferedWriter));
                     break;
                 default:
                     simBufferedWriter.write(Response.ACK + "[5@0] \"" + commandString + "\" not implemented");
@@ -175,11 +180,25 @@ public class MpdServerSimulator
             System.out.println(getName() + command + " DONE");
         }
 
+        private void runSimCommand(SimCommand simCommand) throws IOException
+        {
+            try
+            {
+                simCommand.run();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                simBufferedWriter.write(Response.ACK + "[5@0] Unhandled Exception");
+            }
+        }
+
         private boolean connected()
         {
             return provider.isConnected();
         }
     }
+
 
     public static void main(String[] args) throws Exception
     {
