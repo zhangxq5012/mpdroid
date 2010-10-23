@@ -14,11 +14,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
     public MpdLibServiceAdapter()
     {
         mpdServer = new MpdServer();
-    }
-
-    void setMpdServer(MpdServer mpdServer)
-    {
-        this.mpdServer = mpdServer;
+        com.bender.mpdlib.util.Log.setLogStrategy(new AndroidLogStrategy());
     }
 
     public void connect(String server, int port, String password)

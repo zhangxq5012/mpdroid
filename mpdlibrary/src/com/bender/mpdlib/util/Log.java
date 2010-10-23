@@ -18,6 +18,11 @@ public class Log
         logStrategy = new SysOutLogStrategy();
     }
 
+    public static void setLogStrategy(LogStrategy logStrategy)
+    {
+        Log.logStrategy = logStrategy;
+    }
+
     public static void setLevel(LogStrategy.level lvl)
     {
         logStrategy.setLevel(lvl);
