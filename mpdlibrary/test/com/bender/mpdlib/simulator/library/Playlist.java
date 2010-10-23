@@ -1,0 +1,128 @@
+package com.bender.mpdlib.simulator.library;
+
+import com.bender.mpdlib.MpdStatus;
+import com.bender.mpdlib.SongInfo;
+import com.bender.mpdlib.Subsystem;
+import com.bender.mpdlib.commands.StatusTuple;
+import com.bender.mpdlib.simulator.commands.SubSystemSupport;
+import com.bender.mpdlib.util.Log;
+import noNamespace.LibraryDocument;
+import noNamespace.SongType;
+
+import java.math.BigInteger;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * todo: replace with documentation
+ */
+public class Playlist
+{
+    public static final String TAG = Playlist.class.getSimpleName();
+    private SongInfo currentSong;
+
+    private List<SongInfo> library;
+    private SubSystemSupport subSystemSupport;
+
+
+    public Playlist(SubSystemSupport subSystemSupport)
+    {
+        library = new ArrayList<SongInfo>();
+        URL libraryXml = getClass().getResource("/com/bender/mpdlib/simulator/library/library.xml");
+        try
+        {
+            LibraryDocument libraryDocument = LibraryDocument.Factory.parse(libraryXml);
+            SongType[] songs = libraryDocument.getLibrary().getSongArray();
+            for (SongType song : songs)
+            {
+                SongInfo songInfo = new SongInfo();
+                updateSong(songInfo, song);
+                library.add(songInfo);
+            }
+            Log.v(TAG, "Loaded library. (" + library.size() + ") entries");
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "Error parsing library xml", e);
+        }
+        this.subSystemSupport = subSystemSupport;
+        if (!library.isEmpty())
+        {
+            currentSong = library.get(0);
+        }
+    }
+
+    private static void updateSong(SongInfo songInfo, SongType song)
+    {
+        String artist = song.getArtist();
+        songInfo.updateValue(SongInfo.SongAttributeType.Artist, artist);
+        String file = song.getFile();
+        songInfo.updateValue(SongInfo.SongAttributeType.file, file);
+        BigInteger id = song.getId();
+        songInfo.updateValue(SongInfo.SongAttributeType.Id, id);
+        BigInteger date = song.getDate();
+        songInfo.updateValue(SongInfo.SongAttributeType.Date, date);
+        String genre = song.getGenre();
+        songInfo.updateValue(SongInfo.SongAttributeType.Genre, genre);
+        BigInteger pos = song.getPos();
+        songInfo.updateValue(SongInfo.SongAttributeType.Pos, pos);
+        BigInteger time = song.getTime();
+        songInfo.updateValue(SongInfo.SongAttributeType.Time, time);
+        String title = song.getTitle();
+        songInfo.updateValue(SongInfo.SongAttributeType.Title, title);
+    }
+
+    public SongInfo getCurrentSong()
+    {
+        return currentSong;
+    }
+
+    public StatusTuple getStatus()
+    {
+        if (currentSong != null)
+        {
+            return new StatusTuple(MpdStatus.songid, currentSong.getValue(SongInfo.SongAttributeType.Id));
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void next()
+    {
+        int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
+        gotoSongIndex(index);
+    }
+
+    private void gotoSongIndex(int index)
+    {
+        if (index >= library.size())
+        {
+            index = 0;
+        }
+        else if (index < 0)
+        {
+            index = library.size() - 1;
+        }
+        currentSong = library.get(index);
+        subSystemSupport.updateSubSystemChanged(Subsystem.player);
+    }
+
+    public void previous()
+    {
+        int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
+        gotoSongIndex(index - 2);
+    }
+
+    public int size()
+    {
+        return library.size();
+    }
+
+    public void addSong(SongInfo songInfo)
+    {
+        library.add(songInfo);
+    }
+}

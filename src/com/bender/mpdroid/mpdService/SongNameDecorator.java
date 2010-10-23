@@ -47,4 +47,9 @@ public class SongNameDecorator implements MpdSongAdapterIF
     {
         return implementation.getDate();
     }
+
+    public Integer getSongLength()
+    {
+        return implementation.getSongLength();
+    }
 }

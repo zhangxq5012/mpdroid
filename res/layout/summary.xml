@@ -91,5 +91,29 @@
               android:layout_height="wrap_content"
             />
 
+    <TextView
+            android:tag="@string/progress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+
+    <!--<LinearLayout-->
+    <!--android:orientation="horizontal"-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!-->-->
+    <SeekBar
+            android:id="@+id/song_progress"
+            android:max="100"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+    <TextView
+            android:id="@+id/song_progress_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    <!--</LinearLayout>-->
+
 
 </LinearLayout>

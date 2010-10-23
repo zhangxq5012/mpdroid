@@ -4,6 +4,7 @@ import com.bender.mpdlib.SocketStreamProviderIF;
 import com.bender.mpdlib.commands.MpdCommands;
 import com.bender.mpdlib.commands.Response;
 import com.bender.mpdlib.simulator.commands.*;
+import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
 import java.io.BufferedReader;

@@ -36,4 +36,9 @@ class NullSongAdapter implements MpdSongAdapterIF
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    public Integer getSongLength()
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

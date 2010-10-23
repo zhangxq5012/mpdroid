@@ -1,9 +1,9 @@
 package com.bender.mpdlib.simulator;
 
 import com.bender.mpdlib.SocketStreamProviderIF;
-import com.bender.mpdlib.simulator.commands.Playlist;
 import com.bender.mpdlib.simulator.commands.SimPlayer;
 import com.bender.mpdlib.simulator.commands.SubSystemSupport;
+import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
 import java.io.*;

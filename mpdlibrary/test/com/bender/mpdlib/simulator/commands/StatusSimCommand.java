@@ -2,6 +2,7 @@ package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.commands.Response;
 import com.bender.mpdlib.commands.StatusTuple;
+import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
 import java.io.IOException;
@@ -36,8 +37,11 @@ public class StatusSimCommand extends SimCommand
 
     private void write(StatusTuple statusTuple) throws IOException
     {
-        String string = statusTuple.first() + ": " + statusTuple.second();
-        Log.v(getClass().getSimpleName(), "   " + string);
-        writer.println(string);
+        if (statusTuple != null)
+        {
+            String string = statusTuple.first() + ": " + statusTuple.second();
+            Log.v(getClass().getSimpleName(), "   " + string);
+            writer.println(string);
+        }
     }
 }

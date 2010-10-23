@@ -14,4 +14,6 @@ public interface MpdSongAdapterIF
     String getFile();
 
     String getDate();
+
+    Integer getSongLength();
 }

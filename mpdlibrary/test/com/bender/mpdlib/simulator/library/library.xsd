@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="library" type="libraryType"/>
+    <xs:complexType name="songType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="file"/>
+            <xs:element type="xs:string" name="Title"/>
+            <xs:element type="xs:positiveInteger" name="Time"/>
+            <xs:element type="xs:string" name="Artist"/>
+            <xs:element type="xs:string" name="Genre"/>
+            <xs:element type="xs:positiveInteger" name="Pos"/>
+            <xs:element type="xs:positiveInteger" name="Date"/>
+        </xs:sequence>
+        <xs:attribute type="xs:positiveInteger" name="id" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="libraryType">
+        <xs:sequence>
+            <xs:element type="songType" name="song" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

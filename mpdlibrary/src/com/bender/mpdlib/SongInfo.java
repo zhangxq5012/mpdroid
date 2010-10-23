@@ -14,7 +14,6 @@ public class SongInfo
     {
         file,
         Title,
-        //        Name,
         Artist,
         Album,
         Date,
@@ -49,8 +48,11 @@ public class SongInfo
         updateValue(songAttributeType, stringValue);
     }
 
-    public void updateValue(SongAttributeType songAttributeType, String value)
+    public void updateValue(SongAttributeType songAttributeType, Object value)
     {
-        valueMap.put(songAttributeType, value);
+        if (value != null)
+        {
+            valueMap.put(songAttributeType, value.toString());
+        }
     }
 }

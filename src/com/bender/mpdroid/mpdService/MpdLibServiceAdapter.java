@@ -235,6 +235,18 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
             {
                 return songInfo.getValue(SongInfo.SongAttributeType.Date);
             }
+
+            public Integer getSongLength()
+            {
+                try
+                {
+                    return Integer.valueOf(songInfo.getValue(SongInfo.SongAttributeType.Time));
+                }
+                catch (NumberFormatException e)
+                {
+                    return null;
+                }
+            }
         }
 
         private class SongChangeWrapper implements CurrentSongListener

@@ -2,6 +2,7 @@ package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.SongInfo;
 import com.bender.mpdlib.commands.Response;
+import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
 import java.io.PrintWriter;

@@ -32,6 +32,8 @@ public class MpDroidActivity extends Activity
     private Button muteButton;
     private TextView songNameTextView;
     private TextView songDetailsTextView;
+    private SeekBar songProgressSeekBar;
+    private TextView songProgressTextView;
 
     private MpdPreferences myPreferences;
 
@@ -51,6 +53,7 @@ public class MpDroidActivity extends Activity
         initializeWidgets();
         initializeListeners();
         updatePreferencesDisplay();
+        updateConnectedStatusOnUI(false);
         Log.v(TAG, "onCreate: DONE");
     }
 
@@ -68,6 +71,9 @@ public class MpDroidActivity extends Activity
         muteButton = (Button) findViewById(R.id.mute);
         songNameTextView = (TextView) findViewById(R.id.song_name);
         songDetailsTextView = (TextView) findViewById(R.id.song_details);
+        songProgressSeekBar = (SeekBar) findViewById(R.id.song_progress);
+        songProgressSeekBar.setVisibility(View.INVISIBLE);
+        songProgressTextView = (TextView) findViewById(R.id.song_progress_text);
     }
 
     private void initializeListeners()
@@ -93,6 +99,7 @@ public class MpDroidActivity extends Activity
     {
         if (requestCode == REQUEST_PREFERENCES)
         {
+            Log.v(TAG, "Preferences Updated");
             updatePreferencesDisplay();
         }
     }
@@ -131,7 +138,7 @@ public class MpDroidActivity extends Activity
     {
         String server = myPreferences.getServer();
         serverTextView.setText(getText(R.string.server) + ": " + server);
-        String port = String.valueOf(myPreferences.getDefaultPort());
+        String port = String.valueOf(myPreferences.getPort());
         portTextView.setText(getText(R.string.port) + ": " + port);
         boolean useAuthentication = myPreferences.useAuthentication();
         useAuthenticationCheckbox.setChecked(useAuthentication);
@@ -157,6 +164,14 @@ public class MpDroidActivity extends Activity
         prevButton.setEnabled(connected);
         volumeSeekBar.setEnabled(connected);
         muteButton.setEnabled(connected);
+        int visibility = connected ? View.VISIBLE : View.INVISIBLE;
+        songNameTextView.setVisibility(visibility);
+        songDetailsTextView.setVisibility(visibility);
+        if (!connected)
+        {
+            songProgressSeekBar.setVisibility(visibility);
+        }
+        songProgressTextView.setVisibility(visibility);
         if (connected)
         {
             GetVolumeTask getVolumeTask = new GetVolumeTask();
@@ -230,8 +245,11 @@ public class MpDroidActivity extends Activity
         protected void onPostExecute(Boolean connected)
         {
             updateConnectedStatusOnUI(connected);
-            Toast.makeText(MpDroidActivity.this,
-                    makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
+            if (!connected)
+            {
+                Toast.makeText(MpDroidActivity.this,
+                        makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
@@ -450,6 +468,35 @@ public class MpDroidActivity extends Activity
             details.append(" (" + date + ")");
         }
         songDetailsTextView.setText(details);
+        Integer length = mpdSongAdapterIF.getSongLength();
+        if (length != null)
+        {
+            CharSequence lengthString = getLengthString(length);
+            songProgressSeekBar.setMax(length);
+            songProgressSeekBar.setVisibility(View.INVISIBLE);
+            songProgressTextView.setText("<progress> - " + lengthString);
+            songProgressTextView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            songProgressTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private static CharSequence getLengthString(Integer length)
+    {
+        String stringBuffer = "";
+        do
+        {
+            int remainder = length % 60;
+            stringBuffer = String.format("%02d", remainder) + stringBuffer;
+            if ((length / 60) > 0)
+            {
+                stringBuffer = ":" + stringBuffer;
+            }
+        }
+        while ((length = length / 60) > 0);
+        return stringBuffer;
     }
 
     private class SongListener implements MpdSongListener
