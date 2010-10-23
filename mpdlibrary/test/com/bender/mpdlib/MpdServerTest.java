@@ -160,8 +160,9 @@ public class MpdServerTest extends TestCase
 
         int simId = Integer.valueOf(mpdServerSimulator.getPlaylist().getCurrentSong().getValue(SongInfo.SongAttributeType.Id));
         int id = Integer.valueOf(player.getCurrentSongInfo().getValue(SongInfo.SongAttributeType.Id));
-        assertEquals(10, simId);
-        assertEquals(10, id);
+        int size = mpdServerSimulator.getPlaylist().size();
+        assertEquals(size, simId);
+        assertEquals(size, id);
     }
 
     public void testGetVolume() throws Exception
@@ -262,6 +263,45 @@ public class MpdServerTest extends TestCase
 
         assertEquals(true, listener.playStatusUpdated);
         assertEquals(playStatus, listener.playStatus);
+    }
+
+    public void testArtist() throws Exception
+    {
+        final String ARTIST = "Test Artist";
+        mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Artist, ARTIST);
+        mpdServer.connect(HOSTNAME);
+        Player player = mpdServer.getPlayer();
+        smallWait();
+
+        String artist = player.getCurrentSongInfo().getValue(SongInfo.SongAttributeType.Artist);
+
+        assertEquals(ARTIST, artist);
+    }
+
+    public void testAlbum() throws Exception
+    {
+        final String ALBUM = "Test Album";
+        mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Album, ALBUM);
+
+        mpdServer.connect(HOSTNAME);
+        Player player = mpdServer.getPlayer();
+        smallWait();
+
+        String album = player.getCurrentSongInfo().getValue(SongInfo.SongAttributeType.Album);
+        assertEquals(ALBUM, album);
+    }
+
+    public void testFilename() throws Exception
+    {
+        final String FILENAME = "/test/path/filename.mp3";
+        mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.file, FILENAME);
+
+        mpdServer.connect(HOSTNAME);
+        Player player = mpdServer.getPlayer();
+        smallWait();
+
+        String filename = player.getCurrentSongInfo().getValue(SongInfo.SongAttributeType.file);
+        assertEquals(FILENAME, filename);
     }
 
     private static class MyVolumeListener implements VolumeListener

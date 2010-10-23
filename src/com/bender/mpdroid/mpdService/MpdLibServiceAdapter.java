@@ -222,12 +222,17 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
             public String getArtist()
             {
-                return null;
+                return songInfo.getValue(SongInfo.SongAttributeType.Artist);
             }
 
             public String getAlbumName()
             {
-                return null;
+                return songInfo.getValue(SongInfo.SongAttributeType.Album);
+            }
+
+            public String getFile()
+            {
+                return songInfo.getValue(SongInfo.SongAttributeType.file);
             }
         }
 

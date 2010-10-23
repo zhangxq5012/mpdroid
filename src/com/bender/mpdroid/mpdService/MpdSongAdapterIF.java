@@ -10,4 +10,6 @@ public interface MpdSongAdapterIF
     String getArtist();
 
     String getAlbumName();
+
+    String getFile();
 }

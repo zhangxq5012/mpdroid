@@ -26,4 +26,9 @@ class NullSongAdapter implements MpdSongAdapterIF
         Log.e(TAG, "getAlbumName() called on NULL object");
         return null;
     }
+
+    public String getFile()
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

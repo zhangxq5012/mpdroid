@@ -15,11 +15,13 @@ public class Playlist
 {
     private SongInfo currentSong;
 
-    private static List<SongInfo> library;
+    private List<SongInfo> library;
     private SubSystemSupport subSystemSupport;
 
-    static
+
+    public Playlist(SubSystemSupport subSystemSupport)
     {
+        this.subSystemSupport = subSystemSupport;
         library = new ArrayList<SongInfo>();
         for (int i = 0; i < 10; i++)
         {
@@ -27,13 +29,14 @@ public class Playlist
             SongInfo songInfo = new SongInfo();
             songInfo.updateValue(SongInfo.SongAttributeType.Title, "Simulator Song Title " + id);
             songInfo.updateValue(SongInfo.SongAttributeType.Id, id.toString());
+            songInfo.updateValue(SongInfo.SongAttributeType.Artist, "Simulator Artist");
+            songInfo.updateValue(SongInfo.SongAttributeType.Album, "Simulator Album");
             library.add(songInfo);
         }
-    }
-
-    public Playlist(SubSystemSupport subSystemSupport)
-    {
-        this.subSystemSupport = subSystemSupport;
+        SongInfo songInfo = new SongInfo();
+        songInfo.updateValue(SongInfo.SongAttributeType.Id, Integer.toString(library.size() + 1));
+        songInfo.updateValue(SongInfo.SongAttributeType.file, "/simulator/path/filename.mp3");
+        library.add(songInfo);
         currentSong = library.get(0);
     }
 
@@ -71,5 +74,15 @@ public class Playlist
     {
         int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
         gotoSongIndex(index - 2);
+    }
+
+    public int size()
+    {
+        return library.size();
+    }
+
+    public void addSong(SongInfo songInfo)
+    {
+        library.add(songInfo);
     }
 }

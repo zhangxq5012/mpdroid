@@ -24,19 +24,12 @@ public class MpdServer
     private MpdPlayer player;
     private static final String TAG = MpdServer.class.getSimpleName();
 
+    /**
+     * Normal use constructor.
+     */
     public MpdServer()
     {
         this(new SocketStreamProvider(), new SocketStreamProvider());
-    }
-
-    /**
-     * For testing only.
-     *
-     * @param socketStreamProviderIF stream provider to use for both pipes
-     */
-    public MpdServer(SocketStreamProviderIF socketStreamProviderIF)
-    {
-        this(socketStreamProviderIF, socketStreamProviderIF);
     }
 
     /**

@@ -161,7 +161,7 @@ public class MpDroidActivity extends Activity
         {
             GetVolumeTask getVolumeTask = new GetVolumeTask();
             getVolumeTask.execute();
-            GetSongTask getSongTask = new GetSongTask();
+            GetSongTask getSongTask = new GetSongTask(this, mpdPlayerAdapterIF);
             getSongTask.execute();
         }
     }
@@ -437,33 +437,20 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class GetSongTask extends AsyncTask<Object, Object, MpdSongAdapterIF>
-    {
-        @Override
-        protected MpdSongAdapterIF doInBackground(Object... objects)
-        {
-            MpdSongAdapterIF currentSong = mpdPlayerAdapterIF.getCurrentSong();
-            return currentSong;
-        }
-
-        @Override
-        protected void onPostExecute(MpdSongAdapterIF mpdSongAdapterIF)
-        {
-            updateSongOnUI(mpdSongAdapterIF);
-        }
-
-    }
-
-    private void updateSongOnUI(MpdSongAdapterIF mpdSongAdapterIF)
+    void updateSongOnUI(MpdSongAdapterIF mpdSongAdapterIF)
     {
         String songName = mpdSongAdapterIF.getSongName();
         songNameTextView.setText(songName);
         String artist = mpdSongAdapterIF.getArtist();
         String album = mpdSongAdapterIF.getAlbumName();
-        String details = "";
-        if (artist != null && album != null)
+        StringBuilder details = new StringBuilder();
+        if (artist != null)
         {
-            details = "by " + artist + " from " + album;
+            details.append("by ").append(artist);
+        }
+        if (album != null)
+        {
+            details.append(" from " + album);
         }
         songDetailsTextView.setText(details);
     }
@@ -476,7 +463,7 @@ public class MpDroidActivity extends Activity
             {
                 public void run()
                 {
-                    updateSongOnUI(song);
+                    updateSongOnUI(new SongNameDecorator(song));
                 }
             };
             runOnUiThread(runnable);

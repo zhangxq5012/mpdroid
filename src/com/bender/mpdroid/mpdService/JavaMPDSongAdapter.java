@@ -53,4 +53,9 @@ class JavaMPDSongAdapter implements MpdSongAdapterIF
         }
         return albumName;
     }
+
+    public String getFile()
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

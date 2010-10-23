@@ -17,6 +17,7 @@ public class SongInfo
         Title,
         //        Name,
         Artist,
+        Album,
         Date,
         Genre,
         Time,
