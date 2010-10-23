@@ -2,7 +2,6 @@ package com.bender.mpdlib;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * todo: replace with documentation
@@ -44,9 +43,9 @@ public class SongInfo
 
     public void updateValue(String line)
     {
-        StringTokenizer stringTokenizer = new StringTokenizer(line, ":");
-        SongAttributeType songAttributeType = SongAttributeType.parse(stringTokenizer.nextToken());
-        String stringValue = stringTokenizer.nextToken().trim();
+        String[] strings = line.split(":");
+        SongAttributeType songAttributeType = SongAttributeType.parse(strings[0].trim());
+        String stringValue = strings[1].trim();
         updateValue(songAttributeType, stringValue);
     }
 

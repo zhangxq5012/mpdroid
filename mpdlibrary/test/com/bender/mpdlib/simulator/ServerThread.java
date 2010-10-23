@@ -9,7 +9,6 @@ import com.bender.mpdlib.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.StringTokenizer;
 
 /**
  * todo: replace with documentation
@@ -79,8 +78,8 @@ class ServerThread extends Thread
 
     private void process(String line) throws IOException
     {
-        StringTokenizer stringTokenizer = new StringTokenizer(line);
-        String commandString = stringTokenizer.nextToken().trim();
+        String[] strings = line.split("\\s");
+        String commandString = strings[0].trim();
         MpdCommands command = MpdCommands.parse(commandString);
         if (command == null)
         {
@@ -118,7 +117,7 @@ class ServerThread extends Thread
                 runSimCommand(new PreviousSimCommand(printWriter, playlist));
                 break;
             case setvol:
-                VolumeSimCommand volumeSimCommand = new VolumeSimCommand(printWriter, stringTokenizer, simPlayer);
+                VolumeSimCommand volumeSimCommand = new VolumeSimCommand(printWriter, strings, simPlayer);
                 volumeSimCommand.run();
                 break;
             case ping:

@@ -1,6 +1,5 @@
 package com.bender.mpdlib;
 
-import java.util.StringTokenizer;
 
 /**
  * todo: replace with documentation
@@ -17,11 +16,11 @@ public enum Subsystem
 
     public static Subsystem parse(String changedLine)
     {
-        StringTokenizer stringTokenizer = new StringTokenizer(changedLine, ":");
-        String changed = stringTokenizer.nextToken();
-        if (changed.equals("changed") && stringTokenizer.hasMoreTokens())
+        String[] strings = changedLine.split(":");
+        String changed = strings[0].trim();
+        if (changed.equals("changed") && strings.length == 2)
         {
-            String subsystemString = stringTokenizer.nextToken().trim();
+            String subsystemString = strings[1].trim();
             for (Subsystem subsystem : values())
             {
                 if (subsystemString.equals(subsystem.toString()))

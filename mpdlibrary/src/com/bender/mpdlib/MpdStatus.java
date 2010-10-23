@@ -2,8 +2,6 @@ package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.StatusTuple;
 
-import java.util.StringTokenizer;
-
 /**
  * todo: replace with documentation
  */
@@ -29,8 +27,8 @@ public enum MpdStatus
     public static StatusTuple parse(String line)
     {
         MpdStatus status = null;
-        StringTokenizer stringTokenizer = new StringTokenizer(line, ":");
-        String statusString = stringTokenizer.nextToken();
+        String[] strings = line.split(":");
+        String statusString = strings[0].trim();
         for (MpdStatus mpdStatus : values())
         {
             if (mpdStatus.toString().equals(statusString))
@@ -38,7 +36,7 @@ public enum MpdStatus
                 status = mpdStatus;
             }
         }
-        String valueString = stringTokenizer.nextToken().trim();
+        String valueString = strings[1].trim();
         StatusTuple statusTuple = new StatusTuple(status, valueString);
         return statusTuple;
     }

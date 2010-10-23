@@ -3,32 +3,31 @@ package com.bender.mpdlib.simulator.commands;
 import com.bender.mpdlib.commands.Response;
 
 import java.io.PrintWriter;
-import java.util.StringTokenizer;
 
 /**
  * todo: replace with documentation
  */
 public class VolumeSimCommand extends SimCommand
 {
-    private StringTokenizer stringTokenizer;
     private SimPlayer simPlayer;
+    private String[] command;
 
-    public VolumeSimCommand(PrintWriter writer, StringTokenizer tokenizer, SimPlayer simPlayer)
+    public VolumeSimCommand(PrintWriter writer, String[] command, SimPlayer simPlayer)
     {
         super(writer);
         this.simPlayer = simPlayer;
-        stringTokenizer = tokenizer;
+        this.command = command;
     }
 
     @Override
     public void run()
     {
-        if (stringTokenizer.hasMoreTokens())
+        if (command.length == 2)
         {
             Integer volume;
             try
             {
-                volume = Integer.parseInt(stringTokenizer.nextToken());
+                volume = Integer.parseInt(command[1].trim());
                 setVolume(volume);
                 writer.println(Response.OK);
             }
