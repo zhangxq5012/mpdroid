@@ -304,6 +304,19 @@ public class MpdServerTest extends TestCase
         assertEquals(FILENAME, filename);
     }
 
+    public void testDate() throws Exception
+    {
+        final String DATE = "2010";
+        mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Date, DATE);
+
+        mpdServer.connect(HOSTNAME);
+        Player player = mpdServer.getPlayer();
+        smallWait();
+
+        String date = player.getCurrentSongInfo().getValue(SongInfo.SongAttributeType.Date);
+        assertEquals(DATE, date);
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;

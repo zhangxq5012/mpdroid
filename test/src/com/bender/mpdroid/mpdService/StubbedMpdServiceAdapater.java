@@ -146,6 +146,11 @@ public class StubbedMpdServiceAdapater implements MpdServiceAdapterIF
             {
                 return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
+
+            public String getDate()
+            {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
         }
     }
 }

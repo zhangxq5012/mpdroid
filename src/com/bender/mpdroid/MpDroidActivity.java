@@ -338,22 +338,14 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class PlayTask extends AsyncTask<Object, Object, MpdPlayerAdapterIF.PlayStatus>
+    private class PlayTask extends AsyncTask<Object, Object, Object>
     {
         @Override
-        protected MpdPlayerAdapterIF.PlayStatus doInBackground(Object... objects)
+        protected Object doInBackground(Object... objects)
         {
             mpdPlayerAdapterIF.playOrPause();
-            return mpdPlayerAdapterIF.getPlayStatus();
+            return null;
         }
-
-        @Override
-        protected void onPostExecute(MpdPlayerAdapterIF.PlayStatus playStatus)
-        {
-            Log.v(TAG, "Play Status Update: " + playStatus);
-            updatePlayStatusOnUI(playStatus);
-        }
-
     }
 
     private class NextTask extends AsyncTask<Object, Object, Object>
@@ -443,6 +435,7 @@ public class MpDroidActivity extends Activity
         songNameTextView.setText(songName);
         String artist = mpdSongAdapterIF.getArtist();
         String album = mpdSongAdapterIF.getAlbumName();
+        String date = mpdSongAdapterIF.getDate();
         StringBuilder details = new StringBuilder();
         if (artist != null)
         {
@@ -451,6 +444,10 @@ public class MpDroidActivity extends Activity
         if (album != null)
         {
             details.append(" from " + album);
+        }
+        if (date != null)
+        {
+            details.append(" (" + date + ")");
         }
         songDetailsTextView.setText(details);
     }

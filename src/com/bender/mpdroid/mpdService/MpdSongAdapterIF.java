@@ -12,4 +12,6 @@ public interface MpdSongAdapterIF
     String getAlbumName();
 
     String getFile();
+
+    String getDate();
 }
