@@ -28,7 +28,7 @@ class ServerThread extends Thread
 
     public ServerThread(SocketStreamProviderIF commandStreamProvider, Playlist playlist, SimPlayer simPlayer, SubSystemSupport subSystemSupport)
     {
-        super("Sim-" + count++ + ":");
+        super("Sim-" + count++);
         this.playlist = playlist;
         this.simPlayer = simPlayer;
         this.subSystemSupport = subSystemSupport;

@@ -11,56 +11,119 @@ public class Log
     public static final String PATTERN = "MM-dd HH:mm:ss.SSS";
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(PATTERN);
 
-    private enum level
+    private static LogStrategy logStrategy;
+
+    static
     {
-        VERBOSE,
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
-        WTF
+        logStrategy = new SysOutLogStrategy();
+    }
+
+    public static void setLevel(LogStrategy.level lvl)
+    {
+        logStrategy.setLevel(lvl);
     }
 
     public static void v(String tag, String text)
     {
-        print(level.VERBOSE, tag, text);
+        logStrategy.v(tag, text);
     }
 
-    private static void print(level verbose, String tag, String text)
-    {
-        System.out.println(SIMPLE_DATE_FORMAT.format(new Date())
-                + "-(" + Thread.currentThread().getName()
-                + ")-[" + verbose + "]->" + tag + ": " + text);
-    }
 
     public static void d(String tag, String text)
     {
-        print(level.DEBUG, tag, text);
+        logStrategy.d(tag, text);
     }
 
     public static void i(String tag, String text)
     {
-        print(level.INFO, tag, text);
+        logStrategy.i(tag, text);
     }
 
     public static void w(String tag, String text)
     {
-        print(level.WARN, tag, text);
+        logStrategy.w(tag, text);
     }
 
     public static void e(String tag, String text, Exception e)
     {
-        print(level.ERROR, tag, text);
-        e.printStackTrace(System.out);
+        logStrategy.e(tag, text, e);
     }
 
     public static void e(String tag, Exception e)
     {
-        e(tag, e.getMessage(), e);
+        logStrategy.e(tag, e);
     }
 
     public static void wtf(String tag, String text)
     {
-        print(level.WTF, tag, text);
+        logStrategy.wtf(tag, text);
+    }
+
+    private static class SysOutLogStrategy implements LogStrategy
+    {
+
+        private void print(level lvl, String tag, String text)
+        {
+            if (isEnabled(lvl))
+            {
+                System.out.println(SIMPLE_DATE_FORMAT.format(new Date())
+                        + "-(" + Thread.currentThread().getName()
+                        + ")-[" + lvl + "]->" + tag + ": " + text);
+            }
+        }
+
+        private boolean isEnabled(level lvl)
+        {
+            synchronized (this)
+            {
+                return currentLevel.isEnabled(lvl);
+            }
+        }
+
+        private level currentLevel = level.VER;
+
+        public void setLevel(level lvl)
+        {
+            synchronized (this)
+            {
+                currentLevel = lvl;
+            }
+        }
+
+        public void v(String tag, String text)
+        {
+            print(level.VER, tag, text);
+        }
+
+        public void d(String tag, String text)
+        {
+            print(level.DBG, tag, text);
+        }
+
+        public void i(String tag, String text)
+        {
+            print(level.INF, tag, text);
+        }
+
+        public void w(String tag, String text)
+        {
+            print(level.WRN, tag, text);
+        }
+
+        public void e(String tag, String text, Exception e)
+        {
+            print(level.ERR, tag, text);
+            e.printStackTrace(System.out);
+        }
+
+        public void e(String tag, Exception e)
+        {
+            e(tag, e.getMessage(), e);
+        }
+
+        public void wtf(String tag, String text)
+        {
+            print(level.WTF, tag, text);
+        }
     }
 }
