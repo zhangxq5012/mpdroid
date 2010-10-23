@@ -4,6 +4,7 @@ import com.bender.mpdlib.SocketStreamProviderIF;
 import com.bender.mpdlib.commands.MpdCommands;
 import com.bender.mpdlib.commands.Response;
 import com.bender.mpdlib.simulator.commands.*;
+import com.bender.mpdlib.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +24,7 @@ class ServerThread extends Thread
     private SimPlayer simPlayer;
     private SubSystemSupport subSystemSupport;
     private boolean forceClose;
+    private static final String TAG = "MpdServerThread";
 
     public ServerThread(SocketStreamProviderIF commandStreamProvider, Playlist playlist, SimPlayer simPlayer, SubSystemSupport subSystemSupport)
     {
@@ -58,7 +60,7 @@ class ServerThread extends Thread
             }
             catch (IOException e)
             {
-                e.printStackTrace(System.out);
+                Log.e(TAG, e);
             }
             if (!connected() || line == null)
             {
@@ -70,7 +72,7 @@ class ServerThread extends Thread
             }
             catch (IOException e)
             {
-                e.printStackTrace(System.out);
+                Log.e(TAG, e);
             }
         }
     }
@@ -85,7 +87,7 @@ class ServerThread extends Thread
             printWriter.println(Response.ACK + " [5@0] {} unknown command \"" + commandString + "\"");
             return;
         }
-        System.out.println(getName() + "process(): " + command);
+        Log.v(TAG, "process(): " + command);
         switch (command)
         {
             case close:
@@ -129,7 +131,7 @@ class ServerThread extends Thread
                 printWriter.write(Response.ACK + "[5@0] \"" + commandString + "\" not implemented");
                 break;
         }
-        System.out.println(getName() + command + " DONE");
+        Log.v(TAG, command + " DONE");
     }
 
     private void runSimCommand(SimCommand simCommand) throws IOException

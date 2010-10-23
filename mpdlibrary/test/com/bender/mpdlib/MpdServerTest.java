@@ -19,13 +19,7 @@ public class MpdServerTest extends TestCase
     public void setUp() throws Exception
     {
         mpdServerSimulator = new MpdServerSimulator();
-        mpdServerSimulator.getSubSystemSupport().setIdleStrategy(new SubSystemSupport.IdleStrategy()
-        {
-            public void execute(Runnable runnable)
-            {
-                runnable.run();
-            }
-        });
+        mpdServerSimulator.getSubSystemSupport().setIdleStrategy(new SingleThreadIdleStrategy());
         SocketStreamProviderIF mpdSocket = mpdServerSimulator.createMpdSocket();
         SocketStreamProviderIF mpdSocket1 = mpdServerSimulator.createMpdSocket();
         mpdServer = new MpdServer(mpdSocket, mpdSocket1);
@@ -279,6 +273,14 @@ public class MpdServerTest extends TestCase
         {
             volumeChanged = true;
             newVolume = volume;
+        }
+    }
+
+    private static class SingleThreadIdleStrategy implements SubSystemSupport.IdleStrategy
+    {
+        public void execute(Runnable runnable)
+        {
+            runnable.run();
         }
     }
 

@@ -18,15 +18,7 @@ public class SubSystemSupport
 
     public SubSystemSupport()
     {
-        idleStrategy = new IdleStrategy()
-        {
-            public void execute(Runnable runnable)
-            {
-                Log.i("SubSystemSupport", "Using threading idle strategy");
-                Thread thread = new Thread(runnable);
-                thread.start();
-            }
-        };
+        setIdleStrategy(new ThreadingIdleStrategy());
     }
 
     public void disconnect()
@@ -68,7 +60,7 @@ public class SubSystemSupport
         synchronized (this)
         {
             changedSubsystem = subsystem;
-            System.out.println(getClass().getSimpleName() + ": subsystem changed: " + changedSubsystem);
+            Log.v(getClass().getSimpleName(), ": subsystem changed: " + changedSubsystem);
             notifyAll();
         }
     }
@@ -80,11 +72,21 @@ public class SubSystemSupport
 
     public void setIdleStrategy(IdleStrategy idleStrategy)
     {
+        Log.i("SubSystemSupport", "Using " + idleStrategy.getClass().getSimpleName());
         this.idleStrategy = idleStrategy;
     }
 
     public interface IdleStrategy
     {
         void execute(Runnable runnable);
+    }
+
+    private static class ThreadingIdleStrategy implements IdleStrategy
+    {
+        public void execute(Runnable runnable)
+        {
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
     }
 }

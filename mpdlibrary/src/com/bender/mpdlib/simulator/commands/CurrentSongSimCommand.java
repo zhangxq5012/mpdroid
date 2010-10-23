@@ -2,6 +2,7 @@ package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.SongInfo;
 import com.bender.mpdlib.commands.Response;
+import com.bender.mpdlib.util.Log;
 
 import java.io.PrintWriter;
 
@@ -30,7 +31,7 @@ public class CurrentSongSimCommand extends SimCommand
                 writer.println(songAttributeType + ": " + value);
             }
         }
-        System.out.println(getClass().getSimpleName() + ": id=" + currentSong.getValue(SongInfo.SongAttributeType.Id));
+        Log.v(getClass().getSimpleName(), ": id=" + currentSong.getValue(SongInfo.SongAttributeType.Id));
         writer.println(Response.OK);
     }
 

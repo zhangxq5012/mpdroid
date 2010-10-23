@@ -4,6 +4,7 @@ import com.bender.mpdlib.SocketStreamProviderIF;
 import com.bender.mpdlib.simulator.commands.Playlist;
 import com.bender.mpdlib.simulator.commands.SimPlayer;
 import com.bender.mpdlib.simulator.commands.SubSystemSupport;
+import com.bender.mpdlib.util.Log;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -19,6 +20,7 @@ public class MpdServerSimulator
     private SimPlayer simPlayer;
     private Playlist playlist;
     private SubSystemSupport subSystemSupport;
+    private static final String TAG = MpdServerSimulator.class.getSimpleName();
 
     public MpdServerSimulator()
     {
@@ -60,7 +62,7 @@ public class MpdServerSimulator
 
         public void connect(SocketAddress socketAddress) throws IOException
         {
-            System.out.println("SIM connect(addr=" + socketAddress + ")");
+            Log.v(TAG, "connect(addr=" + socketAddress + ")");
             clientPipedReader = new PipedReader();
             PipedWriter simPipedWriter = new PipedWriter(clientPipedReader);
             simBufferedWriter = new PrintWriter(simPipedWriter, true);
@@ -94,7 +96,7 @@ public class MpdServerSimulator
                 }
             }, playlist, simPlayer, subSystemSupport);
             serverThread.start();
-            System.out.println("SIM connect()");
+            Log.v(TAG, "SIM connect()");
         }
 
         public BufferedReader getBufferedReader() throws IOException
@@ -115,7 +117,7 @@ public class MpdServerSimulator
             simBufferedWriter.close();
             simBufferedReader.close();
             serverThread.interrupt();
-            System.out.println("disconnect()");
+            Log.v(TAG, "disconnect()");
         }
 
         public boolean isConnected()
@@ -197,7 +199,7 @@ public class MpdServerSimulator
         while (true)
         {
             final Socket clientSocket = serverSocket.accept();
-            System.out.println("client connected" + clientSocket.getInetAddress());
+            Log.v(TAG, "client connected" + clientSocket.getInetAddress());
             final ServerThread serverThread = new ServerThread(new SocketStreamProviderIF()
             {
                 public void connect(SocketAddress socketAddress) throws IOException

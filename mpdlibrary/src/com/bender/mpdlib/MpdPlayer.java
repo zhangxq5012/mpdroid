@@ -1,6 +1,7 @@
 package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.*;
+import com.bender.mpdlib.util.Log;
 
 import java.util.List;
 
@@ -24,7 +25,6 @@ class MpdPlayer implements Player
 
     public void play()
     {
-        System.out.println(TAG + ": play()");
         CommandRunner.runCommand(new PlayCommand(commandPipe));
     }
 
@@ -36,19 +36,16 @@ class MpdPlayer implements Player
 
     public void stop()
     {
-        System.out.println(TAG + ": stop()");
         CommandRunner.runCommand(new StopCommand(commandPipe));
     }
 
     public void next()
     {
-        System.out.println(TAG + ": next()");
         CommandRunner.runCommand(new NextCommand(commandPipe));
     }
 
     public void pause()
     {
-        System.out.println(TAG + ": pause()");
         CommandRunner.runCommand(new PauseCommand(commandPipe));
     }
 
@@ -59,7 +56,6 @@ class MpdPlayer implements Player
 
     public void previous()
     {
-        System.out.println(TAG + ": previous()");
         CommandRunner.runCommand(new PreviousCommand(commandPipe));
     }
 
@@ -101,13 +97,12 @@ class MpdPlayer implements Player
         if (changed)
         {
             songId = newSongId;
-            System.out.println(TAG + ": GetCurrentSongCommand");
             Result<SongInfo> result = CommandRunner.runCommand(new GetCurrentSongCommand(commandPipe));
             if (result.status.isSuccessful())
             {
                 currentSongInfo = result.result;
                 currentSongListener.songUpdated(result.result);
-                System.out.println(TAG + ": songUpdated(): " + result.result.getValue(SongInfo.SongAttributeType.Id));
+                Log.i(TAG, "songUpdated(): " + result.result.getValue(SongInfo.SongAttributeType.Id));
             }
         }
     }
@@ -124,7 +119,7 @@ class MpdPlayer implements Player
         if (changed)
         {
             myListener.playStatusChanged(newPlayStatus);
-            System.out.println(TAG + ": playStatusChanged: " + newPlayStatus);
+            Log.i(TAG, "playStatusChanged(): " + newPlayStatus);
         }
     }
 
@@ -138,7 +133,6 @@ class MpdPlayer implements Player
     {
         public void playStatusChanged(PlayStatus playStatus)
         {
-            System.out.println(getClass().getSimpleName() + "playStatusChanged()" + playStatus);
         }
     }
 

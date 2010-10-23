@@ -2,7 +2,6 @@ package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.*;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
@@ -72,7 +71,7 @@ public class MpdServer
             processStatuses(listResult.result);
 
 
-            callbackThread = new CallbackThread(socketAddress);
+            callbackThread = new CallbackThread(this, socketAddress, callbackPipe);
             callbackThread.start();
         }
         catch (Exception e)
@@ -81,7 +80,7 @@ public class MpdServer
         }
     }
 
-    private void processStatuses(List<StatusTuple> result)
+    void processStatuses(List<StatusTuple> result)
     {
         getPlayer();
         player.processStatus(result);
@@ -166,86 +165,6 @@ public class MpdServer
     public void addVolumeListener(VolumeListener listener)
     {
         volumeListener = listener;
-    }
-
-    private class CallbackThread extends Thread
-    {
-        private SocketAddress address;
-        private volatile boolean disconnected;
-
-        public CallbackThread(SocketAddress theAddress)
-        {
-            super("MpdServer.CallbackThread");
-            address = theAddress;
-        }
-
-        public void run()
-        {
-            try
-            {
-                Result<String> connectResult = CommandRunner.runCommand(new ConnectCommand(callbackPipe, address));
-                if (!connectResult.status.isSuccessful())
-                {
-                    System.out.println(TAG + "connect unsuccessful: " + connectResult.status.getResultString());
-                    return;
-                }
-                while (!disconnected)
-                {
-                    Result<List<Subsystem>> idleResult = CommandRunner.runCommand(new IdleCommand(callbackPipe));
-                    if (disconnected)
-                    {
-                        System.out.println("CallbackThread disconnected");
-                        return;
-                    }
-                    if (idleResult.status.isSuccessful())
-                    {
-                        System.out.println("CallbackThread: idle successful");
-                        List<Subsystem> result = idleResult.result;
-                        if (result.contains(Subsystem.mixer) || result.contains(Subsystem.player))
-                        {
-                            getAndProcessStatus();
-                        }
-                    }
-                    else
-                    {
-                        System.out.println(TAG + "idle unsuccessful: " + idleResult.status.getResultString());
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                if (!disconnected)
-                {
-                    System.out.println("CallbackThread ERROR" + e.getMessage());
-                    e.printStackTrace(System.out);
-                }
-            }
-            System.out.println(TAG + "CallbackThread DONE");
-        }
-
-        private void getAndProcessStatus()
-        {
-            Result<List<StatusTuple>> listResult = CommandRunner.runCommand(new GetStatusCommand(callbackPipe));
-            System.out.println("CallbackThread.getAndProcessStatus " + listResult.result.size());
-            processStatuses(listResult.result);
-        }
-
-        @Override
-        public void interrupt()
-        {
-            disconnected = true;
-            try
-            {
-//                CommandRunner.runCommand(new DisconnectCommand(callbackPipe));
-                callbackPipe.write(MpdCommands.close);
-                callbackPipe.disconnect();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            super.interrupt();
-        }
     }
 
 
