@@ -12,7 +12,6 @@ import java.net.Socket;
 import java.net.SocketAddress;
 
 /**
- * todo: replace with documentation
  */
 public class MpdServerSimulator
 {

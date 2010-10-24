@@ -3,7 +3,6 @@ package com.bender.mpdlib;
 import com.bender.mpdlib.commands.StatusTuple;
 
 /**
- * todo: replace with documentation
  */
 public enum MpdStatus
 {

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 /**
- * todo: replace with documentation
  */
 public abstract class Command<V, T> implements Callable<T>
 {

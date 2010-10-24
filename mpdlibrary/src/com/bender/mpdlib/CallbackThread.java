@@ -8,7 +8,6 @@ import java.net.SocketAddress;
 import java.util.List;
 
 /**
- * todo: replace with documentation
  */
 class CallbackThread extends Thread
 {

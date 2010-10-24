@@ -8,7 +8,6 @@ import com.bender.mpdlib.util.Log;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 public class CurrentSongSimCommand extends SimCommand
 {

@@ -11,7 +11,7 @@ public interface MpdPlayerAdapterIF
 
     void prev();
 
-    Integer setVolume(Integer volume);
+    void setVolume(Integer volume);
 
     Integer getVolume();
 
@@ -37,7 +37,6 @@ public interface MpdPlayerAdapterIF
     }
 
     /**
-     * todo: replace with documentation
      */
     interface MpdPlayStatusListener
     {

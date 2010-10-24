@@ -6,7 +6,6 @@ import com.bender.mpdlib.util.Log;
 import java.util.List;
 
 /**
- * todo: replace with documentation
  */
 class MpdPlayer implements Player
 {

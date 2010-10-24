@@ -6,7 +6,6 @@ import com.bender.mpdlib.SongInfo;
 import java.io.IOException;
 
 /**
- * todo: replace with documentation
  */
 public class GetCurrentSongCommand extends Command<NullArg, Result<SongInfo>>
 {

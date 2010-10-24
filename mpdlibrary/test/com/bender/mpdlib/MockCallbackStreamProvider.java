@@ -14,7 +14,6 @@ import java.util.Queue;
 import static org.mockito.Mockito.*;
 
 /**
- * todo: replace with documentation
  */
 class MockCallbackStreamProvider implements SocketStreamProviderIF
 {

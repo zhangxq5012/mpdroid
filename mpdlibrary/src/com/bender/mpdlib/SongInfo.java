@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * todo: replace with documentation
  */
 public class SongInfo
 {

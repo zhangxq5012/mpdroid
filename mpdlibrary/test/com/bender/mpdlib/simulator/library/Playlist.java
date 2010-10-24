@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * todo: replace with documentation
  */
 public class Playlist
 {

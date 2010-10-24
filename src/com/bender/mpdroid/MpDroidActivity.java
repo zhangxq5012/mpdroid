@@ -24,10 +24,6 @@ public class MpDroidActivity extends Activity
     private TextView portTextView;
     private CheckBox useAuthenticationCheckbox;
     private Button connectButton;
-    private Button playButton;
-    private Button stopButton;
-    private Button nextButton;
-    private Button prevButton;
     private SeekBar volumeSeekBar;
     private Button muteButton;
     private TextView songNameTextView;
@@ -39,6 +35,12 @@ public class MpDroidActivity extends Activity
 
     private MpdServiceAdapterIF mpdServiceAdapterIF;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
+    private MpDroidActivityWidget mpDroidActivityWidget;
+
+    public MpDroidActivity()
+    {
+        mpDroidActivityWidget = new PlayerFrame();
+    }
 
     /**
      * Called when the activity is first created.
@@ -50,6 +52,7 @@ public class MpDroidActivity extends Activity
         setContentView(R.layout.summary);
         mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
         myPreferences = new MpdPreferences(this);
+        mpDroidActivityWidget.onCreate(this);
         initializeWidgets();
         initializeListeners();
         updatePreferencesDisplay();
@@ -63,10 +66,6 @@ public class MpDroidActivity extends Activity
         portTextView = (TextView) findViewById(R.id.port);
         useAuthenticationCheckbox = (CheckBox) findViewById(R.id.use_authentication);
         connectButton = (Button) findViewById(R.id.connect);
-        playButton = (Button) findViewById(R.id.play);
-        stopButton = (Button) findViewById(R.id.stop);
-        nextButton = (Button) findViewById(R.id.next);
-        prevButton = (Button) findViewById(R.id.prev);
         volumeSeekBar = (SeekBar) findViewById(R.id.volume);
         muteButton = (Button) findViewById(R.id.mute);
         songNameTextView = (TextView) findViewById(R.id.song_name);
@@ -80,18 +79,8 @@ public class MpDroidActivity extends Activity
     {
         ButtonClickListener buttonClickListener = new ButtonClickListener();
         connectButton.setOnClickListener(buttonClickListener);
-        playButton.setOnClickListener(buttonClickListener);
-        stopButton.setOnClickListener(buttonClickListener);
-        nextButton.setOnClickListener(buttonClickListener);
-        prevButton.setOnClickListener(buttonClickListener);
         volumeSeekBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener());
         muteButton.setOnClickListener(buttonClickListener);
-    }
-
-    private void connect()
-    {
-        ConnectTask connectTask = new ConnectTask();
-        connectTask.execute();
     }
 
     @Override
@@ -144,11 +133,6 @@ public class MpDroidActivity extends Activity
         useAuthenticationCheckbox.setChecked(useAuthentication);
     }
 
-    /**
-     * For unit test.
-     *
-     * @return mpd adapter
-     */
     MpdServiceAdapterIF getMpdServiceAdapterIF()
     {
         return mpdServiceAdapterIF;
@@ -158,10 +142,6 @@ public class MpDroidActivity extends Activity
     {
         String text = connected ? getString(R.string.disconnect) : getString(R.string.connect);
         connectButton.setText(text);
-        playButton.setEnabled(connected);
-        stopButton.setEnabled(connected);
-        nextButton.setEnabled(connected);
-        prevButton.setEnabled(connected);
         volumeSeekBar.setEnabled(connected);
         muteButton.setEnabled(connected);
         int visibility = connected ? View.VISIBLE : View.INVISIBLE;
@@ -179,21 +159,9 @@ public class MpDroidActivity extends Activity
             GetSongTask getSongTask = new GetSongTask(this, mpdPlayerAdapterIF);
             getSongTask.execute();
         }
+        mpDroidActivityWidget.onConnectionChange(connected);
     }
 
-    private void updatePlayStatusOnUI(MpdPlayerAdapterIF.PlayStatus playStatus)
-    {
-        switch (playStatus)
-        {
-            case Playing:
-                playButton.setText(getString(R.string.pause));
-                break;
-            case Paused:
-                playButton.setText(getString(R.string.play));
-            default:
-                playButton.setText(getString(R.string.play));
-        }
-    }
 
     private class ConnectTask extends AsyncTask<Object, MpdPlayerAdapterIF.PlayStatus, Boolean>
     {
@@ -223,10 +191,8 @@ public class MpDroidActivity extends Activity
             {
                 mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
                 mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
-                mpdPlayerAdapterIF.addPlayStatusListener(new PlayListener());
                 mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
-                MpdPlayerAdapterIF.PlayStatus playStatus = mpdPlayerAdapterIF.getPlayStatus();
-                publishProgress(playStatus);
+                mpDroidActivityWidget.onConnect();
 
                 Log.v(TAG, "MPD Server version: " + mpdServiceAdapterIF.getServerVersion());
             }
@@ -251,13 +217,8 @@ public class MpDroidActivity extends Activity
                         makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
             }
         }
-
-        @Override
-        protected void onProgressUpdate(MpdPlayerAdapterIF.PlayStatus... values)
-        {
-            updatePlayStatusOnUI(values[0]);
-        }
     }
+
 
     private class ButtonClickListener implements View.OnClickListener
     {
@@ -268,31 +229,14 @@ public class MpDroidActivity extends Activity
                 boolean connected = mpdServiceAdapterIF.isConnected();
                 if (connected)
                 {
-                    disconnect();
+                    DisconnectTask disconnectTask = new DisconnectTask();
+                    disconnectTask.execute();
                 }
                 else
                 {
-                    connect();
+                    ConnectTask connectTask = new ConnectTask();
+                    connectTask.execute();
                 }
-            }
-            else if (view == playButton)
-            {
-                play();
-            }
-            else if (view == stopButton)
-            {
-                StopTask stopTask = new StopTask();
-                stopTask.execute();
-            }
-            else if (view == nextButton)
-            {
-                NextTask nextTask = new NextTask();
-                nextTask.execute();
-            }
-            else if (view == prevButton)
-            {
-                PrevTask prevTask = new PrevTask();
-                prevTask.execute();
             }
             else if (view == muteButton)
             {
@@ -300,44 +244,6 @@ public class MpDroidActivity extends Activity
                 toggleMuteTask.execute();
             }
         }
-
-        private class PrevTask extends AsyncTask<Object, Object, Object>
-        {
-            @Override
-            protected Object doInBackground(Object... objects)
-            {
-                mpdPlayerAdapterIF.prev();
-                return null;
-            }
-        }
-
-        private class StopTask extends AsyncTask<Object, Object, MpdPlayerAdapterIF.PlayStatus>
-        {
-            @Override
-            protected MpdPlayerAdapterIF.PlayStatus doInBackground(Object... objects)
-            {
-                mpdPlayerAdapterIF.stop();
-                return mpdPlayerAdapterIF.getPlayStatus();
-            }
-
-            @Override
-            protected void onPostExecute(MpdPlayerAdapterIF.PlayStatus playStatus)
-            {
-                updatePlayStatusOnUI(playStatus);
-            }
-        }
-    }
-
-    private void play()
-    {
-        PlayTask playTask = new PlayTask();
-        playTask.execute();
-    }
-
-    private void disconnect()
-    {
-        DisconnectTask disconnectTask = new DisconnectTask();
-        disconnectTask.execute();
     }
 
     private class DisconnectTask extends AsyncTask<Object, Object, Boolean>
@@ -356,33 +262,13 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class PlayTask extends AsyncTask<Object, Object, Object>
-    {
-        @Override
-        protected Object doInBackground(Object... objects)
-        {
-            mpdPlayerAdapterIF.playOrPause();
-            return null;
-        }
-    }
-
-    private class NextTask extends AsyncTask<Object, Object, Object>
-    {
-        @Override
-        protected Object doInBackground(Object... objects)
-        {
-            mpdPlayerAdapterIF.next();
-            return null;
-        }
-    }
-
     private class VolumeSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener
     {
         public void onProgressChanged(SeekBar seekBar, int volume, boolean fromUser)
         {
             if (seekBar == volumeSeekBar && fromUser)
             {
-                VolumeTask volumeTask = new VolumeTask();
+                VolumeTask volumeTask = new VolumeTask(mpdPlayerAdapterIF);
                 volumeTask.execute(volume);
             }
         }
@@ -395,16 +281,6 @@ public class MpDroidActivity extends Activity
         {
         }
 
-    }
-
-    private class VolumeTask extends AsyncTask<Integer, Object, Integer>
-    {
-        @Override
-        protected Integer doInBackground(Integer... params)
-        {
-            Integer volume = params[0];
-            return mpdPlayerAdapterIF.setVolume(volume);
-        }
     }
 
     private class ToggleMuteTask extends AsyncTask<Object, Integer, Boolean>
@@ -514,20 +390,6 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class PlayListener implements MpdPlayerAdapterIF.MpdPlayStatusListener
-    {
-        public void playStatusUpdated(final MpdPlayerAdapterIF.PlayStatus playStatus)
-        {
-            Runnable runnable = new Runnable()
-            {
-                public void run()
-                {
-                    updatePlayStatusOnUI(playStatus);
-                }
-            };
-            runOnUiThread(runnable);
-        }
-    }
 
     private class UiVolumeListener implements MpdPlayerAdapterIF.MpdVolumeListener
     {

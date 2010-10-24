@@ -4,7 +4,6 @@ import android.util.Log;
 import com.bender.mpdlib.util.LogStrategy;
 
 /**
- * todo: replace with documentation
  */
 public class AndroidLogStrategy implements LogStrategy
 {

@@ -6,7 +6,6 @@ import com.bender.mpdroid.mpdService.MpdSongAdapterIF;
 import com.bender.mpdroid.mpdService.SongNameDecorator;
 
 /**
- * todo: replace with documentation
  */
 class GetSongTask extends AsyncTask<Object, Object, MpdSongAdapterIF>
 {

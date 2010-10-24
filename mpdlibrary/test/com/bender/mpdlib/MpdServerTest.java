@@ -5,7 +5,6 @@ import com.bender.mpdlib.simulator.commands.SubSystemSupport;
 import junit.framework.TestCase;
 
 /**
- * todo: replace with documentation
  */
 public class MpdServerTest extends TestCase
 {

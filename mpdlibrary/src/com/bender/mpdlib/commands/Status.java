@@ -1,7 +1,6 @@
 package com.bender.mpdlib.commands;
 
 /**
- * todo: replace with documentation
  */
 public class Status
 {

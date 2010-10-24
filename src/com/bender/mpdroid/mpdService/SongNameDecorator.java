@@ -1,7 +1,6 @@
 package com.bender.mpdroid.mpdService;
 
 /**
- * todo: replace with documentation
  */
 public class SongNameDecorator implements MpdSongAdapterIF
 {

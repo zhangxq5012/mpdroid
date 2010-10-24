@@ -2,17 +2,10 @@ package com.bender.mpdroid;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
-import com.bender.mpdroid.mpdService.MpdAdapterFactory;
 import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
-import com.bender.mpdroid.mpdService.StubbedMpdServiceAdapater;
 
 public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroidActivity>
 {
-    static
-    {
-        System.setProperty(MpdAdapterFactory.MPD_ADAPTER_CLASSNAME_PROPERTY, StubbedMpdServiceAdapater.class.getName());
-    }
-
     private MpDroidActivity activity;
 
     public MpDroidActivityTest()
@@ -46,11 +39,5 @@ public class MpDroidActivityTest extends ActivityInstrumentationTestCase2<MpDroi
         });
 
         MpdServiceAdapterIF mpdServiceAdapterIF = activity.getMpdServiceAdapterIF();
-        assertEquals(true, mpdServiceAdapterIF instanceof StubbedMpdServiceAdapater);
-        StubbedMpdServiceAdapater stubbedMpdAdapater = (StubbedMpdServiceAdapater) mpdServiceAdapterIF;
-        // make sure connect is called
-        assertEquals(1, stubbedMpdAdapater.connectCount);
-        assertEquals(1, stubbedMpdAdapater.disconnectCount);
-
     }
 }

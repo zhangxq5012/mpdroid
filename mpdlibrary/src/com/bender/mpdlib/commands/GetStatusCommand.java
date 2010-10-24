@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * todo: replace with documentation
  */
 public class GetStatusCommand extends Command<NullArg, Result<List<StatusTuple>>>
 {

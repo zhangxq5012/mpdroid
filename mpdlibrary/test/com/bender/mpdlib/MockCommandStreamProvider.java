@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
- * todo: replace with documentation
  */
 public class MockCommandStreamProvider implements SocketStreamProviderIF
 {

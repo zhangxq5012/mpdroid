@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.net.SocketAddress;
 
 /**
- * todo: replace with documentation
  */
 public class Pipe
 {

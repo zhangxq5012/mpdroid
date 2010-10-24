@@ -32,12 +32,12 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
 
     public void addPlayStatusListener(MpdPlayStatusListener listener)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Log.e(TAG, "addPlayStatusListener() called on NULL object");
     }
 
     public void addVolumeListener(MpdVolumeListener listener)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Log.e(TAG, "addVolumeListener() called on NULL object");
     }
 
     public PlayStatus getPlayStatus()
@@ -56,10 +56,9 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
         Log.e(TAG, "prev() called on NULL object");
     }
 
-    public Integer setVolume(Integer volume)
+    public void setVolume(Integer volume)
     {
         Log.e(TAG, "setVolume(volume) called on NULL object");
-        return 0;
     }
 
     public Integer getVolume()

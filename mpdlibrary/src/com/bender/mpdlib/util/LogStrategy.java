@@ -1,7 +1,6 @@
 package com.bender.mpdlib.util;
 
 /**
- * todo: replace with documentation
  */
 public interface LogStrategy
 {

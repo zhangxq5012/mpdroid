@@ -4,7 +4,6 @@ import android.util.Log;
 import com.bender.mpdlib.*;
 
 /**
- * todo: replace with documentation
  */
 public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 {
@@ -111,10 +110,9 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
             player.previous();
         }
 
-        public Integer setVolume(Integer volume)
+        public void setVolume(Integer volume)
         {
             mpdServer.setVolume(volume);
-            return null;
         }
 
         public Integer getVolume()

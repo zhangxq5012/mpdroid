@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * todo: replace with documentation
  */
 public class MpdServer
 {

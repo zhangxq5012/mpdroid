@@ -5,7 +5,6 @@ import com.bender.mpdlib.PlayStatus;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 public class PauseSimCommand extends PlayerSimCommand
 {

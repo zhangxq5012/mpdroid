@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 class ServerThread extends Thread
 {

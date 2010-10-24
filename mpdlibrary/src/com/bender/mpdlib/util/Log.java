@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * todo: replace with documentation
  */
 public class Log
 {

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 /**
- * todo: replace with documentation
  */
 public class ConnectCommand extends Command<SocketAddress, Result<String>>
 {

@@ -3,7 +3,6 @@ package com.bender.mpdlib.simulator.commands;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 public abstract class SimCommand
 {

@@ -6,7 +6,6 @@ import com.bender.mpdlib.simulator.library.Playlist;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 public class NextSimCommand extends SimCommand
 {

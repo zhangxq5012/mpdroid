@@ -5,7 +5,6 @@ import com.bender.mpdlib.Pipe;
 import java.io.IOException;
 
 /**
- * todo: replace with documentation
  */
 public abstract class StatusCommand<V> extends Command<V, Status>
 {

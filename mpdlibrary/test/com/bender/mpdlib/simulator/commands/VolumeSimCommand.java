@@ -5,7 +5,6 @@ import com.bender.mpdlib.commands.Response;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 public class VolumeSimCommand extends SimCommand
 {

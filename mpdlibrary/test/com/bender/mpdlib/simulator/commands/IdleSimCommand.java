@@ -5,7 +5,6 @@ import com.bender.mpdlib.Subsystem;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 public class IdleSimCommand extends SimCommand
 {

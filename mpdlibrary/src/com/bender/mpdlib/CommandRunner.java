@@ -4,7 +4,6 @@ import com.bender.mpdlib.commands.Command;
 import com.bender.mpdlib.util.Log;
 
 /**
- * todo: replace with documentation
  */
 class CommandRunner
 {

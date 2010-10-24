@@ -8,7 +8,6 @@ import com.bender.mpdlib.commands.StatusTuple;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * todo: replace with documentation
  */
 public class SimPlayer
 {

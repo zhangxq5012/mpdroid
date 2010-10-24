@@ -29,16 +29,19 @@ class NullSongAdapter implements MpdSongAdapterIF
 
     public String getFile()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        Log.e(TAG, "getFile() called on NULL object");
+        return null;
     }
 
     public String getDate()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        Log.e(TAG, "getDate() called on NULL object");
+        return null;
     }
 
     public Integer getSongLength()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        Log.e(TAG, "getSongLength() called on NULL object");
+        return null;
     }
 }

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * todo: replace with documentation
  */
 public class StatusSimCommand extends SimCommand
 {
