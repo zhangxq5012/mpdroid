@@ -34,8 +34,7 @@ public class AndroidLogStrategy implements LogStrategy
 
     public void e(String tag, Exception e)
     {
-        //doh
-        Log.e(tag, e.getMessage());
+        e(tag, e.getMessage(), e);
     }
 
     public void wtf(String tag, String text)
