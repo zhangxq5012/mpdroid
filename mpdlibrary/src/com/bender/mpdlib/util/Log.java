@@ -71,8 +71,8 @@ public class Log
             if (isEnabled(lvl))
             {
                 System.out.println(SIMPLE_DATE_FORMAT.format(new Date())
-                        + "-(" + Thread.currentThread().getName()
-                        + ")-[" + lvl + "]->" + tag + ": " + text);
+                        + "-[" + lvl + "]-(" + Thread.currentThread().getName()
+                        + ")->" + tag + ": " + text);
             }
         }
 

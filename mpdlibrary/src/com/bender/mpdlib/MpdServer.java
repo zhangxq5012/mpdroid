@@ -1,6 +1,7 @@
 package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.*;
+import com.bender.mpdlib.util.Log;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -19,9 +20,10 @@ public class MpdServer
     private CallbackThread callbackThread;
     private Integer volume = 0;
     private VolumeListener volumeListener = new NullVolumeListener();
-    private AtomicInteger ignoreVolumeUpdate = new AtomicInteger(0);
     private MpdPlayer player;
     private static final String TAG = MpdServer.class.getSimpleName();
+    private AtomicInteger cachedVolume = new AtomicInteger(-1);
+    private boolean muted = true;
 
     /**
      * Normal use constructor.
@@ -85,9 +87,10 @@ public class MpdServer
                     if (!newVolume.equals(volume))
                     {
                         volume = newVolume;
-                        if (ignoreVolumeUpdate.decrementAndGet() < 0)
+                        muted = (volume == 0);
+                        Log.v(TAG, "processStatuses: volume=" + newVolume + ",muted=" + muted);
+                        if (!newVolume.equals(cachedVolume.get()))
                         {
-                            ignoreVolumeUpdate.incrementAndGet();
                             volumeListener.volumeChanged(volume);
                         }
                     }
@@ -150,13 +153,38 @@ public class MpdServer
 
     public void setVolume(Integer volume)
     {
-        ignoreVolumeUpdate.incrementAndGet();
+        setCachedVolume(volume);
         CommandRunner.runCommand(new SetVolumeCommand(commandPipe, volume));
+    }
+
+    private void setCachedVolume(Integer volume)
+    {
+        cachedVolume.set(volume);
     }
 
     public void addVolumeListener(VolumeListener listener)
     {
         volumeListener = listener;
+    }
+
+    public Boolean toggleMute()
+    {
+        boolean muted = isMuted();
+        if (muted)
+        {
+            //todo: use last cached volume
+            CommandRunner.runCommand(new SetVolumeCommand(commandPipe, 100));
+        }
+        else
+        {
+            CommandRunner.runCommand(new SetVolumeCommand(commandPipe, 0));
+        }
+        return null;
+    }
+
+    public boolean isMuted()
+    {
+        return muted;
     }
 
 

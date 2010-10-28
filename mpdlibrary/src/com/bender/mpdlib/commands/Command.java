@@ -32,6 +32,11 @@ public abstract class Command<V, T> implements Callable<T>
         }
     }
 
+    public V getArg()
+    {
+        return arg;
+    }
+
     protected abstract void executeCommand(V arg) throws IOException;
 
     protected abstract T readResult() throws IOException;

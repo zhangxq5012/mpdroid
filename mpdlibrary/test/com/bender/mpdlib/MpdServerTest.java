@@ -316,6 +316,27 @@ public class MpdServerTest extends TestCase
         assertEquals(DATE, date);
     }
 
+    public void testMute() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+
+        smallWait();
+        mpdServer.toggleMute();
+        smallWait();
+
+        assertEquals(true, mpdServer.isMuted());
+        Integer zero = 0;
+        assertEquals(zero, mpdServer.getVolume());
+
+        mpdServer.toggleMute();
+        smallWait();
+
+        assertEquals(false, mpdServer.isMuted());
+        Integer hundred = 100;
+        assertEquals(hundred, mpdServer.getVolume());
+
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;

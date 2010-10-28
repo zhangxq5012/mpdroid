@@ -9,23 +9,23 @@ import java.util.List;
 
 /**
  */
-public class IdleCommand extends Command<Subsystem[], Result<List<Subsystem>>>
+public class IdleCommand extends Command<IdleCommand.SubsystemList, Result<List<Subsystem>>>
 {
     public IdleCommand(Pipe pipe)
     {
-        this(pipe, new Subsystem[]{});
+        this(pipe, new SubsystemList(new Subsystem[]{}));
     }
 
-    public IdleCommand(Pipe pipe, Subsystem[] subsystems)
+    public IdleCommand(Pipe pipe, SubsystemList subsystems)
     {
         super(pipe, subsystems);
     }
 
     @Override
-    protected void executeCommand(Subsystem[] arg) throws IOException
+    protected void executeCommand(SubsystemList arg) throws IOException
     {
         StringBuffer arguments = new StringBuffer("");
-        for (Subsystem subsystem : arg)
+        for (Subsystem subsystem : arg.subsystems)
         {
             arguments.append(" ").append(subsystem.toString());
         }
@@ -47,5 +47,30 @@ public class IdleCommand extends Command<Subsystem[], Result<List<Subsystem>>>
         result.status = status;
         result.result = ret;
         return result;
+    }
+
+    static class SubsystemList
+    {
+        public final Subsystem[] subsystems;
+
+        public SubsystemList(Subsystem[] subsystems)
+        {
+            this.subsystems = subsystems;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            if (subsystems.length == 0)
+            {
+                return null;
+            }
+            for (Subsystem subsystem : subsystems)
+            {
+                stringBuilder.append(subsystem);
+            }
+            return stringBuilder.toString();
+        }
     }
 }

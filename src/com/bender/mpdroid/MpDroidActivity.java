@@ -283,28 +283,13 @@ public class MpDroidActivity extends Activity
 
     }
 
-    private class ToggleMuteTask extends AsyncTask<Object, Integer, Boolean>
+    private class ToggleMuteTask extends AsyncTask<Object, Integer, Object>
     {
         @Override
         protected Boolean doInBackground(Object... objects)
         {
-            Boolean muted = mpdPlayerAdapterIF.toggleMute();
-            Integer volume = mpdPlayerAdapterIF.getVolume();
-            publishProgress(volume);
-            return muted;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean muted)
-        {
-            muteButton.setSelected(muted);
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values)
-        {
-            Integer volume = values[0];
-            volumeSeekBar.setProgress(volume);
+            mpdPlayerAdapterIF.toggleMute();
+            return null;
         }
     }
 

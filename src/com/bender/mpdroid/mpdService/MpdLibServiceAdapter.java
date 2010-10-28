@@ -122,7 +122,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
         public Boolean toggleMute()
         {
-            return true;
+            return mpdServer.toggleMute();
         }
 
         public void playOrPause()
