@@ -24,6 +24,7 @@ public class MpdServer
     private static final String TAG = MpdServer.class.getSimpleName();
     private AtomicInteger cachedVolume = new AtomicInteger(-1);
     private boolean muted = true;
+    private AtomicInteger setVolumeCounter = new AtomicInteger(0);
 
     /**
      * Normal use constructor.
@@ -89,8 +90,9 @@ public class MpdServer
                         volume = newVolume;
                         muted = (volume == 0);
                         Log.v(TAG, "processStatuses: volume=" + newVolume + ",muted=" + muted);
-                        if (!newVolume.equals(cachedVolume.get()))
+                        if (setVolumeCounter.decrementAndGet() < 0)
                         {
+                            setVolumeCounter.set(0);
                             volumeListener.volumeChanged(volume);
                         }
                     }
@@ -153,13 +155,12 @@ public class MpdServer
 
     public void setVolume(Integer volume)
     {
-        setCachedVolume(volume);
-        CommandRunner.runCommand(new SetVolumeCommand(commandPipe, volume));
+        setVolumeImpl(volume);
     }
 
-    private void setCachedVolume(Integer volume)
+    private void setVolumeImpl(Integer volume)
     {
-        cachedVolume.set(volume);
+        CommandRunner.runCommand(new SetVolumeCommand(commandPipe, volume));
     }
 
     public void addVolumeListener(VolumeListener listener)
@@ -173,11 +174,11 @@ public class MpdServer
         if (muted)
         {
             //todo: use last cached volume
-            CommandRunner.runCommand(new SetVolumeCommand(commandPipe, 100));
+            setVolumeImpl(100);
         }
         else
         {
-            CommandRunner.runCommand(new SetVolumeCommand(commandPipe, 0));
+            setVolumeImpl(0);
         }
         return null;
     }

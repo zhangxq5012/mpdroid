@@ -3,6 +3,8 @@ package com.bender.mpdroid.mpdService;
 import android.util.Log;
 import com.bender.mpdlib.*;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  */
 public class MpdLibServiceAdapter implements MpdServiceAdapterIF
@@ -88,6 +90,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
     {
         public MpdPlayStatusListener playStatusListener = new NullMpdPlayStatusListener();
         private Player player;
+        private AtomicInteger setVolumeCount = new AtomicInteger(0);
 
         public MyMpdPlayerAdapter(Player player)
         {
@@ -112,6 +115,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
         public void setVolume(Integer volume)
         {
+            setVolumeCount.incrementAndGet();
             mpdServer.setVolume(volume);
         }
 
@@ -166,7 +170,12 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
             {
                 public void volumeChanged(Integer volume)
                 {
-                    listener.volumeUpdated(volume);
+                    int count = setVolumeCount.decrementAndGet();
+                    if (count < 0)
+                    {
+                        setVolumeCount.incrementAndGet();
+                        listener.volumeUpdated(volume);
+                    }
                 }
             });
         }
