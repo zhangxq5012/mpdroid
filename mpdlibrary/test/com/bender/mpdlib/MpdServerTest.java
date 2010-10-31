@@ -171,7 +171,7 @@ public class MpdServerTest extends TestCase
         mpdServerSimulator.getSimPlayer().setVolume(VOLUME);
         mpdServer.connect(HOSTNAME);
 
-        Integer volume = mpdServer.getVolume();
+        Integer volume = mpdServer.getPlayer().getVolume();
 
         assertEquals(VOLUME, volume);
     }
@@ -217,11 +217,11 @@ public class MpdServerTest extends TestCase
 
         Integer volume = 75;
 
-        mpdServer.setVolume(volume);
+        mpdServer.getPlayer().setVolume(volume);
         smallWait();
 
         assertEquals(volume, mpdServerSimulator.getSimPlayer().getVolume());
-        assertEquals(volume, mpdServer.getVolume());
+        assertEquals(volume, mpdServer.getPlayer().getVolume());
     }
 
 
@@ -235,7 +235,7 @@ public class MpdServerTest extends TestCase
         mpdServerSimulator.getSimPlayer().setVolume(volume);
 
         MyVolumeListener listener = new MyVolumeListener();
-        mpdServer.addVolumeListener(listener);
+        mpdServer.getPlayer().addVolumeListener(listener);
         smallWait();
 
         mpdServerSimulator.getSubSystemSupport().updateSubSystemChanged(Subsystem.mixer);
@@ -321,19 +321,20 @@ public class MpdServerTest extends TestCase
         mpdServer.connect(HOSTNAME);
 
         smallWait();
-        mpdServer.toggleMute();
+        Player player = mpdServer.getPlayer();
+        player.toggleMute();
         smallWait();
 
-        assertEquals(true, mpdServer.isMuted());
+        assertEquals(true, player.isMuted());
         Integer zero = 0;
-        assertEquals(zero, mpdServer.getVolume());
+        assertEquals(zero, player.getVolume());
 
-        mpdServer.toggleMute();
+        player.toggleMute();
         smallWait();
 
-        assertEquals(false, mpdServer.isMuted());
+        assertEquals(false, player.isMuted());
         Integer hundred = 100;
-        assertEquals(hundred, mpdServer.getVolume());
+        assertEquals(hundred, player.getVolume());
 
     }
 

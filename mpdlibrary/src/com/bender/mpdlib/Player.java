@@ -21,4 +21,16 @@ public interface Player
     SongInfo getCurrentSongInfo();
 
     void addCurrentSongListener(CurrentSongListener currentSongListener);
+
+    Integer getVolume();
+
+    void setVolume(Integer volume);
+
+    void setVolumeImpl(Integer volume);
+
+    void addVolumeListener(VolumeListener listener);
+
+    Boolean toggleMute();
+
+    boolean isMuted();
 }

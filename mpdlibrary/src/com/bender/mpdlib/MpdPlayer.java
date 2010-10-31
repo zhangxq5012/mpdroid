@@ -16,6 +16,9 @@ class MpdPlayer implements Player
     private Integer songId;
     private CurrentSongListener currentSongListener = new NullCurrentSongListener();
     private static final String TAG = MpdPlayer.class.getSimpleName();
+    private Integer volume;
+    private VolumeListener volumeListener = new NullVolumeListener();
+    private boolean muted;
 
     public MpdPlayer(Pipe commandPipe)
     {
@@ -68,6 +71,46 @@ class MpdPlayer implements Player
         this.currentSongListener = currentSongListener;
     }
 
+    public Integer getVolume()
+    {
+        return volume;
+    }
+
+    public void setVolume(Integer volume)
+    {
+        setVolumeImpl(volume);
+    }
+
+    public void setVolumeImpl(Integer volume)
+    {
+        CommandRunner.runCommand(new SetVolumeCommand(commandPipe, volume));
+    }
+
+    public void addVolumeListener(VolumeListener listener)
+    {
+        volumeListener = listener;
+    }
+
+    public Boolean toggleMute()
+    {
+        boolean muted = isMuted();
+        if (muted)
+        {
+            //todo: use last cached volume
+            setVolumeImpl(100);
+        }
+        else
+        {
+            setVolumeImpl(0);
+        }
+        return null;
+    }
+
+    public boolean isMuted()
+    {
+        return muted;
+    }
+
     void processStatus(List<StatusTuple> statusTupleList)
     {
         for (StatusTuple statusTuple : statusTupleList)
@@ -80,7 +123,26 @@ class MpdPlayer implements Player
                 case songid:
                     songUpdated(statusTuple);
                     break;
+                case volume:
+                    volumeUpdated(statusTuple);
             }
+        }
+    }
+
+    private void volumeUpdated(StatusTuple statusTuple)
+    {
+        Integer newVolume = Integer.valueOf(statusTuple.getValue());
+        boolean changed;
+        synchronized (this)
+        {
+            changed = !newVolume.equals(volume);
+        }
+        volume = newVolume;
+        if (changed)
+        {
+            muted = newVolume.equals(0);
+            Log.i(TAG, "volumeUpdated(): " + newVolume + ", " + (muted ? "muted" : ""));
+            volumeListener.volumeChanged(newVolume);
         }
     }
 
@@ -95,7 +157,6 @@ class MpdPlayer implements Player
         }
         if (changed)
         {
-            songId = newSongId;
             Result<SongInfo> result = CommandRunner.runCommand(new GetCurrentSongCommand(commandPipe));
             if (result.status.isSuccessful())
             {
@@ -147,6 +208,13 @@ class MpdPlayer implements Player
     private class NullCurrentSongListener implements CurrentSongListener
     {
         public void songUpdated(SongInfo songInfo)
+        {
+        }
+    }
+
+    private class NullVolumeListener implements VolumeListener
+    {
+        public void volumeChanged(Integer volume)
         {
         }
     }

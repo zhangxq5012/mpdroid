@@ -1,12 +1,10 @@
 package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.*;
-import com.bender.mpdlib.util.Log;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  */
@@ -18,13 +16,8 @@ public class MpdServer
     private Pipe commandPipe;
     private Pipe callbackPipe;
     private CallbackThread callbackThread;
-    private Integer volume = 0;
-    private VolumeListener volumeListener = new NullVolumeListener();
     private MpdPlayer player;
     private static final String TAG = MpdServer.class.getSimpleName();
-    private AtomicInteger cachedVolume = new AtomicInteger(-1);
-    private boolean muted = true;
-    private AtomicInteger setVolumeCounter = new AtomicInteger(0);
 
     /**
      * Normal use constructor.
@@ -79,26 +72,6 @@ public class MpdServer
     {
         getPlayer();
         player.processStatus(result);
-        for (StatusTuple statusTuple : result)
-        {
-            switch (statusTuple.getStatus())
-            {
-                case volume:
-                    Integer newVolume = Integer.parseInt(statusTuple.getValue());
-                    if (!newVolume.equals(volume))
-                    {
-                        volume = newVolume;
-                        muted = (volume == 0);
-                        Log.v(TAG, "processStatuses: volume=" + newVolume + ",muted=" + muted);
-                        if (setVolumeCounter.decrementAndGet() < 0)
-                        {
-                            setVolumeCounter.set(0);
-                            volumeListener.volumeChanged(volume);
-                        }
-                    }
-                    break;
-            }
-        }
     }
 
 
@@ -148,51 +121,4 @@ public class MpdServer
     }
 
 
-    public Integer getVolume()
-    {
-        return volume;
-    }
-
-    public void setVolume(Integer volume)
-    {
-        setVolumeImpl(volume);
-    }
-
-    private void setVolumeImpl(Integer volume)
-    {
-        CommandRunner.runCommand(new SetVolumeCommand(commandPipe, volume));
-    }
-
-    public void addVolumeListener(VolumeListener listener)
-    {
-        volumeListener = listener;
-    }
-
-    public Boolean toggleMute()
-    {
-        boolean muted = isMuted();
-        if (muted)
-        {
-            //todo: use last cached volume
-            setVolumeImpl(100);
-        }
-        else
-        {
-            setVolumeImpl(0);
-        }
-        return null;
-    }
-
-    public boolean isMuted()
-    {
-        return muted;
-    }
-
-
-    private class NullVolumeListener implements VolumeListener
-    {
-        public void volumeChanged(Integer volume)
-        {
-        }
-    }
 }
