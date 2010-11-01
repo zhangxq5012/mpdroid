@@ -376,6 +376,23 @@ public class MpdServerTest extends TestCase
         assertEquals(false, listener.connected);
     }
 
+    public void testReconnectAfterCrash() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        MyConnectionListener listener = new MyConnectionListener();
+        mpdServer.addConnectionListener(listener);
+
+        mpdServerSimulator.crash();
+        smallWait();
+
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+
+        assertEquals(true, mpdServer.isConnected());
+        assertEquals(true, listener.connected);
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;
