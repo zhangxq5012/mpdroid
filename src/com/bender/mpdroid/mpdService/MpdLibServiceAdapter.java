@@ -58,6 +58,17 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
         return new NullPlaylistAdapter();
     }
 
+    public void addConnectionListener(final MpdConnectionListenerIF connectionListenerIF)
+    {
+        mpdServer.addConnectionListener(new ConnectionListener()
+        {
+            public void connectionChanged(boolean isConnected)
+            {
+                connectionListenerIF.connectionStateUpdated(isConnected);
+            }
+        });
+    }
+
     private static enum MpdLibPlayStatus
     {
         Playing(PlayStatus.Playing, MpdPlayerAdapterIF.PlayStatus.Playing),
@@ -116,17 +127,17 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
         public void setVolume(Integer volume)
         {
             setVolumeCount.incrementAndGet();
-            mpdServer.setVolume(volume);
+            player.setVolume(volume);
         }
 
         public Integer getVolume()
         {
-            return mpdServer.getVolume();
+            return player.getVolume();
         }
 
         public Boolean toggleMute()
         {
-            return mpdServer.toggleMute();
+            return player.toggleMute();
         }
 
         public void playOrPause()
@@ -166,7 +177,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
         public void addVolumeListener(final MpdVolumeListener listener)
         {
-            mpdServer.addVolumeListener(new VolumeListener()
+            player.addVolumeListener(new VolumeListener()
             {
                 public void volumeChanged(Integer volume)
                 {

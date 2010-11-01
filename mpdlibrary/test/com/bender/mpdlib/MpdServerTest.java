@@ -338,6 +338,44 @@ public class MpdServerTest extends TestCase
 
     }
 
+    public void testConnectionListenerOnConnection() throws Exception
+    {
+        MyConnectionListener listener = new MyConnectionListener();
+        mpdServer.addConnectionListener(listener);
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+
+        assertEquals(true, listener.connectionUpdated);
+        assertEquals(true, listener.connected);
+    }
+
+    public void testConnectionListenerOnDisconnect() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+        MyConnectionListener listener = new MyConnectionListener();
+        mpdServer.addConnectionListener(listener);
+
+        smallWait();
+        mpdServer.disconnect();
+        assertEquals(true, listener.connectionUpdated);
+        assertEquals(false, listener.connected);
+    }
+
+    public void testConnectionListenerOnServerCrash() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        MyConnectionListener listener = new MyConnectionListener();
+        mpdServer.addConnectionListener(listener);
+
+        mpdServerSimulator.crash();
+        smallWait();
+
+
+        assertEquals(true, listener.connectionUpdated);
+        assertEquals(false, listener.connected);
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;
@@ -355,6 +393,18 @@ public class MpdServerTest extends TestCase
         public void execute(Runnable runnable)
         {
             runnable.run();
+        }
+    }
+
+    private class MyConnectionListener implements ConnectionListener
+    {
+        private boolean connectionUpdated;
+        private boolean connected;
+
+        public void connectionChanged(boolean isConnected)
+        {
+            connectionUpdated = true;
+            connected = isConnected;
         }
     }
 

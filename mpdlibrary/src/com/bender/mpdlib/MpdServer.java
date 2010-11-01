@@ -2,6 +2,7 @@ package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.*;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
@@ -18,6 +19,7 @@ public class MpdServer
     private CallbackThread callbackThread;
     private MpdPlayer player;
     private static final String TAG = MpdServer.class.getSimpleName();
+    private ConnectionListener connectionListener = new NullConnectionListener();
 
     /**
      * Normal use constructor.
@@ -66,6 +68,10 @@ public class MpdServer
         {
             e.printStackTrace();
         }
+        finally
+        {
+            connectionListener.connectionChanged(isConnected());
+        }
     }
 
     void processStatuses(List<StatusTuple> result)
@@ -99,6 +105,10 @@ public class MpdServer
         {
             e.printStackTrace();
         }
+        finally
+        {
+            connectionListener.connectionChanged(isConnected());
+        }
     }
 
     public boolean isConnected()
@@ -121,4 +131,33 @@ public class MpdServer
     }
 
 
+    public void addConnectionListener(ConnectionListener listener)
+    {
+        connectionListener = listener;
+    }
+
+    void crashDetected()
+    {
+        try
+        {
+            player.disconnect();
+            player = null;
+            commandPipe.disconnect();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            connectionListener.connectionChanged(isConnected());
+        }
+    }
+
+    private class NullConnectionListener implements ConnectionListener
+    {
+        public void connectionChanged(boolean isConnected)
+        {
+        }
+    }
 }

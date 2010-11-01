@@ -58,6 +58,15 @@ class CallbackThread extends Thread
             if (!disconnected)
             {
                 Log.e(TAG, e);
+                try
+                {
+                    callbackPipe.disconnect();
+                }
+                catch (IOException e1)
+                {
+                    Log.e(TAG, e1);
+                }
+                mpdServer.crashDetected();
             }
         }
         Log.v(TAG, "CallbackThread DONE");

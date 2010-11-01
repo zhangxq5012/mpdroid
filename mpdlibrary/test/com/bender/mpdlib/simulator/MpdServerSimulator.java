@@ -10,6 +10,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  */
@@ -20,6 +22,7 @@ public class MpdServerSimulator
     private Playlist playlist;
     private SubSystemSupport subSystemSupport;
     private static final String TAG = MpdServerSimulator.class.getSimpleName();
+    private static List<CommandStreamProvider> connections = new ArrayList<CommandStreamProvider>();
 
     public MpdServerSimulator()
     {
@@ -30,7 +33,9 @@ public class MpdServerSimulator
 
     public SocketStreamProviderIF createMpdSocket()
     {
-        return new CommandStreamProvider();
+        CommandStreamProvider commandStreamProvider = new CommandStreamProvider();
+        connections.add(commandStreamProvider);
+        return commandStreamProvider;
     }
 
     public SimPlayer getSimPlayer()
@@ -46,6 +51,22 @@ public class MpdServerSimulator
     public SubSystemSupport getSubSystemSupport()
     {
         return subSystemSupport;
+    }
+
+    public void crash()
+    {
+        for (CommandStreamProvider connection : connections)
+        {
+            try
+            {
+                connection.disconnect();
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e);
+            }
+        }
+        connections.clear();
     }
 
     private class CommandStreamProvider implements SocketStreamProviderIF
@@ -111,11 +132,26 @@ public class MpdServerSimulator
         public void disconnect() throws IOException
         {
             connected = false;
-            clientPipedReader.close();
-            clientPipedWriter.close();
-            simBufferedWriter.close();
-            simBufferedReader.close();
-            serverThread.interrupt();
+            if (clientPipedReader != null)
+            {
+                clientPipedReader.close();
+            }
+            if (clientPipedWriter != null)
+            {
+                clientPipedWriter.close();
+            }
+            if (simBufferedWriter != null)
+            {
+                simBufferedWriter.close();
+            }
+            if (simBufferedReader != null)
+            {
+                simBufferedReader.close();
+            }
+            if (serverThread != null)
+            {
+                serverThread.interrupt();
+            }
             Log.v(TAG, "disconnect()");
         }
 

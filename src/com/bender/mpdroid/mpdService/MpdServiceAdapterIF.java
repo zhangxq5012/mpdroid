@@ -20,4 +20,6 @@ public interface MpdServiceAdapterIF
     MpdPlayerAdapterIF getPlayer();
 
     MpdPlaylistAdapterIF getPlaylist();
+
+    void addConnectionListener(MpdConnectionListenerIF connectionListenerIF);
 }

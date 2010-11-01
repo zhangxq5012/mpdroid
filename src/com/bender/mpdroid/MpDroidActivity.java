@@ -186,6 +186,7 @@ public class MpDroidActivity extends Activity
                 mpdServiceAdapterIF.connect(server);
             }
             boolean connected = mpdServiceAdapterIF.isConnected();
+            mpdServiceAdapterIF.addConnectionListener(new MyMpdConnectionListenerIF());
 
             if (connected)
             {
@@ -215,6 +216,20 @@ public class MpDroidActivity extends Activity
             {
                 Toast.makeText(MpDroidActivity.this,
                         makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        private class MyMpdConnectionListenerIF implements MpdConnectionListenerIF
+        {
+            public void connectionStateUpdated(final boolean connected)
+            {
+                runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        updateConnectedStatusOnUI(connected);
+                    }
+                });
             }
         }
     }

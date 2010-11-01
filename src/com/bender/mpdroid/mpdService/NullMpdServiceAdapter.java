@@ -54,5 +54,10 @@ class NullMpdServiceAdapter implements MpdServiceAdapterIF
         return new NullPlaylistAdapter();
     }
 
+    public void addConnectionListener(MpdConnectionListenerIF connectionListenerIF)
+    {
+        Log.e(TAG, "addConnectionListener() called on NULL object");
+    }
+
 
 }
