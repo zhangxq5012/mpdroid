@@ -33,4 +33,6 @@ public interface Player
     Boolean toggleMute();
 
     boolean isMuted();
+
+    SongProgress getProgress();
 }

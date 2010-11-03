@@ -1,6 +1,7 @@
 package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.PlayStatus;
+import com.bender.mpdlib.simulator.SimPlayer;
 
 import java.io.PrintWriter;
 

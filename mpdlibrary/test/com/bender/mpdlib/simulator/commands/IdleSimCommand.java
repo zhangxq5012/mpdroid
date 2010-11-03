@@ -1,6 +1,7 @@
 package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.Subsystem;
+import com.bender.mpdlib.simulator.SubSystemSupport;
 
 import java.io.PrintWriter;
 

@@ -19,6 +19,7 @@ class MpdPlayer implements Player
     private Integer volume;
     private VolumeListener volumeListener = new NullVolumeListener();
     private boolean muted;
+    private SongProgress progress = new NullProgress();
 
     public MpdPlayer(Pipe commandPipe)
     {
@@ -111,11 +112,16 @@ class MpdPlayer implements Player
         return muted;
     }
 
+    public SongProgress getProgress()
+    {
+        return progress;
+    }
+
     void processStatus(List<StatusTuple> statusTupleList)
     {
         for (StatusTuple statusTuple : statusTupleList)
         {
-            switch (statusTuple.first())
+            switch (statusTuple.getStatus())
             {
                 case state:
                     stateUpdated(statusTuple);
@@ -125,7 +131,28 @@ class MpdPlayer implements Player
                     break;
                 case volume:
                     volumeUpdated(statusTuple);
+                    break;
+                case time:
+                    timeUpdated(statusTuple);
+                    break;
             }
+        }
+    }
+
+    private void timeUpdated(StatusTuple statusTuple)
+    {
+        String value = statusTuple.getValue();
+        String[] splitStrings = value.split(":");
+        if (splitStrings.length == 2)
+        {
+            int currentTime = Integer.parseInt(splitStrings[0].trim());
+            int totalTime = Integer.parseInt(splitStrings[1].trim());
+            progress = new SongProgress(currentTime, totalTime);
+        }
+        else
+        {
+            Log.w(TAG, "Illegal time value: " + value);
+            progress = new NullProgress();
         }
     }
 
@@ -216,6 +243,14 @@ class MpdPlayer implements Player
     {
         public void volumeChanged(Integer volume)
         {
+        }
+    }
+
+    private class NullProgress extends SongProgress
+    {
+        private NullProgress()
+        {
+            super(0, 0);
         }
     }
 }

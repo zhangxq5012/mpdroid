@@ -2,6 +2,7 @@ package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.commands.Response;
 import com.bender.mpdlib.commands.StatusTuple;
+import com.bender.mpdlib.simulator.SimPlayer;
 import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
@@ -30,6 +31,8 @@ public class StatusSimCommand extends SimCommand
         statusTuple = simPlayer.getVolumeStatus();
         write(statusTuple);
         statusTuple = playlist.getStatus();
+        write(statusTuple);
+        statusTuple = simPlayer.getTimeStatus();
         write(statusTuple);
         writer.println(Response.OK);
     }

@@ -4,7 +4,7 @@ import com.bender.mpdlib.MpdStatus;
 import com.bender.mpdlib.SongInfo;
 import com.bender.mpdlib.Subsystem;
 import com.bender.mpdlib.commands.StatusTuple;
-import com.bender.mpdlib.simulator.commands.SubSystemSupport;
+import com.bender.mpdlib.simulator.SubSystemSupport;
 import com.bender.mpdlib.util.Log;
 import noNamespace.LibraryDocument;
 import noNamespace.SongType;

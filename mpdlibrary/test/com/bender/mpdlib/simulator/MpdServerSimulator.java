@@ -1,8 +1,6 @@
 package com.bender.mpdlib.simulator;
 
 import com.bender.mpdlib.SocketStreamProviderIF;
-import com.bender.mpdlib.simulator.commands.SimPlayer;
-import com.bender.mpdlib.simulator.commands.SubSystemSupport;
 import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
@@ -27,8 +25,8 @@ public class MpdServerSimulator
     public MpdServerSimulator()
     {
         subSystemSupport = new SubSystemSupport();
-        simPlayer = new SimPlayer(subSystemSupport);
         playlist = new Playlist(subSystemSupport);
+        simPlayer = new SimPlayer(subSystemSupport, playlist);
     }
 
     public SocketStreamProviderIF createMpdSocket()
@@ -229,7 +227,7 @@ public class MpdServerSimulator
         ServerSocket serverSocket = new ServerSocket(port);
         SubSystemSupport systemSupport = new SubSystemSupport();
         Playlist playlist = new Playlist(systemSupport);
-        SimPlayer simPlayer = new SimPlayer(systemSupport);
+        SimPlayer simPlayer = new SimPlayer(systemSupport, playlist);
 
         while (true)
         {

@@ -1,6 +1,7 @@
 package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.StatusTuple;
+import com.bender.mpdlib.util.Log;
 
 /**
  */
@@ -35,7 +36,11 @@ public enum MpdStatus
                 status = mpdStatus;
             }
         }
-        String valueString = strings[1].trim();
+        if (strings.length < 2)
+        {
+            Log.w("MpdStatus", "illegal status string: " + line);
+        }
+        String valueString = line.substring(line.indexOf(":") + 1).trim();
         StatusTuple statusTuple = new StatusTuple(status, valueString);
         return statusTuple;
     }

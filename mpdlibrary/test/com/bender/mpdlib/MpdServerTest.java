@@ -1,7 +1,7 @@
 package com.bender.mpdlib;
 
 import com.bender.mpdlib.simulator.MpdServerSimulator;
-import com.bender.mpdlib.simulator.commands.SubSystemSupport;
+import com.bender.mpdlib.simulator.SubSystemSupport;
 import junit.framework.TestCase;
 
 /**
@@ -391,6 +391,16 @@ public class MpdServerTest extends TestCase
 
         assertEquals(true, mpdServer.isConnected());
         assertEquals(true, listener.connected);
+    }
+
+    public void testCurrentTime() throws Exception
+    {
+        mpdServerSimulator.getSimPlayer().setSongProgress(123);
+        mpdServer.connect(HOSTNAME);
+
+        SongProgress progress = mpdServer.getPlayer().getProgress();
+
+        assertEquals(123, progress.getCurrentTime());
     }
 
     private static class MyVolumeListener implements VolumeListener

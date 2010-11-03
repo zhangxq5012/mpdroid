@@ -1,4 +1,4 @@
-package com.bender.mpdlib.simulator.commands;
+package com.bender.mpdlib.simulator;
 
 import com.bender.mpdlib.Subsystem;
 import com.bender.mpdlib.util.Log;
