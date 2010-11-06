@@ -48,6 +48,10 @@ public class PlayerFrame implements MpDroidActivityWidget
 
     private void updatePlayStatusOnUI(final MpdPlayerAdapterIF.PlayStatus playStatus)
     {
+        if (playStatus == null)
+        {
+            throw new NullPointerException();
+        }
         Runnable runnable = new Runnable()
         {
             public void run()

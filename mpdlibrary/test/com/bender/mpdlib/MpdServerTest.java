@@ -395,13 +395,16 @@ public class MpdServerTest extends TestCase
 
     public void testCurrentTime() throws Exception
     {
-        mpdServerSimulator.getSimPlayer().setSongProgress(123);
+        Integer currentTime = 123;
+        mpdServerSimulator.getSimPlayer().setSongProgress(currentTime);
         mpdServer.connect(HOSTNAME);
 
         SongProgress progress = mpdServer.getPlayer().getProgress();
 
-        assertEquals(123, progress.getCurrentTime());
+        assertEquals(currentTime, progress.getCurrentTime());
     }
+
+    //todo: song progress listener test?
 
     private static class MyVolumeListener implements VolumeListener
     {

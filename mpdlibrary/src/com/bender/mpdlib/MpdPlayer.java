@@ -3,7 +3,9 @@ package com.bender.mpdlib;
 import com.bender.mpdlib.commands.*;
 import com.bender.mpdlib.util.Log;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  */
@@ -19,11 +21,13 @@ class MpdPlayer implements Player
     private Integer volume;
     private VolumeListener volumeListener = new NullVolumeListener();
     private boolean muted;
-    private SongProgress progress = new NullProgress();
+    private SongProgressListener songProgressListener = new NullSongProgressListener();
+    private SongTimerManager songTimerManager;
 
     public MpdPlayer(Pipe commandPipe)
     {
         this.commandPipe = commandPipe;
+        songTimerManager = new SongTimerManager();
     }
 
     public void play()
@@ -114,35 +118,44 @@ class MpdPlayer implements Player
 
     public SongProgress getProgress()
     {
-        return progress;
+        return songTimerManager.getProgress();
     }
 
-    void processStatus(List<StatusTuple> statusTupleList)
+    public void addSongProgressListener(SongProgressListener listener)
     {
-        for (StatusTuple statusTuple : statusTupleList)
+        songProgressListener = listener;
+    }
+
+    void processStatus(Map<MpdStatus, StatusTuple> statusTupleMap)
+    {
+
+        if (statusTupleMap.containsKey(MpdStatus.state))
         {
-            switch (statusTuple.getStatus())
-            {
-                case state:
-                    stateUpdated(statusTuple);
-                    break;
-                case songid:
-                    songUpdated(statusTuple);
-                    break;
-                case volume:
-                    volumeUpdated(statusTuple);
-                    break;
-                case time:
-                    timeUpdated(statusTuple);
-                    break;
-            }
+            stateUpdated(statusTupleMap.get(MpdStatus.state));
         }
+
+        if (statusTupleMap.containsKey(MpdStatus.songid))
+        {
+            songUpdated(statusTupleMap.get(MpdStatus.songid));
+        }
+
+        if (statusTupleMap.containsKey(MpdStatus.volume))
+        {
+            volumeUpdated(statusTupleMap.get(MpdStatus.volume));
+        }
+
+        if (statusTupleMap.containsKey(MpdStatus.time))
+        {
+            timeUpdated(statusTupleMap.get(MpdStatus.time));
+        }
+
     }
 
     private void timeUpdated(StatusTuple statusTuple)
     {
         String value = statusTuple.getValue();
         String[] splitStrings = value.split(":");
+        SongProgress progress;
         if (splitStrings.length == 2)
         {
             int currentTime = Integer.parseInt(splitStrings[0].trim());
@@ -154,6 +167,7 @@ class MpdPlayer implements Player
             Log.w(TAG, "Illegal time value: " + value);
             progress = new NullProgress();
         }
+        songTimerManager.setSongProgress(progress);
     }
 
     private void volumeUpdated(StatusTuple statusTuple)
@@ -205,8 +219,78 @@ class MpdPlayer implements Player
         }
         if (changed)
         {
+            songTimerManager.updateSongTimer(newPlayStatus);
             myListener.playStatusChanged(newPlayStatus);
             Log.i(TAG, "playStatusChanged(): " + newPlayStatus);
+        }
+    }
+
+
+    private class SongTimerManager
+    {
+        private Timer songTimer;
+        private SongProgress progress = new NullProgress();
+
+        //todo: replace with better sync
+        private synchronized void updateSongTimer(PlayStatus newPlayStatus)
+        {
+            switch (newPlayStatus)
+            {
+                case Playing:
+                    if (songTimer == null)
+                    {
+                        songTimer = new Timer("SongTimer");
+                        songTimer.scheduleAtFixedRate(new TimerTask()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                //TMI
+//                                Log.v(TAG,"SongTimer.run()");
+                                if (progress.isDone())
+                                {
+                                    songTimer.cancel();
+                                    songTimer = null;
+                                }
+                                else
+                                {
+                                    progress.increment();
+                                    songProgressListener.songProgressUpdated(progress);
+                                }
+                            }
+                        }, 1000L, 1000L);
+                    }
+                    else
+                    {
+                        Log.w(TAG, "updateSongTimer: Playing is status but there is an existing songTimer");
+                    }
+                    break;
+                case Stopped:
+                    progress = new NullProgress();
+                    songProgressListener.songProgressUpdated(progress);
+                case Paused:
+                    if (songTimer != null)
+                    {
+                        songTimer.cancel();
+                        songTimer = null;
+                    }
+                    else
+                    {
+                        Log.w(TAG, "updateSongTimer: " + newPlayStatus + " is status but there is no songTimer");
+                    }
+                    break;
+            }
+        }
+
+        public synchronized SongProgress getProgress()
+        {
+            return progress;
+        }
+
+        public synchronized void setSongProgress(SongProgress progress)
+        {
+            this.progress = progress;
+            songProgressListener.songProgressUpdated(progress);
         }
     }
 
@@ -214,6 +298,13 @@ class MpdPlayer implements Player
     {
         myListener = new NullPlayStatusListener();
         currentSongListener = new NullCurrentSongListener();
+    }
+
+    private static class NullSongProgressListener implements SongProgressListener
+    {
+        public void songProgressUpdated(SongProgress songProgress)
+        {
+        }
     }
 
     private class NullPlayStatusListener implements PlayStatusListener
@@ -250,7 +341,12 @@ class MpdPlayer implements Player
     {
         private NullProgress()
         {
-            super(0, 0);
+            super(null, null);
+        }
+
+        @Override
+        void increment()
+        {
         }
     }
 }

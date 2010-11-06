@@ -1,25 +1,24 @@
 package com.bender.mpdlib;
 
 /**
- * todo: replace with documentation
  */
 public class SongProgress
 {
-    private int currentTime;
-    private int totalTime;
+    private Integer currentTime;
+    private Integer totalTime;
 
-    public SongProgress(int currentTime, int totalTime)
+    public SongProgress(Integer currentTime, Integer totalTime)
     {
         this.currentTime = currentTime;
         this.totalTime = totalTime;
     }
 
-    public int getCurrentTime()
+    public Integer getCurrentTime()
     {
         return currentTime;
     }
 
-    public int getTotalTime()
+    public Integer getTotalTime()
     {
         return totalTime;
     }
@@ -34,4 +33,16 @@ public class SongProgress
         return Math.round(getPercentCompleteAFloat());
     }
 
+    void increment()
+    {
+        if (currentTime < totalTime)
+        {
+            currentTime++;
+        }
+    }
+
+    boolean isDone()
+    {
+        return currentTime == totalTime;
+    }
 }

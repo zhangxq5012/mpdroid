@@ -4,12 +4,12 @@ import com.bender.mpdlib.MpdStatus;
 import com.bender.mpdlib.Pipe;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  */
-public class GetStatusCommand extends Command<NullArg, Result<List<StatusTuple>>>
+public class GetStatusCommand extends Command<NullArg, Result<Map<MpdStatus, StatusTuple>>>
 {
     public GetStatusCommand(Pipe pipe)
     {
@@ -23,17 +23,17 @@ public class GetStatusCommand extends Command<NullArg, Result<List<StatusTuple>>
     }
 
     @Override
-    protected Result<List<StatusTuple>> readResult() throws IOException
+    protected Result<Map<MpdStatus, StatusTuple>> readResult() throws IOException
     {
-        List<StatusTuple> statuses = new ArrayList<StatusTuple>();
+        Map<MpdStatus, StatusTuple> statuses = new HashMap<MpdStatus, StatusTuple>();
         String line;
         while (!isLastLine(line = pipe.readLine()))
         {
             StatusTuple statusTuple = MpdStatus.parse(line);
-            statuses.add(statusTuple);
+            statuses.put(statusTuple.getStatus(), statusTuple);
         }
         Status status = Status.parse(line);
-        Result<List<StatusTuple>> listResult = new Result<List<StatusTuple>>();
+        Result<Map<MpdStatus, StatusTuple>> listResult = new Result<Map<MpdStatus, StatusTuple>>();
         listResult.status = status;
         listResult.result = statuses;
         return listResult;

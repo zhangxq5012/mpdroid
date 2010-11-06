@@ -5,7 +5,7 @@ import com.bender.mpdlib.commands.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -57,7 +57,7 @@ public class MpdServer
             version = result.result;
 
             GetStatusCommand statusCommand = new GetStatusCommand(commandPipe);
-            Result<List<StatusTuple>> listResult = CommandRunner.runCommand(statusCommand);
+            Result<Map<MpdStatus, StatusTuple>> listResult = CommandRunner.runCommand(statusCommand);
             processStatuses(listResult.result);
 
 
@@ -74,7 +74,7 @@ public class MpdServer
         }
     }
 
-    void processStatuses(List<StatusTuple> result)
+    void processStatuses(Map<MpdStatus, StatusTuple> result)
     {
         getPlayer();
         player.processStatus(result);

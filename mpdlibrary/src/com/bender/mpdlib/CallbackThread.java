@@ -6,6 +6,7 @@ import com.bender.mpdlib.util.Log;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -74,7 +75,7 @@ class CallbackThread extends Thread
 
     private void getAndProcessStatus()
     {
-        Result<List<StatusTuple>> listResult = CommandRunner.runCommand(new GetStatusCommand(callbackPipe));
+        Result<Map<MpdStatus, StatusTuple>> listResult = CommandRunner.runCommand(new GetStatusCommand(callbackPipe));
         mpdServer.processStatuses(listResult.result);
     }
 

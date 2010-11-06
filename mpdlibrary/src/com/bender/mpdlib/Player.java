@@ -35,4 +35,6 @@ public interface Player
     boolean isMuted();
 
     SongProgress getProgress();
+
+    void addSongProgressListener(SongProgressListener listener);
 }

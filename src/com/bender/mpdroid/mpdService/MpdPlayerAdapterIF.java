@@ -29,6 +29,10 @@ public interface MpdPlayerAdapterIF
 
     void addVolumeListener(MpdVolumeListener listener);
 
+    void addSongProgressListener(MpSongProgressListener listener);
+
+    MpdSongProgress getSongProgress();
+
     public enum PlayStatus
     {
         Playing,
@@ -46,5 +50,17 @@ public interface MpdPlayerAdapterIF
     interface MpdVolumeListener
     {
         void volumeUpdated(Integer volume);
+    }
+
+    interface MpdSongProgress
+    {
+        Integer getCurrentTime();
+
+        Integer getTotalTime();
+    }
+
+    interface MpSongProgressListener
+    {
+        void songProgressUpdate(MpdSongProgress songProgress);
     }
 }
