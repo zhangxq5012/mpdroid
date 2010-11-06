@@ -138,6 +138,13 @@ public class SimPlayer
         public void run()
         {
             int progress = songProgress.incrementAndGet();
+            String totalTimeString = playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
+            if (progress >= Integer.parseInt(totalTimeString))
+            {
+                // song finished
+                songProgress.set(0);
+                playlist.next();
+            }
             Log.v("SimPlayer", "timer fired: " + progress);
         }
     }
