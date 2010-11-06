@@ -292,12 +292,23 @@ class MpdPlayer implements Player
             this.progress = progress;
             songProgressListener.songProgressUpdated(progress);
         }
+
+        public synchronized void disconnect()
+        {
+            if (songTimer != null)
+            {
+                songTimer.cancel();
+                songTimer = null;
+                progress = new NullProgress();
+            }
+        }
     }
 
     public void disconnect()
     {
         myListener = new NullPlayStatusListener();
         currentSongListener = new NullCurrentSongListener();
+        songTimerManager.disconnect();
     }
 
     private static class NullSongProgressListener implements SongProgressListener

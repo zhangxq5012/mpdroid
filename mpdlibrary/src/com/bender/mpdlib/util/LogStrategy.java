@@ -31,7 +31,7 @@ public interface LogStrategy
 
         private final int bitMask;
 
-        level(int bitMask)
+        private level(int bitMask)
         {
             this.bitMask = bitMask;
         }

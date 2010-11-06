@@ -138,7 +138,7 @@ public class SimPlayer
         public void run()
         {
             int progress = songProgress.incrementAndGet();
-            Log.i("SimPlayer", "timer fired: " + progress);
+            Log.v("SimPlayer", "timer fired: " + progress);
         }
     }
 }
