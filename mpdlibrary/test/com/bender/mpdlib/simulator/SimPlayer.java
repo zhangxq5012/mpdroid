@@ -63,7 +63,7 @@ public class SimPlayer
                 break;
 
             case Stopped:
-                songProgress.set(0);
+                resetProgress();
             case Paused:
                 synchronized (this)
                 {
@@ -132,6 +132,21 @@ public class SimPlayer
         return new StatusTuple(MpdStatus.time, currentTime + ":" + totalTime);
     }
 
+    public void next()
+    {
+        resetProgress();
+    }
+
+    public void previous()
+    {
+        resetProgress();
+    }
+
+    private void resetProgress()
+    {
+        songProgress.set(0);
+    }
+
     private class SongTimerTask extends TimerTask
     {
         @Override
@@ -142,7 +157,7 @@ public class SimPlayer
             if (progress >= Integer.parseInt(totalTimeString))
             {
                 // song finished
-                songProgress.set(0);
+                resetProgress();
                 playlist.next();
             }
             Log.v("SimPlayer", "timer fired: " + progress);

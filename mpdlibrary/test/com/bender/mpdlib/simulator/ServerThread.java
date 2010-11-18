@@ -111,10 +111,10 @@ class ServerThread extends Thread
                 stopSimCommand.run();
                 break;
             case next:
-                runSimCommand(new NextSimCommand(printWriter, playlist));
+                runSimCommand(new NextSimCommand(printWriter, playlist, simPlayer));
                 break;
             case previous:
-                runSimCommand(new PreviousSimCommand(printWriter, playlist));
+                runSimCommand(new PreviousSimCommand(printWriter, playlist, simPlayer));
                 break;
             case setvol:
                 VolumeSimCommand volumeSimCommand = new VolumeSimCommand(printWriter, strings, simPlayer);
