@@ -167,9 +167,12 @@ public class MpDroidActivity extends Activity
 
     private class SongProgressSeekChangeListener implements SeekBar.OnSeekBarChangeListener
     {
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
         {
-            //todo: seek
+            if (fromUser)
+            {
+                mpdPlayerAdapterIF.seek(progress);
+            }
         }
 
         public void onStartTrackingTouch(SeekBar seekBar)

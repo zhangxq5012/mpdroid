@@ -33,6 +33,8 @@ public interface MpdPlayerAdapterIF
 
     MpdSongProgress getSongProgress();
 
+    void seek(int progress);
+
     public enum PlayStatus
     {
         Playing,

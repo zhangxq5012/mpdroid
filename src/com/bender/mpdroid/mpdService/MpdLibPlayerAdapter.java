@@ -118,6 +118,11 @@ class MpdLibPlayerAdapter implements MpdPlayerAdapterIF
         return new MpdSongProgressWrapper(progress);
     }
 
+    public void seek(int progress)
+    {
+        player.seek(progress);
+    }
+
     private static class MpdSongProgressWrapper implements MpdSongProgress
     {
         private final SongProgress progress;
