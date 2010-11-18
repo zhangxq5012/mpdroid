@@ -11,6 +11,7 @@ public enum MpdCommands
     stop,
     previous,
     status,
+    seekid,
     close,
     ping,
     crossfade,

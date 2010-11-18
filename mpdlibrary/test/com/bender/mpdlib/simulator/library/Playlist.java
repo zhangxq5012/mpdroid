@@ -95,6 +95,11 @@ public class Playlist
         gotoSongIndex(index);
     }
 
+    /**
+     * The simulator makes the very important assumption that the song id's in the xml file are sequential.
+     *
+     * @param index
+     */
     private void gotoSongIndex(int index)
     {
         if (index >= library.size())
@@ -123,5 +128,14 @@ public class Playlist
     public void addSong(SongInfo songInfo)
     {
         library.add(songInfo);
+    }
+
+    public void gotoSongBySongId(Integer songId)
+    {
+        Integer currentSongId = Integer.valueOf(currentSong.getValue(SongInfo.SongAttributeType.Id));
+        if (!currentSongId.equals(songId))
+        {
+            gotoSongIndex(songId - 1);
+        }
     }
 }

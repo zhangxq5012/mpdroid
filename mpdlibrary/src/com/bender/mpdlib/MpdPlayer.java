@@ -126,6 +126,12 @@ class MpdPlayer implements Player
         songProgressListener = listener;
     }
 
+    public void seek(Integer position)
+    {
+        SeekArg seekArg = new SeekArg(songId, position);
+        CommandRunner.runCommand(new SeekCommand(commandPipe, seekArg));
+    }
+
     void processStatus(Map<MpdStatus, StatusTuple> statusTupleMap)
     {
 
@@ -161,6 +167,7 @@ class MpdPlayer implements Player
             int currentTime = Integer.parseInt(splitStrings[0].trim());
             int totalTime = Integer.parseInt(splitStrings[1].trim());
             progress = new SongProgress(currentTime, totalTime);
+            Log.v(TAG, "time updated: " + progress);
         }
         else
         {

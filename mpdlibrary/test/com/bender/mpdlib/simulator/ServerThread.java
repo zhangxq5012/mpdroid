@@ -126,8 +126,11 @@ class ServerThread extends Thread
             case currentsong:
                 runSimCommand(new CurrentSongSimCommand(printWriter, playlist));
                 break;
+            case seekid:
+                runSimCommand(new SeekByIdSimCommand(printWriter, strings, simPlayer));
+                break;
             default:
-                printWriter.write(Response.ACK + "[5@0] \"" + commandString + "\" not implemented");
+                printWriter.println(Response.ACK + "[5@0] \"" + commandString + "\" not implemented");
                 break;
         }
         Log.v(TAG, command + " DONE");

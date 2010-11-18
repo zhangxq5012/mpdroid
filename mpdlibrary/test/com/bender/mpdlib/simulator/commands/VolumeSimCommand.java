@@ -39,7 +39,7 @@ public class VolumeSimCommand extends SimCommand
         }
         else
         {
-            writer.println(Response.ACK + " [2@0] {setvol} wrong number of arguments for \"volume\"");
+            writer.println(Response.ACK + " [2@0] {setvol} wrong number of arguments for \"setvol\"");
         }
     }
 

@@ -37,4 +37,6 @@ public interface Player
     SongProgress getProgress();
 
     void addSongProgressListener(SongProgressListener listener);
+
+    void seek(Integer position);
 }

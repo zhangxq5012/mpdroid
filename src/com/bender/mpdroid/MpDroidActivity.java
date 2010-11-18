@@ -81,6 +81,7 @@ public class MpDroidActivity extends Activity
         connectButton.setOnClickListener(buttonClickListener);
         volumeSeekBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener());
         muteButton.setOnClickListener(buttonClickListener);
+        songProgressSeekBar.setOnSeekBarChangeListener(new SongProgressSeekChangeListener());
     }
 
     @Override
@@ -162,6 +163,22 @@ public class MpDroidActivity extends Activity
             getSongProgressTask.execute();
         }
         mpDroidActivityWidget.onConnectionChange(connected);
+    }
+
+    private class SongProgressSeekChangeListener implements SeekBar.OnSeekBarChangeListener
+    {
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+        {
+            //todo: seek
+        }
+
+        public void onStartTrackingTouch(SeekBar seekBar)
+        {
+        }
+
+        public void onStopTrackingTouch(SeekBar seekBar)
+        {
+        }
     }
 
 

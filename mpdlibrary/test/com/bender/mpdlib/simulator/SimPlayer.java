@@ -128,7 +128,7 @@ public class SimPlayer
 
     public StatusTuple getTimeStatus()
     {
-        String totalTime = playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
+        String totalTime = getCurrentSongTotalTime();
         if (totalTime == null)
         {
             totalTime = BigInteger.ZERO.toString();
@@ -152,13 +152,36 @@ public class SimPlayer
         songProgress.set(0);
     }
 
+    public void seek(Integer songId, Integer position)
+    {
+        playlist.gotoSongBySongId(songId);
+        String currentSongTotalTime = getCurrentSongTotalTime();
+        // todo: potential threading problem between get and set
+        int progress = songProgress.get();
+        if (currentSongTotalTime != null && (progress <= Integer.parseInt(currentSongTotalTime)))
+        {
+            Log.v(getClass().getSimpleName(), "seekid: " + position + ", previous=" + progress);
+            songProgress.set(position);
+            subSystemSupport.updateSubSystemChanged(Subsystem.player);
+        }
+        else
+        {
+            Log.d(getClass().getSimpleName(), "seekid: not seeking. total=" + currentSongTotalTime + ", progress=" + progress);
+        }
+    }
+
+    private String getCurrentSongTotalTime()
+    {
+        return playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
+    }
+
     private class SongTimerTask extends TimerTask
     {
         @Override
         public void run()
         {
             int progress = songProgress.incrementAndGet();
-            String totalTimeString = playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
+            String totalTimeString = getCurrentSongTotalTime();
             if (totalTimeString != null && progress >= Integer.parseInt(totalTimeString))
             {
                 // song finished

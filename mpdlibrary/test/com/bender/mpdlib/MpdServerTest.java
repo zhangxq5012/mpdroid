@@ -406,6 +406,21 @@ public class MpdServerTest extends TestCase
 
     //todo: song progress listener test?
 
+
+    public void testSeek() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        Player player = mpdServer.getPlayer();
+        Integer POSITION = 5;
+        player.seek(POSITION);
+        smallWait();
+
+        SongProgress progress = player.getProgress();
+        smallWait();
+        assertEquals(POSITION, progress.getCurrentTime());
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;
