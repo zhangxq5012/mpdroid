@@ -8,6 +8,7 @@ import com.bender.mpdlib.commands.StatusTuple;
 import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
+import java.math.BigInteger;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -128,6 +129,10 @@ public class SimPlayer
     public StatusTuple getTimeStatus()
     {
         String totalTime = playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
+        if (totalTime == null)
+        {
+            totalTime = BigInteger.ZERO.toString();
+        }
         int currentTime = songProgress.get();
         return new StatusTuple(MpdStatus.time, currentTime + ":" + totalTime);
     }
@@ -154,7 +159,7 @@ public class SimPlayer
         {
             int progress = songProgress.incrementAndGet();
             String totalTimeString = playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
-            if (progress >= Integer.parseInt(totalTimeString))
+            if (totalTimeString != null && progress >= Integer.parseInt(totalTimeString))
             {
                 // song finished
                 resetProgress();

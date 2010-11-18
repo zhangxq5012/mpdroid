@@ -159,6 +159,7 @@ public class MpDroidActivity extends Activity
             GetSongTask getSongTask = new GetSongTask(this, mpdPlayerAdapterIF);
             getSongTask.execute();
             GetSongProgressTask getSongProgressTask = new GetSongProgressTask();
+            getSongProgressTask.execute();
         }
         mpDroidActivityWidget.onConnectionChange(connected);
     }
@@ -354,20 +355,20 @@ public class MpDroidActivity extends Activity
             details.append(" (" + date + ")");
         }
         songDetailsTextView.setText(details);
-        Integer length = mpdSongAdapterIF.getSongLength();
-        if (length != null)
-        {
-            CharSequence lengthString = getLengthString(length);
-            songProgressSeekBar.setMax(length);
-            songProgressSeekBar.setProgress(0);
-            songProgressSeekBar.setVisibility(View.VISIBLE);
-            songProgressTextView.setText(lengthString);
-            songProgressTextView.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            songProgressTextView.setVisibility(View.INVISIBLE);
-        }
+//        Integer length = mpdSongAdapterIF.getSongLength();
+//        if (length != null)
+//        {
+//            CharSequence lengthString = getLengthString(length);
+//            songProgressSeekBar.setMax(length);
+//            songProgressSeekBar.setProgress(0);
+//            songProgressSeekBar.setVisibility(View.VISIBLE);
+//            songProgressTextView.setText(lengthString);
+//            songProgressTextView.setVisibility(View.VISIBLE);
+//        }
+//        else
+//        {
+//            songProgressTextView.setVisibility(View.INVISIBLE);
+//        }
     }
 
     private static CharSequence getLengthString(Integer length)
@@ -443,12 +444,23 @@ public class MpDroidActivity extends Activity
             {
                 public void run()
                 {
-                    songProgressSeekBar.setMax(totalTime);
-                    songProgressSeekBar.setProgress(currentTime);
+                    if (totalTime > 0)
+                    {
+                        songProgressSeekBar.setMax(totalTime);
+                        songProgressSeekBar.setProgress(currentTime);
+                        songProgressSeekBar.setVisibility(View.VISIBLE);
 
-                    String songProgressText = getLengthString(currentTime) + "-" + getLengthString(totalTime);
+                        String songProgressText = getLengthString(currentTime) + "-" + getLengthString(totalTime);
 
-                    songProgressTextView.setText(songProgressText);
+                        songProgressTextView.setText(songProgressText);
+                        songProgressTextView.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        songProgressTextView.setText(getLengthString(currentTime));
+                        songProgressTextView.setVisibility(View.VISIBLE);
+                        songProgressSeekBar.setVisibility(View.INVISIBLE);
+                    }
                 }
             };
             runOnUiThread(runnable);

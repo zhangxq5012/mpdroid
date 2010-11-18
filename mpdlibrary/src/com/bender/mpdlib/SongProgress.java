@@ -35,7 +35,7 @@ public class SongProgress
 
     void increment()
     {
-        if (currentTime < totalTime)
+        if (totalTime == 0 || currentTime < totalTime)
         {
             currentTime++;
         }
@@ -43,6 +43,6 @@ public class SongProgress
 
     boolean isDone()
     {
-        return currentTime == totalTime;
+        return totalTime > 0 && currentTime == totalTime;
     }
 }
