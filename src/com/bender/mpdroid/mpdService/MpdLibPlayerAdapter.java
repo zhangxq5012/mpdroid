@@ -12,6 +12,7 @@ class MpdLibPlayerAdapter implements MpdPlayerAdapterIF
     public MpdPlayStatusListener playStatusListener = new NullMpdPlayStatusListener();
     private Player player;
     private AtomicInteger setVolumeCount = new AtomicInteger(0);
+    private AtomicInteger seekCount = new AtomicInteger(0);
     private static final String TAG = MpdLibPlayerAdapter.class.getSimpleName();
 
     public MpdLibPlayerAdapter(Player player)
@@ -107,7 +108,12 @@ class MpdLibPlayerAdapter implements MpdPlayerAdapterIF
         {
             public void songProgressUpdated(SongProgress songProgress)
             {
-                listener.songProgressUpdate(new MpdSongProgressWrapper(songProgress));
+                int count = seekCount.decrementAndGet();
+                if (count < 0)
+                {
+                    seekCount.incrementAndGet();
+                    listener.songProgressUpdate(new MpdSongProgressWrapper(songProgress));
+                }
             }
         });
     }
@@ -120,6 +126,7 @@ class MpdLibPlayerAdapter implements MpdPlayerAdapterIF
 
     public void seek(int progress)
     {
+        seekCount.incrementAndGet();
         player.seek(progress);
     }
 
@@ -211,8 +218,7 @@ class MpdLibPlayerAdapter implements MpdPlayerAdapterIF
             try
             {
                 return Integer.valueOf(songInfo.getValue(SongInfo.SongAttributeType.Time));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 return null;
             }

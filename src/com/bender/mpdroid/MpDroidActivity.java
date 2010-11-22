@@ -172,6 +172,7 @@ public class MpDroidActivity extends Activity
             if (fromUser)
             {
                 mpdPlayerAdapterIF.seek(progress);
+                updateSongProgressTextOnUI(mpdPlayerAdapterIF.getSongProgress());
             }
         }
 
@@ -485,5 +486,31 @@ public class MpDroidActivity extends Activity
             };
             runOnUiThread(runnable);
         }
+    }
+
+    private void updateSongProgressTextOnUI(MpdPlayerAdapterIF.MpdSongProgress mpdSongProgress)
+    {
+        final Integer currentTime = mpdSongProgress.getCurrentTime();
+        final Integer totalTime = mpdSongProgress.getTotalTime();
+        final String songProgressText = getLengthString(currentTime) + "-" + getLengthString(totalTime);
+
+        Runnable runnable = new Runnable()
+        {
+            public void run()
+            {
+                if (totalTime > 0)
+                {
+
+                    songProgressTextView.setText(songProgressText);
+                    songProgressTextView.setVisibility(View.VISIBLE);
+                } else
+                {
+                    songProgressTextView.setText(getLengthString(currentTime));
+                    songProgressTextView.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+        runOnUiThread(runnable);
+
     }
 }
