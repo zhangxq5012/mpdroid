@@ -2,10 +2,10 @@ package com.bender.mpdlib.commands;
 
 /**
  */
-public class NullArg
+public class NullArg extends Arg
 {
-    public static NullArg nullArg()
+    public NullArg()
     {
-        return new NullArg();
+        super();
     }
 }

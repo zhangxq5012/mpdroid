@@ -1,22 +1,13 @@
 package com.bender.mpdlib.commands;
 
 /**
- * todo: replace with documentation
  */
-public class SeekArg
+public class SeekArg extends Arg
 {
-    public final Integer songId;
-    public final Integer position;
 
     public SeekArg(Integer songId, Integer position)
     {
-        this.position = position;
-        this.songId = songId;
+        super(songId, position);
     }
 
-    @Override
-    public String toString()
-    {
-        return songId + " " + position;
-    }
 }

@@ -4,6 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Logging utility class for mpdlibrary.
+ *
+ * To change the log strategy use #Log.setLogStrategy.  The default strategy is to log everything to system out.
  */
 public class Log
 {
@@ -17,6 +20,11 @@ public class Log
         logStrategy = new SysOutLogStrategy();
     }
 
+    /**
+     * Change the log strategy.
+     *
+     * @param logStrategy new log strategy
+     */
     public static void setLogStrategy(LogStrategy logStrategy)
     {
         Log.logStrategy = logStrategy;

@@ -7,17 +7,17 @@ import java.net.SocketAddress;
 
 /**
  */
-public class ConnectCommand extends Command<SocketAddress, Result<String>>
+public class ConnectCommand extends Command<SingleArg<SocketAddress>, Result<String>>
 {
     public ConnectCommand(Pipe pipe, SocketAddress theAddress)
     {
-        super(pipe, theAddress);
+        super(pipe, new SingleArg<SocketAddress>(theAddress));
     }
 
     @Override
-    public void executeCommand(SocketAddress address) throws IOException
+    public void executeCommand(SingleArg<SocketAddress> address) throws IOException
     {
-        pipe.connect(address);
+        pipe.connect(address.getArg());
     }
 
     @Override

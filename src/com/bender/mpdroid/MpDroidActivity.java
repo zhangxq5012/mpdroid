@@ -35,11 +35,11 @@ public class MpDroidActivity extends Activity
 
     private MpdServiceAdapterIF mpdServiceAdapterIF;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
-    private MpDroidActivityWidget mpDroidActivityWidget;
+    private MpDroidActivityWidget playerFrame;
 
     public MpDroidActivity()
     {
-        mpDroidActivityWidget = new PlayerFrame();
+        playerFrame = new PlayerFrame();
     }
 
     /**
@@ -52,7 +52,7 @@ public class MpDroidActivity extends Activity
         setContentView(R.layout.summary);
         mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
         myPreferences = new MpdPreferences(this);
-        mpDroidActivityWidget.onCreate(this);
+        playerFrame.onCreate(this);
         initializeWidgets();
         initializeListeners();
         updatePreferencesDisplay();
@@ -162,7 +162,7 @@ public class MpDroidActivity extends Activity
             GetSongProgressTask getSongProgressTask = new GetSongProgressTask();
             getSongProgressTask.execute();
         }
-        mpDroidActivityWidget.onConnectionChange(connected);
+        playerFrame.onConnectionChange(connected);
     }
 
     private class SongProgressSeekChangeListener implements SeekBar.OnSeekBarChangeListener
@@ -217,7 +217,7 @@ public class MpDroidActivity extends Activity
                 mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
                 mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
                 mpdPlayerAdapterIF.addSongProgressListener(new UIMpSongProgressListener());
-                mpDroidActivityWidget.onConnect();
+                playerFrame.onConnect();
 
                 Log.v(TAG, "MPD Server version: " + mpdServiceAdapterIF.getServerVersion());
             }

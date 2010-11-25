@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  */
-public class IdleCommand extends Command<IdleCommand.SubsystemList, Result<List<Subsystem>>>
+public class IdleCommand extends Command<SingleArg<IdleCommand.SubsystemList>, Result<List<Subsystem>>>
 {
     public IdleCommand(Pipe pipe)
     {
@@ -18,14 +18,14 @@ public class IdleCommand extends Command<IdleCommand.SubsystemList, Result<List<
 
     public IdleCommand(Pipe pipe, SubsystemList subsystems)
     {
-        super(pipe, subsystems);
+        super(pipe, new SingleArg<SubsystemList>(subsystems));
     }
 
     @Override
-    protected void executeCommand(SubsystemList arg) throws IOException
+    protected void executeCommand(SingleArg<SubsystemList> arg) throws IOException
     {
         StringBuffer arguments = new StringBuffer("");
-        for (Subsystem subsystem : arg.subsystems)
+        for (Subsystem subsystem : arg.getArg().subsystems)
         {
             arguments.append(" ").append(subsystem.toString());
         }

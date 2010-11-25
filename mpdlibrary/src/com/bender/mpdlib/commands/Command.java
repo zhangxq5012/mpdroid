@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 
 /**
  */
-public abstract class Command<V, T> implements Callable<T>
+public abstract class Command<V extends Arg, T> implements Callable<T>
 {
     protected final Pipe pipe;
     private V arg;

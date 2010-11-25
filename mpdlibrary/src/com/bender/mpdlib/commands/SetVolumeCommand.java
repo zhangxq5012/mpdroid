@@ -6,15 +6,15 @@ import java.io.IOException;
 
 /**
  */
-public class SetVolumeCommand extends StatusCommand<Integer>
+public class SetVolumeCommand extends StatusCommand<SingleArg<Integer>>
 {
     public SetVolumeCommand(Pipe pipe, Integer volume)
     {
-        super(pipe, volume);
+        super(pipe, new SingleArg<Integer>(volume));
     }
 
     @Override
-    public void executeCommand(Integer volume) throws IOException
+    public void executeCommand(SingleArg<Integer> volume) throws IOException
     {
         pipe.write(MpdCommands.setvol + " " + volume);
     }

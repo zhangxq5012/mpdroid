@@ -1,5 +1,6 @@
 package com.bender.mpdlib;
 
+import com.bender.mpdlib.commands.Arg;
 import com.bender.mpdlib.commands.Command;
 import com.bender.mpdlib.util.Log;
 
@@ -9,7 +10,7 @@ class CommandRunner
 {
     public static final String TAG = "CommandRunner";
 
-    public static <K, T> T runCommand(Command<K, T> command)
+    public static <K extends Arg, T> T runCommand(Command<K, T> command)
     {
         try
         {
@@ -22,7 +23,7 @@ class CommandRunner
         return null;
     }
 
-    public static <K, T> T callCommand(Command<K, T> command) throws Exception
+    public static <K extends Arg, T> T callCommand(Command<K, T> command) throws Exception
     {
         String debugLine = "callCommand: " + command.getClass().getSimpleName();
         K arg = command.getArg();

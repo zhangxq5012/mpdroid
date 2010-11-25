@@ -4,6 +4,8 @@ import android.util.Log;
 import com.bender.mpdlib.util.LogStrategy;
 
 /**
+ * Implementation of #LogStrategy that uses Android's logging framework.
+ *
  */
 public class AndroidLogStrategy implements LogStrategy
 {
@@ -42,6 +44,11 @@ public class AndroidLogStrategy implements LogStrategy
         Log.wtf(tag, text);
     }
 
+    /**
+     * Not used! Android has it's own level filtering mechanism.
+     *
+     * @param lvl level
+     */
     public void setLevel(level lvl)
     {
         //no-op
