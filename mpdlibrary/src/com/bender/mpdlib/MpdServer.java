@@ -1,6 +1,7 @@
 package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.*;
+import com.bender.mpdlib.util.Log;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -66,7 +67,7 @@ public class MpdServer
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.e(TAG,e);
         }
         finally
         {

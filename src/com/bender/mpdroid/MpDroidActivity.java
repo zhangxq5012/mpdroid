@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.*;
 import com.bender.mpdroid.mpdService.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Main activity for the mpd droid application
  */
@@ -28,18 +31,19 @@ public class MpDroidActivity extends Activity
     private Button muteButton;
     private TextView songNameTextView;
     private TextView songDetailsTextView;
-    private SeekBar songProgressSeekBar;
-    private TextView songProgressTextView;
 
     private MpdPreferences myPreferences;
 
     private MpdServiceAdapterIF mpdServiceAdapterIF;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
-    private MpDroidActivityWidget playerFrame;
+
+    private List<MpDroidActivityWidget> mpDroidActivityWidgetList;
 
     public MpDroidActivity()
     {
-        playerFrame = new PlayerFrame();
+        mpDroidActivityWidgetList = new ArrayList<MpDroidActivityWidget>();
+        mpDroidActivityWidgetList.add(new PlayerFrame());
+        mpDroidActivityWidgetList.add(new SongProgressFrame());
     }
 
     /**
@@ -52,7 +56,10 @@ public class MpDroidActivity extends Activity
         setContentView(R.layout.summary);
         mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
         myPreferences = new MpdPreferences(this);
-        playerFrame.onCreate(this);
+        for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
+        {
+            mpDroidActivityWidget.onCreate(this);
+        }
         initializeWidgets();
         initializeListeners();
         updatePreferencesDisplay();
@@ -70,9 +77,6 @@ public class MpDroidActivity extends Activity
         muteButton = (Button) findViewById(R.id.mute);
         songNameTextView = (TextView) findViewById(R.id.song_name);
         songDetailsTextView = (TextView) findViewById(R.id.song_details);
-        songProgressSeekBar = (SeekBar) findViewById(R.id.song_progress);
-        songProgressSeekBar.setVisibility(View.INVISIBLE);
-        songProgressTextView = (TextView) findViewById(R.id.song_progress_text);
     }
 
     private void initializeListeners()
@@ -81,7 +85,6 @@ public class MpDroidActivity extends Activity
         connectButton.setOnClickListener(buttonClickListener);
         volumeSeekBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener());
         muteButton.setOnClickListener(buttonClickListener);
-        songProgressSeekBar.setOnSeekBarChangeListener(new SongProgressSeekChangeListener());
     }
 
     @Override
@@ -148,42 +151,19 @@ public class MpDroidActivity extends Activity
         int visibility = connected ? View.VISIBLE : View.INVISIBLE;
         songNameTextView.setVisibility(visibility);
         songDetailsTextView.setVisibility(visibility);
-        if (!connected)
-        {
-            songProgressSeekBar.setVisibility(visibility);
-        }
-        songProgressTextView.setVisibility(visibility);
         if (connected)
         {
             GetVolumeTask getVolumeTask = new GetVolumeTask();
             getVolumeTask.execute();
             GetSongTask getSongTask = new GetSongTask(this, mpdPlayerAdapterIF);
             getSongTask.execute();
-            GetSongProgressTask getSongProgressTask = new GetSongProgressTask();
-            getSongProgressTask.execute();
         }
-        playerFrame.onConnectionChange(connected);
+        for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
+        {
+            mpDroidActivityWidget.onConnectionChange(connected);
+        }
     }
 
-    private class SongProgressSeekChangeListener implements SeekBar.OnSeekBarChangeListener
-    {
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
-        {
-            if (fromUser)
-            {
-                mpdPlayerAdapterIF.seek(progress);
-                updateSongProgressTextOnUI(mpdPlayerAdapterIF.getSongProgress());
-            }
-        }
-
-        public void onStartTrackingTouch(SeekBar seekBar)
-        {
-        }
-
-        public void onStopTrackingTouch(SeekBar seekBar)
-        {
-        }
-    }
 
 
     private class ConnectTask extends AsyncTask<Object, MpdPlayerAdapterIF.PlayStatus, Boolean>
@@ -216,8 +196,10 @@ public class MpDroidActivity extends Activity
                 mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
                 mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
                 mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
-                mpdPlayerAdapterIF.addSongProgressListener(new UIMpSongProgressListener());
-                playerFrame.onConnect();
+                for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
+                {
+                    mpDroidActivityWidget.onConnect();
+                }
 
                 Log.v(TAG, "MPD Server version: " + mpdServiceAdapterIF.getServerVersion());
             }
@@ -257,13 +239,6 @@ public class MpDroidActivity extends Activity
             }
         }
 
-        private class UIMpSongProgressListener implements MpdPlayerAdapterIF.MpSongProgressListener
-        {
-            public void songProgressUpdate(MpdPlayerAdapterIF.MpdSongProgress songProgress)
-            {
-                updateSongProgressOnUI(songProgress);
-            }
-        }
     }
 
 
@@ -376,36 +351,6 @@ public class MpDroidActivity extends Activity
             details.append(" (" + date + ")");
         }
         songDetailsTextView.setText(details);
-//        Integer length = mpdSongAdapterIF.getSongLength();
-//        if (length != null)
-//        {
-//            CharSequence lengthString = getLengthString(length);
-//            songProgressSeekBar.setMax(length);
-//            songProgressSeekBar.setProgress(0);
-//            songProgressSeekBar.setVisibility(View.VISIBLE);
-//            songProgressTextView.setText(lengthString);
-//            songProgressTextView.setVisibility(View.VISIBLE);
-//        }
-//        else
-//        {
-//            songProgressTextView.setVisibility(View.INVISIBLE);
-//        }
-    }
-
-    private static CharSequence getLengthString(Integer length)
-    {
-        String stringBuffer = "";
-        do
-        {
-            int remainder = length % 60;
-            stringBuffer = String.format("%02d", remainder) + stringBuffer;
-            if ((length / 60) > 0)
-            {
-                stringBuffer = ":" + stringBuffer;
-            }
-        }
-        while ((length = length / 60) > 0);
-        return stringBuffer;
     }
 
     private class SongListener implements MpdSongListener
@@ -439,78 +384,5 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class GetSongProgressTask extends AsyncTask<Void, Void, MpdPlayerAdapterIF.MpdSongProgress>
-    {
-        @Override
-        protected MpdPlayerAdapterIF.MpdSongProgress doInBackground(Void... voids)
-        {
-            return mpdPlayerAdapterIF.getSongProgress();
-        }
 
-        @Override
-        protected void onPostExecute(MpdPlayerAdapterIF.MpdSongProgress mpdSongProgress)
-        {
-            updateSongProgressOnUI(mpdSongProgress);
-        }
-    }
-
-    private void updateSongProgressOnUI(MpdPlayerAdapterIF.MpdSongProgress mpdSongProgress)
-    {
-        final Integer currentTime = mpdSongProgress.getCurrentTime();
-        final Integer totalTime = mpdSongProgress.getTotalTime();
-
-        if (currentTime != null && totalTime != null)
-        {
-            Runnable runnable = new Runnable()
-            {
-                public void run()
-                {
-                    if (totalTime > 0)
-                    {
-                        songProgressSeekBar.setMax(totalTime);
-                        songProgressSeekBar.setProgress(currentTime);
-                        songProgressSeekBar.setVisibility(View.VISIBLE);
-
-                        String songProgressText = getLengthString(currentTime) + "-" + getLengthString(totalTime);
-
-                        songProgressTextView.setText(songProgressText);
-                        songProgressTextView.setVisibility(View.VISIBLE);
-                    }
-                    else
-                    {
-                        songProgressTextView.setText(getLengthString(currentTime));
-                        songProgressTextView.setVisibility(View.VISIBLE);
-                        songProgressSeekBar.setVisibility(View.INVISIBLE);
-                    }
-                }
-            };
-            runOnUiThread(runnable);
-        }
-    }
-
-    private void updateSongProgressTextOnUI(MpdPlayerAdapterIF.MpdSongProgress mpdSongProgress)
-    {
-        final Integer currentTime = mpdSongProgress.getCurrentTime();
-        final Integer totalTime = mpdSongProgress.getTotalTime();
-        final String songProgressText = getLengthString(currentTime) + "-" + getLengthString(totalTime);
-
-        Runnable runnable = new Runnable()
-        {
-            public void run()
-            {
-                if (totalTime > 0)
-                {
-
-                    songProgressTextView.setText(songProgressText);
-                    songProgressTextView.setVisibility(View.VISIBLE);
-                } else
-                {
-                    songProgressTextView.setText(getLengthString(currentTime));
-                    songProgressTextView.setVisibility(View.VISIBLE);
-                }
-            }
-        };
-        runOnUiThread(runnable);
-
-    }
 }

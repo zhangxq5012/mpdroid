@@ -8,8 +8,6 @@ public interface MpDroidActivityWidget
 
     /**
      * Called on a worker thread.
-     *
-     * @param connected is connected?
      */
     void onConnect();
 
