@@ -3,16 +3,17 @@ package com.bender.mpdroid;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import com.bender.mpdroid.mpdService.MpdPlayerAdapterIF;
 
 /**
  */
 public class PlayerFrame implements MpDroidActivityWidget
 {
-    private Button playButton;
-    private Button stopButton;
-    private Button nextButton;
-    private Button prevButton;
+    private ImageButton playButton;
+//    private Button stopButton;
+    private ImageButton nextButton;
+    private ImageButton prevButton;
     private MpDroidActivity activity;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
@@ -20,12 +21,12 @@ public class PlayerFrame implements MpDroidActivityWidget
     {
         this.activity = activity;
         ButtonClickListener buttonClickListener = new ButtonClickListener();
-        playButton = (Button) activity.findViewById(R.id.play);
-        stopButton = (Button) activity.findViewById(R.id.stop);
-        nextButton = (Button) activity.findViewById(R.id.next);
-        prevButton = (Button) activity.findViewById(R.id.prev);
+        playButton = (ImageButton) activity.findViewById(R.id.play);
+//        stopButton = (Button) activity.findViewById(R.id.stop);
+        nextButton = (ImageButton) activity.findViewById(R.id.next);
+        prevButton = (ImageButton) activity.findViewById(R.id.prev);
         playButton.setOnClickListener(buttonClickListener);
-        stopButton.setOnClickListener(buttonClickListener);
+//        stopButton.setOnClickListener(buttonClickListener);
         nextButton.setOnClickListener(buttonClickListener);
         prevButton.setOnClickListener(buttonClickListener);
     }
@@ -40,7 +41,7 @@ public class PlayerFrame implements MpDroidActivityWidget
     public void onConnectionChange(boolean connected)
     {
         playButton.setEnabled(connected);
-        stopButton.setEnabled(connected);
+//        stopButton.setEnabled(connected);
         nextButton.setEnabled(connected);
         prevButton.setEnabled(connected);
 
@@ -59,12 +60,11 @@ public class PlayerFrame implements MpDroidActivityWidget
                 switch (playStatus)
                 {
                     case Playing:
-                        playButton.setText(activity.getString(R.string.pause));
+                        playButton.setImageResource(android.R.drawable.ic_media_pause);
                         break;
                     case Paused:
-                        playButton.setText(activity.getString(R.string.play));
                     default:
-                        playButton.setText(activity.getString(R.string.play));
+                        playButton.setImageResource(android.R.drawable.ic_media_play);
                 }
             }
         };
@@ -80,11 +80,11 @@ public class PlayerFrame implements MpDroidActivityWidget
                 PlayTask playTask = new PlayTask(mpdPlayerAdapterIF);
                 playTask.execute();
             }
-            else if (view == stopButton)
-            {
-                StopTask stopTask = new StopTask(mpdPlayerAdapterIF);
-                stopTask.execute();
-            }
+//            else if (view == stopButton)
+//            {
+//                StopTask stopTask = new StopTask(mpdPlayerAdapterIF);
+//                stopTask.execute();
+//            }
             else if (view == nextButton)
             {
                 NextTask nextTask = new NextTask(mpdPlayerAdapterIF);

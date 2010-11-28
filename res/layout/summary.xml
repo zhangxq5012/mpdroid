@@ -28,37 +28,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             />
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            >
-        <Button android:id="@+id/prev"
-                android:text="@string/prev"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                />
-        <Button android:id="@+id/stop"
-                android:text="@string/stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                />
-        <Button android:id="@+id/play"
-                android:text="@string/play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                />
-        <Button android:id="@+id/next"
-                android:text="@string/next"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                />
 
-    </LinearLayout>
+    <include layout="@layout/player"/>
 
     <TextView
             android:text="@string/volume"
