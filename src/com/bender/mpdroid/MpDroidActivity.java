@@ -165,7 +165,6 @@ public class MpDroidActivity extends Activity
     }
 
 
-
     private class ConnectTask extends AsyncTask<Object, MpdPlayerAdapterIF.PlayStatus, Boolean>
     {
         @Override
@@ -179,12 +178,10 @@ public class MpDroidActivity extends Activity
             {
                 String password = myPreferences.getPassword();
                 mpdServiceAdapterIF.connect(server, port, password);
-            }
-            else if (usePort)
+            } else if (usePort)
             {
                 mpdServiceAdapterIF.connect(server, port);
-            }
-            else
+            } else
             {
                 mpdServiceAdapterIF.connect(server);
             }
@@ -253,14 +250,12 @@ public class MpDroidActivity extends Activity
                 {
                     DisconnectTask disconnectTask = new DisconnectTask();
                     disconnectTask.execute();
-                }
-                else
+                } else
                 {
                     ConnectTask connectTask = new ConnectTask();
                     connectTask.execute();
                 }
-            }
-            else if (view == muteButton)
+            } else if (view == muteButton)
             {
                 ToggleMuteTask toggleMuteTask = new ToggleMuteTask();
                 toggleMuteTask.execute();

@@ -3,9 +3,7 @@ package com.bender.mpdlib;
 import com.bender.mpdlib.commands.*;
 import com.bender.mpdlib.util.Log;
 
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  */
@@ -13,7 +11,7 @@ class MpdPlayer implements Player
 {
     private Pipe commandPipe;
     private PlayStatus playState;
-    private PlayStatusListener myListener = new NullPlayStatusListener();
+    private Set<PlayStatusListener> playStatusListeners = new HashSet<PlayStatusListener>();
     private SongInfo currentSongInfo = new NullSongInfo();
     private Integer songId;
     private CurrentSongListener currentSongListener = new NullCurrentSongListener();
@@ -58,7 +56,7 @@ class MpdPlayer implements Player
 
     public void addPlayStatusListener(PlayStatusListener listener)
     {
-        myListener = listener;
+        playStatusListeners.add(listener);
     }
 
     public void previous()
@@ -103,8 +101,7 @@ class MpdPlayer implements Player
         {
             //todo: use last cached volume
             setVolumeImpl(100);
-        }
-        else
+        } else
         {
             setVolumeImpl(0);
         }
@@ -168,8 +165,7 @@ class MpdPlayer implements Player
             int totalTime = Integer.parseInt(splitStrings[1].trim());
             progress = new SongProgress(currentTime, totalTime);
             Log.v(TAG, "time updated: " + progress);
-        }
-        else
+        } else
         {
             Log.w(TAG, "Illegal time value: " + value);
             progress = new NullProgress();
@@ -227,7 +223,10 @@ class MpdPlayer implements Player
         if (changed)
         {
             songTimerManager.updateSongTimer(newPlayStatus);
-            myListener.playStatusChanged(newPlayStatus);
+            for (PlayStatusListener playStatusListener : playStatusListeners)
+            {
+                playStatusListener.playStatusChanged(newPlayStatus);
+            }
             Log.i(TAG, "playStatusChanged(): " + newPlayStatus);
         }
     }
@@ -252,22 +251,18 @@ class MpdPlayer implements Player
                             @Override
                             public void run()
                             {
-                                //TMI
-//                                Log.v(TAG,"SongTimer.run()");
                                 if (progress.isDone())
                                 {
                                     songTimer.cancel();
                                     songTimer = null;
-                                }
-                                else
+                                } else
                                 {
                                     progress.increment();
                                     songProgressListener.songProgressUpdated(progress);
                                 }
                             }
                         }, 1000L, 1000L);
-                    }
-                    else
+                    } else
                     {
                         Log.w(TAG, "updateSongTimer: Playing is status but there is an existing songTimer");
                     }
@@ -280,8 +275,7 @@ class MpdPlayer implements Player
                     {
                         songTimer.cancel();
                         songTimer = null;
-                    }
-                    else
+                    } else
                     {
                         Log.w(TAG, "updateSongTimer: " + newPlayStatus + " is status but there is no songTimer");
                     }
@@ -313,7 +307,7 @@ class MpdPlayer implements Player
 
     public void disconnect()
     {
-        myListener = new NullPlayStatusListener();
+        playStatusListeners.clear();
         currentSongListener = new NullCurrentSongListener();
         songTimerManager.disconnect();
     }
@@ -321,13 +315,6 @@ class MpdPlayer implements Player
     private static class NullSongProgressListener implements SongProgressListener
     {
         public void songProgressUpdated(SongProgress songProgress)
-        {
-        }
-    }
-
-    private class NullPlayStatusListener implements PlayStatusListener
-    {
-        public void playStatusChanged(PlayStatus playStatus)
         {
         }
     }
