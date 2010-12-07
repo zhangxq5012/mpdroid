@@ -9,9 +9,9 @@ public class SingleArg<T> extends Arg
         super(arg);
     }
 
+    @SuppressWarnings("unchecked")
     public T getArg()
     {
-        //noinspection unchecked
         return (T) getArgs()[0];
     }
 }

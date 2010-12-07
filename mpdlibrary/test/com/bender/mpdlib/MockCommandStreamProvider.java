@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -21,7 +20,7 @@ public class MockCommandStreamProvider implements SocketStreamProviderIF
     private PrintWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private List<String> commandQueue;
-    private Queue<String> responseQueue;
+    private LinkedList<String> responseQueue;
 
     private boolean connected;
 
@@ -38,9 +37,9 @@ public class MockCommandStreamProvider implements SocketStreamProviderIF
                 return responseQueue.remove();
             }
         });
-        doAnswer(new Answer()
+        doAnswer(new Answer<Void>()
         {
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 commandQueue.add((String) invocationOnMock.getArguments()[0]);
                 return null;
@@ -85,8 +84,7 @@ public class MockCommandStreamProvider implements SocketStreamProviderIF
 
     public void removeLastCommand()
     {
-        List<String> list = (List<String>) responseQueue;
-        list.remove(list.size() - 1);
+        responseQueue.remove(responseQueue.size() - 1);
     }
 
     public void assertLastCommandEquals(String command)

@@ -8,7 +8,7 @@ import com.bender.mpdlib.MpdServer;
 public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 {
     private MpdServer mpdServer;
-    private static final String TAG = MpdLibServiceAdapter.class.getSimpleName();
+//    private static final String TAG = MpdLibServiceAdapter.class.getSimpleName();
 
     public MpdLibServiceAdapter()
     {

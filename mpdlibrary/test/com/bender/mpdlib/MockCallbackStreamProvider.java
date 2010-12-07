@@ -42,9 +42,9 @@ class MockCallbackStreamProvider implements SocketStreamProviderIF
     public PrintWriter getPrintWriter() throws IOException
     {
         PrintWriter mock = mock(PrintWriter.class);
-        doAnswer(new Answer()
+        doAnswer(new Answer<Void>()
         {
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 if (invocationOnMock.getArguments()[0].equals(MpdCommands.idle.toString()))
                 {

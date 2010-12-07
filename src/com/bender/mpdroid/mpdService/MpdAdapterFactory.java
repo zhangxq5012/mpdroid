@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
  */
 public class MpdAdapterFactory
 {
-    private static final String TAG = MpdAdapterFactory.class.getSimpleName();
+//    private static final String TAG = MpdAdapterFactory.class.getSimpleName();
 
     public static final String MPD_ADAPTER_CLASSNAME_PROPERTY = "MPD_ADAPTER";
 

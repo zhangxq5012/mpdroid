@@ -17,7 +17,6 @@ public class SongProgressFrame implements MpDroidActivityWidget
     private TextView totalTimeTextView;
     private MpDroidActivity activity;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
-    private static final int REFRESH = 1;
     private MpdServiceAdapterIF mpdServiceAdapterIF;
 
     private Handler myHandler = new Handler();
