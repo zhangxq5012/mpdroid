@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  */
-public class BasicCommand extends StatusCommand<NullArg>
+class BasicCommand extends StatusCommand<NullArg>
 {
     private MpdCommands command;
 

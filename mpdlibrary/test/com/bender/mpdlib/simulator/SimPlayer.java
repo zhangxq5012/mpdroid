@@ -12,14 +12,14 @@ import java.math.BigInteger;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  */
 public class SimPlayer
 {
     private static final long INTERVAL = 1000L;
-    private PlayStatus currentPlayStatus = PlayStatus.Stopped;
-    private final Object playStatusLock = new Object();
+    private AtomicReference<PlayStatus> currentPlayStatus = new AtomicReference<PlayStatus>(PlayStatus.Stopped);
     private AtomicInteger currentVolume = new AtomicInteger(100);
     private SubSystemSupport subSystemSupport;
     private AtomicInteger songProgress;
@@ -35,13 +35,8 @@ public class SimPlayer
 
     public void updatePlayStatus(PlayStatus playStatus)
     {
-        boolean changed;
-        synchronized (playStatusLock)
-        {
-            changed = !currentPlayStatus.equals(playStatus);
-            currentPlayStatus = playStatus;
-        }
-        if (changed)
+        PlayStatus oldValue = currentPlayStatus.getAndSet(playStatus);
+        if (!oldValue.equals(playStatus))
         {
             processPlayStatus(playStatus);
             subSystemSupport.updateSubSystemChanged(Subsystem.player);
@@ -68,24 +63,24 @@ public class SimPlayer
             case Paused:
                 synchronized (this)
                 {
-                    songTimer.cancel();
-                    songTimer = null;
+                    if (songTimer != null)
+                    {
+                        songTimer.cancel();
+                        songTimer = null;
+                    }
                 }
                 break;
         }
     }
 
-    public synchronized StatusTuple getPlayStatus()
+    public StatusTuple getPlayStatus()
     {
-        return new StatusTuple(MpdStatus.state, currentPlayStatus.serverString);
+        return new StatusTuple(MpdStatus.state, currentPlayStatus.get().serverString);
     }
 
     public PlayStatus getCurrentPlayStatus()
     {
-        synchronized (playStatusLock)
-        {
-            return currentPlayStatus;
-        }
+        return currentPlayStatus.get();
     }
 
     public Integer getVolume()
@@ -163,8 +158,7 @@ public class SimPlayer
             Log.v(getClass().getSimpleName(), "seekid: " + position + ", previous=" + progress);
             songProgress.set(position);
             subSystemSupport.updateSubSystemChanged(Subsystem.player);
-        }
-        else
+        } else
         {
             Log.d(getClass().getSimpleName(), "seekid: not seeking. total=" + currentSongTotalTime + ", progress=" + progress);
         }

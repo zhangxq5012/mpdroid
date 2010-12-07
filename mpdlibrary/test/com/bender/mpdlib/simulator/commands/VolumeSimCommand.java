@@ -1,50 +1,32 @@
 package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.commands.Response;
-import com.bender.mpdlib.simulator.SimPlayer;
-
-import java.io.PrintWriter;
 
 /**
  */
 public class VolumeSimCommand extends SimCommand
 {
-    private SimPlayer simPlayer;
-    private String[] command;
-
-    public VolumeSimCommand(PrintWriter writer, String[] command, SimPlayer simPlayer)
-    {
-        super(writer);
-        this.simPlayer = simPlayer;
-        this.command = command;
-    }
 
     @Override
-    public void run()
+    public void run(String[] commands)
     {
-        if (command.length == 2)
+        if (commands.length == 2)
         {
             Integer volume;
             try
             {
-                volume = Integer.parseInt(command[1].trim());
-                setVolume(volume);
-                writer.println(Response.OK);
-            }
-            catch (NumberFormatException e)
+                volume = Integer.parseInt(commands[1].trim());
+                simPlayer.setVolume(volume);
+                printWriter.println(Response.OK);
+            } catch (NumberFormatException e)
             {
                 e.printStackTrace();
-                writer.println(Response.ACK + " [2@0] {setvol} need an integer");
+                printWriter.println(Response.ACK + " [2@0] {setvol} need an integer");
             }
-        }
-        else
+        } else
         {
-            writer.println(Response.ACK + " [2@0] {setvol} wrong number of arguments for \"setvol\"");
+            printWriter.println(Response.ACK + " [2@0] {setvol} wrong number of arguments for \"setvol\"");
         }
     }
 
-    private void setVolume(Integer volume)
-    {
-        simPlayer.setVolume(volume);
-    }
 }

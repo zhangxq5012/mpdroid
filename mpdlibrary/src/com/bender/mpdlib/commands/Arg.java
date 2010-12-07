@@ -6,7 +6,7 @@ public abstract class Arg
 {
     private final Object[] args;
 
-    public Arg(Object ... args)
+    public Arg(Object... args)
     {
         this.args = args;
     }
@@ -23,7 +23,7 @@ public abstract class Arg
         for (int i = 0; i < args.length; i++)
         {
             stringBuffer.append(args[i]);
-            if (i < args.length)
+            if ((i + 1) < args.length)
             {
                 stringBuffer.append(' ');
             }

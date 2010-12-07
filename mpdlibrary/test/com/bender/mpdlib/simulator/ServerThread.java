@@ -3,7 +3,9 @@ package com.bender.mpdlib.simulator;
 import com.bender.mpdlib.SocketStreamProviderIF;
 import com.bender.mpdlib.commands.MpdCommands;
 import com.bender.mpdlib.commands.Response;
-import com.bender.mpdlib.simulator.commands.*;
+import com.bender.mpdlib.simulator.commands.CloseSimCommand;
+import com.bender.mpdlib.simulator.commands.CommandResourceIF;
+import com.bender.mpdlib.simulator.commands.SimCommand;
 import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
@@ -13,7 +15,7 @@ import java.io.PrintWriter;
 
 /**
  */
-class ServerThread extends Thread
+class ServerThread extends Thread implements CommandResourceIF
 {
     private SocketStreamProviderIF provider;
     private PrintWriter printWriter;
@@ -22,8 +24,8 @@ class ServerThread extends Thread
     private Playlist playlist;
     private SimPlayer simPlayer;
     private SubSystemSupport subSystemSupport;
-    private boolean forceClose;
     private static final String TAG = "MpdServerThread";
+    private SimCommandFactory simCommandFactory;
 
     public ServerThread(SocketStreamProviderIF commandStreamProvider, Playlist playlist, SimPlayer simPlayer, SubSystemSupport subSystemSupport)
     {
@@ -32,12 +34,12 @@ class ServerThread extends Thread
         this.simPlayer = simPlayer;
         this.subSystemSupport = subSystemSupport;
         provider = commandStreamProvider;
+        simCommandFactory = new SimCommandFactory();
         try
         {
             simBufferedReader = provider.getBufferedReader();
             printWriter = provider.getPrintWriter();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -56,8 +58,7 @@ class ServerThread extends Thread
             try
             {
                 line = simBufferedReader.readLine();
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 Log.e(TAG, e);
             }
@@ -68,8 +69,7 @@ class ServerThread extends Thread
             try
             {
                 process(line);
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 Log.e(TAG, e);
             }
@@ -86,71 +86,58 @@ class ServerThread extends Thread
             printWriter.println(Response.ACK + " [5@0] {} unknown command \"" + commandString + "\"");
             return;
         }
-        Log.v(TAG, "process(): " + command);
-        switch (command)
+        Log.v(TAG, "process: " + command);
+        try
         {
-            case close:
-                provider.disconnect();
-                forceClose = true;
-                break;
-            case idle:
-                runSimCommand(new IdleSimCommand(printWriter, subSystemSupport));
-                break;
-            case status:
-                runSimCommand(new StatusSimCommand(printWriter, simPlayer, playlist));
-                break;
-            case play:
-                runSimCommand(new PlaySimSimCommand(printWriter, simPlayer));
-                break;
-            case pause:
-                PauseSimCommand pauseSimCommand = new PauseSimCommand(printWriter, simPlayer);
-                pauseSimCommand.run();
-                break;
-            case stop:
-                StopSimCommand stopSimCommand = new StopSimCommand(printWriter, simPlayer);
-                stopSimCommand.run();
-                break;
-            case next:
-                runSimCommand(new NextSimCommand(printWriter, playlist, simPlayer));
-                break;
-            case previous:
-                runSimCommand(new PreviousSimCommand(printWriter, playlist, simPlayer));
-                break;
-            case setvol:
-                VolumeSimCommand volumeSimCommand = new VolumeSimCommand(printWriter, strings, simPlayer);
-                volumeSimCommand.run();
-                break;
-            case ping:
-                printWriter.println(Response.OK.toString());
-                break;
-            case currentsong:
-                runSimCommand(new CurrentSongSimCommand(printWriter, playlist));
-                break;
-            case seekid:
-                runSimCommand(new SeekByIdSimCommand(printWriter, strings, simPlayer));
-                break;
-            default:
-                printWriter.println(Response.ACK + "[5@0] \"" + commandString + "\" not implemented");
-                break;
+            SimCommand simCommand = simCommandFactory.create(command);
+            if (simCommand == null)
+            {
+                printWriter.println(Response.ACK + "[5@0] Unimplemented method: " + command);
+            } else
+            {
+                runCommand(strings, simCommand);
+            }
+        } catch (Exception e)
+        {
+            Log.e(TAG, e);
+            printWriter.println(Response.ACK + "[5@0] Unhandled Exception");
         }
         Log.v(TAG, command + " DONE");
     }
 
-    private void runSimCommand(SimCommand simCommand) throws IOException
+    private void runCommand(String[] strings, SimCommand simCommand)
+            throws Exception
     {
-        try
-        {
-            simCommand.run();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            printWriter.write(Response.ACK + "[5@0] Unhandled Exception");
-        }
+        simCommand.execute(strings, this);
     }
 
     private boolean connected()
     {
-        return provider.isConnected() || !forceClose;
+        return provider.isConnected() || !CloseSimCommand.isClosed();
+    }
+
+    public SocketStreamProviderIF getProvider()
+    {
+        return provider;
+    }
+
+    public PrintWriter getPrintWriter()
+    {
+        return printWriter;
+    }
+
+    public Playlist getPlaylist()
+    {
+        return playlist;
+    }
+
+    public SimPlayer getSimPlayer()
+    {
+        return simPlayer;
+    }
+
+    public SubSystemSupport getSubSystemSupport()
+    {
+        return subSystemSupport;
     }
 }

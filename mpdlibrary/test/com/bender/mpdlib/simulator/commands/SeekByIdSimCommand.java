@@ -1,48 +1,35 @@
 package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.commands.Response;
-import com.bender.mpdlib.simulator.SimPlayer;
-
-import java.io.PrintWriter;
+import com.bender.mpdlib.util.Log;
 
 /**
  * Arguments are (songid, position)
  */
 public class SeekByIdSimCommand extends SimCommand
 {
-    private SimPlayer simPlayer;
-    private String[] strings;
-
-    /**
-     * Arguments are (songid, position)
-     */
-    public SeekByIdSimCommand(PrintWriter printWriter, String[] strings, SimPlayer simPlayer)
-    {
-        super(printWriter);
-        this.simPlayer = simPlayer;
-        this.strings = strings;
-    }
-
     @Override
-    public void run() throws Exception
+    public void run(String[] commands) throws Exception
     {
-        if (strings.length == 3)
+        if (commands.length == 3)
         {
             try
             {
-                Integer songId = Integer.valueOf(strings[1]);
-                Integer position = Integer.valueOf(strings[2]);
+                Integer songId = Integer.valueOf(commands[1]);
+                Integer position = Integer.valueOf(commands[2]);
+                Log.v(TAG, " songid=" + songId);
+                Log.v(TAG, " position=" + position);
                 simPlayer.seek(songId, position);
-                writer.println(Response.OK);
-            }
-            catch (NumberFormatException e)
+                printWriter.println(Response.OK);
+            } catch (NumberFormatException e)
             {
-                writer.println(Response.ACK + " [2@0] {seekid} needs an integer");
+                printWriter.println(Response.ACK + " [2@0] {seekid} needs an integer");
+                Log.e(TAG, e);
             }
-        }
-        else
+        } else
         {
-            writer.println(Response.ACK + " [2@0] {seekid} wrong number of arguments for \"seekid\"");
+            printWriter.println(Response.ACK + " [2@0] {seekid} wrong number of arguments for \"seekid\"");
+            Log.w(TAG, "seekid: wrong number of arguments " + commands.length);
         }
     }
 }

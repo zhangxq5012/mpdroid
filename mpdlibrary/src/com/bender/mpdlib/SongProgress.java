@@ -45,4 +45,10 @@ public class SongProgress
     {
         return totalTime > 0 && currentTime == totalTime;
     }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + "(" + currentTime + "/" + totalTime + ")";
+    }
 }

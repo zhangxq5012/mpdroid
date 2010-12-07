@@ -9,28 +9,35 @@ import java.io.PrintWriter;
  */
 public class IdleSimCommand extends SimCommand
 {
-    private SubSystemSupport subSystemSupport;
     private IdleRunnable idleRunnable;
 
-    public IdleSimCommand(PrintWriter pipe, SubSystemSupport subSystemSupport)
+    public IdleSimCommand()
     {
-        super(pipe);
         idleRunnable = new IdleRunnable();
-        this.subSystemSupport = subSystemSupport;
     }
 
-    public void run()
+    public void run(String[] commands)
     {
+        idleRunnable.setContext(printWriter, subSystemSupport);
         subSystemSupport.getIdleStrategy().execute(idleRunnable);
     }
 
     private class IdleRunnable implements Runnable
     {
+        private PrintWriter printWriter;
+        private SubSystemSupport subSystemSupport;
+
         public void run()
         {
             Subsystem changedSubsystem = subSystemSupport.waitForSubSystemChange();
-            writer.println("changed: " + changedSubsystem);
-            writer.println("OK");
+            printWriter.println("changed: " + changedSubsystem);
+            printWriter.println("OK");
+        }
+
+        public void setContext(PrintWriter printWriter, SubSystemSupport subSystemSupport)
+        {
+            this.printWriter = printWriter;
+            this.subSystemSupport = subSystemSupport;
         }
     }
 }

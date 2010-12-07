@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  */
-public abstract class StatusCommand<V extends Arg> extends Command<V, Status>
+abstract class StatusCommand<V extends Arg> extends Command<V, Status>
 {
     public StatusCommand(Pipe pipe)
     {
