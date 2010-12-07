@@ -8,57 +8,48 @@ import com.bender.mpdroid.mpdService.MpdPlayerAdapterIF;
 
 /**
  */
-public class PlayerFrame implements MpDroidActivityWidget
-{
+public class PlayerFrame implements MpDroidActivityWidget {
     private ImageButton playButton;
-//    private Button stopButton;
+    private Button stopButton;
     private ImageButton nextButton;
     private ImageButton prevButton;
     private MpDroidActivity activity;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
-    public void onCreate(MpDroidActivity activity)
-    {
+    public void onCreate(MpDroidActivity activity) {
         this.activity = activity;
         ButtonClickListener buttonClickListener = new ButtonClickListener();
         playButton = (ImageButton) activity.findViewById(R.id.play);
-//        stopButton = (Button) activity.findViewById(R.id.stop);
+        stopButton = (Button) activity.findViewById(R.id.stop);
         nextButton = (ImageButton) activity.findViewById(R.id.next);
         prevButton = (ImageButton) activity.findViewById(R.id.prev);
         playButton.setOnClickListener(buttonClickListener);
-//        stopButton.setOnClickListener(buttonClickListener);
+        stopButton.setOnClickListener(buttonClickListener);
         nextButton.setOnClickListener(buttonClickListener);
         prevButton.setOnClickListener(buttonClickListener);
     }
 
-    public void onConnect()
-    {
+    public void onConnect() {
         mpdPlayerAdapterIF = activity.getMpdServiceAdapterIF().getPlayer();
         mpdPlayerAdapterIF.addPlayStatusListener(new PlayListener());
         updatePlayStatusOnUI(mpdPlayerAdapterIF.getPlayStatus());
     }
 
-    public void onConnectionChange(boolean connected)
-    {
+    public void onConnectionChange(boolean connected) {
         playButton.setEnabled(connected);
-//        stopButton.setEnabled(connected);
+        stopButton.setEnabled(connected);
         nextButton.setEnabled(connected);
         prevButton.setEnabled(connected);
 
     }
 
-    private void updatePlayStatusOnUI(final MpdPlayerAdapterIF.PlayStatus playStatus)
-    {
-        if (playStatus == null)
-        {
+    private void updatePlayStatusOnUI(final MpdPlayerAdapterIF.PlayStatus playStatus) {
+        if (playStatus == null) {
             throw new NullPointerException();
         }
-        Runnable runnable = new Runnable()
-        {
-            public void run()
-            {
-                switch (playStatus)
-                {
+        Runnable runnable = new Runnable() {
+            public void run() {
+                switch (playStatus) {
                     case Playing:
                         playButton.setImageResource(android.R.drawable.ic_media_pause);
                         break;
@@ -71,106 +62,83 @@ public class PlayerFrame implements MpDroidActivityWidget
         activity.runOnUiThread(runnable);
     }
 
-    private class ButtonClickListener implements View.OnClickListener
-    {
-        public void onClick(View view)
-        {
-            if (view == playButton)
-            {
+    private class ButtonClickListener implements View.OnClickListener {
+        public void onClick(View view) {
+            if (view == playButton) {
                 PlayTask playTask = new PlayTask(mpdPlayerAdapterIF);
                 playTask.execute();
-            }
-//            else if (view == stopButton)
-//            {
-//                StopTask stopTask = new StopTask(mpdPlayerAdapterIF);
-//                stopTask.execute();
-//            }
-            else if (view == nextButton)
-            {
+            } else if (view == stopButton) {
+                StopTask stopTask = new StopTask(mpdPlayerAdapterIF);
+                stopTask.execute();
+            } else if (view == nextButton) {
                 NextTask nextTask = new NextTask(mpdPlayerAdapterIF);
                 nextTask.execute();
-            }
-            else if (view == prevButton)
-            {
+            } else if (view == prevButton) {
                 PrevTask prevTask = new PrevTask(mpdPlayerAdapterIF);
                 prevTask.execute();
             }
         }
     }
 
-    private class PlayListener implements MpdPlayerAdapterIF.MpdPlayStatusListener
-    {
-        public void playStatusUpdated(final MpdPlayerAdapterIF.PlayStatus playStatus)
-        {
+    private class PlayListener implements MpdPlayerAdapterIF.MpdPlayStatusListener {
+        public void playStatusUpdated(final MpdPlayerAdapterIF.PlayStatus playStatus) {
             updatePlayStatusOnUI(playStatus);
         }
     }
 
-    private static class PlayTask extends AsyncTask<Object, Object, Object>
-    {
+    private static class PlayTask extends AsyncTask<Void, Void, Void> {
         private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
-        public PlayTask(MpdPlayerAdapterIF mpdPlayerAdapterIF)
-        {
+        public PlayTask(MpdPlayerAdapterIF mpdPlayerAdapterIF) {
             this.mpdPlayerAdapterIF = mpdPlayerAdapterIF;
         }
 
         @Override
-        protected Object doInBackground(Object... objects)
-        {
+        protected Void doInBackground(Void... objects) {
             mpdPlayerAdapterIF.playOrPause();
             return null;
         }
     }
 
-    private static class NextTask extends AsyncTask<Object, Object, Object>
-    {
+    private static class NextTask extends AsyncTask<Void, Void, Void> {
         private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
-        NextTask(MpdPlayerAdapterIF mpdPlayerAdapterIF)
-        {
+        NextTask(MpdPlayerAdapterIF mpdPlayerAdapterIF) {
             this.mpdPlayerAdapterIF = mpdPlayerAdapterIF;
         }
 
         @Override
-        protected Object doInBackground(Object... objects)
-        {
+        protected Void doInBackground(Void... objects) {
             mpdPlayerAdapterIF.next();
             return null;
         }
     }
 
-    private static class PrevTask extends AsyncTask<Object, Object, Object>
-    {
+    private static class PrevTask extends AsyncTask<Void, Void, Void> {
 
         private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
-        public PrevTask(MpdPlayerAdapterIF mpdPlayerAdapterIF)
-        {
+        public PrevTask(MpdPlayerAdapterIF mpdPlayerAdapterIF) {
             this.mpdPlayerAdapterIF = mpdPlayerAdapterIF;
         }
 
         @Override
-        protected Object doInBackground(Object... objects)
-        {
+        protected Void doInBackground(Void... objects) {
             mpdPlayerAdapterIF.prev();
             return null;
         }
     }
 
-    private static class StopTask extends AsyncTask<Object, Object, Object>
-    {
+    private static class StopTask extends AsyncTask<Void, Void, Void> {
 
         private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
-        public StopTask(MpdPlayerAdapterIF mpdPlayerAdapterIF)
-        {
+        public StopTask(MpdPlayerAdapterIF mpdPlayerAdapterIF) {
             this.mpdPlayerAdapterIF = mpdPlayerAdapterIF;
         }
 
         @Override
-        protected MpdPlayerAdapterIF.PlayStatus doInBackground(Object... objects)
-        {
+        protected Void doInBackground(Void... objects) {
             mpdPlayerAdapterIF.stop();
             return null;
         }

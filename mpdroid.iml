@@ -19,8 +19,7 @@
         <option name="APK_PATH" value="" />
         <option name="ADD_ANDROID_LIBRARY" value="true" />
         <option name="LIBRARY_PROJECT" value="false" />
-        <option name="COPY_RESOURCES_FROM_ARTIFACTS" value="true" />
-        <option name="ENABLE_AAPT_COMPILER" value="true" />
+        <option name="RUN_PROCESS_RESOURCES_MAVEN_TASK" value="true" />
         <option name="GENERATE_UNSIGNED_APK" value="false" />
       </configuration>
     </facet>
@@ -44,7 +43,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
     <orderEntry type="library" name="libs" level="project" />
     <orderEntry type="module-library" scope="TEST">
       <library>
@@ -56,6 +54,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="mpdlibrary" />
+    <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
   </component>
 </module>
 

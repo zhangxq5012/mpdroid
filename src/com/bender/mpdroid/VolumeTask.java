@@ -5,19 +5,16 @@ import com.bender.mpdroid.mpdService.MpdPlayerAdapterIF;
 
 /**
  */
-class VolumeTask extends AsyncTask<Integer, Object, Object>
-{
+class VolumeTask extends AsyncTask<Integer, Void, Void> {
 
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
-    public VolumeTask(MpdPlayerAdapterIF mpdPlayerAdapterIF)
-    {
+    public VolumeTask(MpdPlayerAdapterIF mpdPlayerAdapterIF) {
         this.mpdPlayerAdapterIF = mpdPlayerAdapterIF;
     }
 
     @Override
-    protected Integer doInBackground(Integer... params)
-    {
+    protected Void doInBackground(Integer... params) {
         Integer volume = params[0];
         mpdPlayerAdapterIF.setVolume(volume);
         return null;
