@@ -23,7 +23,7 @@ public abstract class Command<V extends Arg, T> implements Callable<T>
         this.arg = arg;
     }
 
-    public T call() throws Exception
+    public final T call() throws Exception
     {
         synchronized (pipe)
         {
@@ -32,12 +32,19 @@ public abstract class Command<V extends Arg, T> implements Callable<T>
         }
     }
 
-    public V getArg()
-    {
-        return arg;
-    }
-
     protected abstract void executeCommand(V arg) throws IOException;
 
     protected abstract T readResult() throws IOException;
+
+    @Override
+    public String toString()
+    {
+        String debugLine = getClass().getSimpleName() + '(';
+        if (arg != null)
+        {
+            debugLine += arg;
+        }
+        debugLine += ')';
+        return debugLine;
+    }
 }
