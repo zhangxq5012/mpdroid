@@ -15,8 +15,7 @@ class CommandRunner
         try
         {
             return callCommand(command);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Log.e(TAG, e);
         }
@@ -25,12 +24,7 @@ class CommandRunner
 
     public static <K extends Arg, T> T callCommand(Command<K, T> command) throws Exception
     {
-        String debugLine = "callCommand: " + command.getClass().getSimpleName();
-        K arg = command.getArg();
-        if (arg != null)
-        {
-            debugLine += "(" + arg + ")";
-        }
+        String debugLine = "callCommand: " + command.toString();
         Log.i(TAG, debugLine);
         return command.call();
     }
