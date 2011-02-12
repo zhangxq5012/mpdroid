@@ -78,5 +78,10 @@ class NullMpdServiceAdapter implements MpdServiceAdapterIF
             Log.e(TAG, "getRepeat() called on NULL object");
             return false;
         }
+
+        public void addOptionsListener(OptionsListener optionsListener)
+        {
+            Log.e(TAG, "addOptionsListener() called on NULL object");
+        }
     }
 }

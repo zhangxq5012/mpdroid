@@ -47,14 +47,13 @@ class CallbackThread extends Thread
                 if (idleResult.status.isSuccessful())
                 {
                     List<Subsystem> result = idleResult.result;
-                    if (result.contains(Subsystem.mixer) || result.contains(Subsystem.player))
+                    if (result.contains(Subsystem.mixer) || result.contains(Subsystem.player) || result.contains(Subsystem.options))
                     {
                         getAndProcessStatus();
                     }
                 }
             }
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             if (!disconnected)
             {
@@ -62,8 +61,7 @@ class CallbackThread extends Thread
                 try
                 {
                     callbackPipe.disconnect();
-                }
-                catch (IOException e1)
+                } catch (IOException e1)
                 {
                     Log.e(TAG, e1);
                 }
@@ -88,8 +86,7 @@ class CallbackThread extends Thread
             // Can't use #DisconnectCommand because when unit testing the callback thread is blocked in the simulator.
             callbackPipe.write(MpdCommands.close);
             callbackPipe.disconnect();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }

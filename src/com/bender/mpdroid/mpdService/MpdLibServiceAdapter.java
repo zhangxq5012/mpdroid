@@ -92,5 +92,16 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
         {
             return options.getRepeat();
         }
+
+        public void addOptionsListener(final OptionsListener optionsListener)
+        {
+            options.setListener(new com.bender.mpdlib.OptionsListener()
+            {
+                public void repeatUpdated(boolean repeat)
+                {
+                    optionsListener.repeatUpdated(repeat);
+                }
+            });
+        }
     }
 }

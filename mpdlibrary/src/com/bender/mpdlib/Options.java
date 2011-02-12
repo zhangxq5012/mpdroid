@@ -14,6 +14,7 @@ public class Options
 
     private Pipe commandPipe;
     private boolean repeat = false;
+    private OptionsListener optionsListener = new NullOptionsListener();
 
     public Options(Pipe commandPipe)
     {
@@ -51,6 +52,19 @@ public class Options
         if (changed)
         {
             Log.v(TAG, "repeat updated: " + newRepeat);
+            optionsListener.repeatUpdated(newRepeat);
+        }
+    }
+
+    public void setListener(OptionsListener optionsListener)
+    {
+        this.optionsListener = optionsListener;
+    }
+
+    private static class NullOptionsListener implements OptionsListener
+    {
+        public void repeatUpdated(boolean repeat)
+        {
         }
     }
 }

@@ -32,6 +32,7 @@ public class MpDroidActivity extends Activity
     private TextView songDetailsTextView;
     private CheckBox repeatCheckbox;
     private CheckBox randomCheckbox;
+    private TextView nowPlayingLabel;
 
     private MpdPreferences myPreferences;
 
@@ -80,6 +81,7 @@ public class MpDroidActivity extends Activity
         songDetailsTextView = (TextView) findViewById(R.id.song_details);
         repeatCheckbox = (CheckBox) findViewById(R.id.repeat);
         randomCheckbox = (CheckBox) findViewById(R.id.random);
+        nowPlayingLabel = (TextView) findViewById(R.id.now_playing_label);
     }
 
     private void initializeListeners()
@@ -154,6 +156,10 @@ public class MpDroidActivity extends Activity
         int visibility = connected ? View.VISIBLE : View.INVISIBLE;
         songNameTextView.setVisibility(visibility);
         songDetailsTextView.setVisibility(visibility);
+        repeatCheckbox.setVisibility(visibility);
+        randomCheckbox.setVisibility(visibility);
+        nowPlayingLabel.setVisibility(visibility);
+
         if (connected)
         {
             GetVolumeTask getVolumeTask = new GetVolumeTask();
@@ -213,6 +219,7 @@ public class MpDroidActivity extends Activity
                 mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
 
                 mpdOptionsIF = mpdServiceAdapterIF.getOptions();
+                mpdOptionsIF.addOptionsListener(new MyOptionsListener());
                 for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
                 {
                     mpDroidActivityWidget.onConnect();
@@ -403,4 +410,18 @@ public class MpDroidActivity extends Activity
     }
 
 
+    private class MyOptionsListener implements OptionsListener
+    {
+        public void repeatUpdated(final boolean repeat)
+        {
+            Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
+                    repeatCheckbox.setChecked(repeat);
+                }
+            };
+            runOnUiThread(runnable);
+        }
+    }
 }

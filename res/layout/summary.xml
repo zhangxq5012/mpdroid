@@ -49,6 +49,18 @@
     <include layout="@layout/player"/>
 
 
+    <TextView
+            android:text="@string/volume"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+
+    <SeekBar android:id="@+id/volume"
+             android:max="100"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+            />
+
     <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -74,18 +86,7 @@
     </RelativeLayout>
 
     <TextView
-            android:text="@string/volume"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            />
-
-    <SeekBar android:id="@+id/volume"
-             android:max="100"
-             android:layout_width="fill_parent"
-             android:layout_height="wrap_content"
-            />
-
-    <TextView
+            android:id="@+id/now_playing_label"
             android:text="@string/now_playing"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

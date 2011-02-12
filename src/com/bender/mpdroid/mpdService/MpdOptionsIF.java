@@ -7,4 +7,6 @@ public interface MpdOptionsIF
     void toggleRepeat();
 
     Boolean getRepeat();
+
+    void addOptionsListener(OptionsListener optionsListener);
 }
