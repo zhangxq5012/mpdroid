@@ -46,11 +46,6 @@ class MpdLibPlayerAdapter implements MpdPlayerAdapterIF
         return player.getVolume();
     }
 
-    public Boolean toggleMute()
-    {
-        return player.toggleMute();
-    }
-
     public void playOrPause()
     {
         switch (getPlayStatus())

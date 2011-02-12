@@ -15,8 +15,6 @@ public interface MpdPlayerAdapterIF
 
     Integer getVolume();
 
-    Boolean toggleMute();
-
     void playOrPause();
 
     void stop();

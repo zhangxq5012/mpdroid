@@ -83,9 +83,4 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
         return 0;
     }
 
-    public Boolean toggleMute()
-    {
-        Log.e(TAG, "toggleMute() called on NULL object");
-        return false;
-    }
 }
