@@ -30,6 +30,8 @@ public class MpDroidActivity extends Activity
     private SeekBar volumeSeekBar;
     private TextView songNameTextView;
     private TextView songDetailsTextView;
+    private CheckBox repeatCheckbox;
+    private CheckBox randomCheckbox;
 
     private MpdPreferences myPreferences;
 
@@ -75,6 +77,8 @@ public class MpDroidActivity extends Activity
         volumeSeekBar = (SeekBar) findViewById(R.id.volume);
         songNameTextView = (TextView) findViewById(R.id.song_name);
         songDetailsTextView = (TextView) findViewById(R.id.song_details);
+        repeatCheckbox = (CheckBox) findViewById(R.id.repeat);
+        randomCheckbox = (CheckBox) findViewById(R.id.random);
     }
 
     private void initializeListeners()
@@ -82,6 +86,8 @@ public class MpDroidActivity extends Activity
         ButtonClickListener buttonClickListener = new ButtonClickListener();
         connectButton.setOnClickListener(buttonClickListener);
         volumeSeekBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener());
+        repeatCheckbox.setOnClickListener(buttonClickListener);
+        randomCheckbox.setOnClickListener(buttonClickListener);
     }
 
     @Override
@@ -251,6 +257,19 @@ public class MpDroidActivity extends Activity
                     ConnectTask connectTask = new ConnectTask();
                     connectTask.execute();
                 }
+            } else if (view == repeatCheckbox)
+            {
+                AsyncTask<Void, Void, Void> toggleRepeatTask = new AsyncTask<Void, Void, Void>()
+                {
+
+                    @Override
+                    protected Void doInBackground(Void... voids)
+                    {
+                        mpdPlayerAdapterIF.toggleRepeat();
+                        return null;
+                    }
+                };
+                toggleRepeatTask.execute();
             }
         }
     }

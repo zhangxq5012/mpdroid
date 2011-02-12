@@ -9,8 +9,11 @@ import com.bender.mpdlib.simulator.library.Playlist;
 import com.bender.mpdlib.util.Log;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -25,6 +28,7 @@ public class SimPlayer
     private AtomicInteger songProgress;
     private Playlist playlist;
     private Timer songTimer;
+    private AtomicBoolean repeat = new AtomicBoolean(false);
 
     public SimPlayer(SubSystemSupport subSystemSupport, Playlist playlist)
     {
@@ -73,7 +77,7 @@ public class SimPlayer
         }
     }
 
-    public StatusTuple getPlayStatus()
+    private StatusTuple getPlayStatus()
     {
         return new StatusTuple(MpdStatus.state, currentPlayStatus.get().serverString);
     }
@@ -111,7 +115,7 @@ public class SimPlayer
         return changed;
     }
 
-    public StatusTuple getVolumeStatus()
+    private StatusTuple getVolumeStatus()
     {
         return new StatusTuple(MpdStatus.volume, currentVolume.toString());
     }
@@ -121,7 +125,7 @@ public class SimPlayer
         songProgress.set(i);
     }
 
-    public StatusTuple getTimeStatus()
+    private StatusTuple getTimeStatus()
     {
         String totalTime = getCurrentSongTotalTime();
         if (totalTime == null)
@@ -167,6 +171,27 @@ public class SimPlayer
     private String getCurrentSongTotalTime()
     {
         return playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
+    }
+
+    public void setRepeat(boolean repeat)
+    {
+        this.repeat.set(repeat);
+        subSystemSupport.updateSubSystemChanged(Subsystem.player);
+    }
+
+    public List<StatusTuple> getStatusList()
+    {
+        ArrayList<StatusTuple> statusTuples = new ArrayList<StatusTuple>();
+        statusTuples.add(getPlayStatus());
+        statusTuples.add(getTimeStatus());
+        statusTuples.add(getVolumeStatus());
+        statusTuples.add(getRepeatStatus());
+        return statusTuples;
+    }
+
+    private StatusTuple getRepeatStatus()
+    {
+        return new StatusTuple(MpdStatus.repeat, SimBoolean.toString(repeat.get()));
     }
 
     private class SongTimerTask extends TimerTask

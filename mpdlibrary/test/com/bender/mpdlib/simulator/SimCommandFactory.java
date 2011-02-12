@@ -23,7 +23,7 @@ public class SimCommandFactory
     }
 
     //todo: refactor to avoid needing to specify the mapping
-    static enum SimCommands
+    private static enum SimCommands
     {
         Idle(MpdCommands.idle, IdleSimCommand.class),
         CurrentSong(MpdCommands.currentsong, CurrentSongSimCommand.class),
@@ -35,7 +35,8 @@ public class SimCommandFactory
         Previous(MpdCommands.previous, PreviousSimCommand.class),
         Stop(MpdCommands.stop, StopSimCommand.class),
         Seek(MpdCommands.seekid, SeekByIdSimCommand.class),
-        Close(MpdCommands.close, CloseSimCommand.class);
+        Close(MpdCommands.close, CloseSimCommand.class),
+        Repeat(MpdCommands.repeat, RepeatSimCommand.class);
 
         private MpdCommands command;
         private Class<? extends SimCommand> simCommandClass;

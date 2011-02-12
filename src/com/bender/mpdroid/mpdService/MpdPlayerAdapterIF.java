@@ -33,6 +33,8 @@ public interface MpdPlayerAdapterIF
 
     void seek(int progress);
 
+    void toggleRepeat();
+
     public enum PlayStatus
     {
         Playing,

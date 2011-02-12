@@ -5,37 +5,80 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
 
-    <TextView android:id="@+id/server_name"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:text="@string/server"/>
-
-    <TextView android:id="@+id/port"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:text="@string/port"/>
-
-    <CheckBox android:id="@+id/use_authentication"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:text="@string/use_authentication"
-              android:checked="false"
-              android:enabled="false"
-            />
-
-    <Button android:id="@+id/connect"
-            android:text="@string/connect"
+    <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            />
+            >
+
+        <TextView android:id="@+id/server_name"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/server"/>
+
+        <TextView android:id="@+id/port"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentRight="true"
+                  android:text="@string/port"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            >
+
+        <CheckBox android:id="@+id/use_authentication"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/use_authentication"
+                  android:checked="false"
+                  android:enabled="false"
+                />
+
+        <Button android:id="@+id/connect"
+                android:text="@string/connect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                />
+
+    </RelativeLayout>
+
 
     <include layout="@layout/player"/>
+
+
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            >
+
+        <CheckBox
+                android:id="@+id/repeat"
+                android:text="@string/repeat"
+                android:enabled="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                />
+
+        <CheckBox
+                android:id="@+id/random"
+                android:text="@string/random"
+                android:enabled="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignParentRight="true"
+                />
+
+    </RelativeLayout>
 
     <TextView
             android:text="@string/volume"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             />
+
     <SeekBar android:id="@+id/volume"
              android:max="100"
              android:layout_width="fill_parent"

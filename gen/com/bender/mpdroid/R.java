@@ -25,16 +25,18 @@ public final class R
         public static final int play = 0x7f070001;
         public static final int port = 0x7f070005;
         public static final int prev = 0x7f070000;
+        public static final int random = 0x7f070009;
+        public static final int repeat = 0x7f070008;
         public static final int server_name = 0x7f070004;
-        public static final int settings_menu = 0x7f07000e;
-        public static final int song_details = 0x7f07000a;
-        public static final int song_name = 0x7f070009;
-        public static final int song_progress = 0x7f07000b;
-        public static final int song_progress_text = 0x7f07000c;
+        public static final int settings_menu = 0x7f070010;
+        public static final int song_details = 0x7f07000c;
+        public static final int song_name = 0x7f07000b;
+        public static final int song_progress = 0x7f07000d;
+        public static final int song_progress_text = 0x7f07000e;
         public static final int stop = 0x7f070002;
-        public static final int total_time = 0x7f07000d;
+        public static final int total_time = 0x7f07000f;
         public static final int use_authentication = 0x7f070006;
-        public static final int volume = 0x7f070008;
+        public static final int volume = 0x7f07000a;
     }
 
     public static final class layout
@@ -62,6 +64,8 @@ public final class R
         public static final int preferences = 0x7f050007;
         public static final int prev = 0x7f05000c;
         public static final int progress = 0x7f050011;
+        public static final int random = 0x7f050013;
+        public static final int repeat = 0x7f050012;
         public static final int server = 0x7f050001;
         public static final int server_summary = 0x7f050002;
         public static final int stop = 0x7f050010;

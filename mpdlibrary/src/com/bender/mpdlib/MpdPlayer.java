@@ -129,6 +129,11 @@ class MpdPlayer implements Player
         CommandRunner.runCommand(new SeekCommand(commandPipe, seekArg));
     }
 
+    public void toggleRepeat()
+    {
+        //todo: implement
+    }
+
     void processStatus(Map<MpdStatus, StatusTuple> statusTupleMap)
     {
 

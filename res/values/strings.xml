@@ -18,4 +18,6 @@
     <string name="now_playing">Now Playing:</string>
     <string name="stop">Stop</string>
     <string name="progress">Progress:</string>
+    <string name="repeat">Repeat</string>
+    <string name="random">Random</string>
 </resources>

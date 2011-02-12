@@ -39,4 +39,6 @@ public interface Player
     void addSongProgressListener(SongProgressListener listener);
 
     void seek(Integer position);
+
+    void toggleRepeat();
 }

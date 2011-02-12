@@ -6,6 +6,7 @@ import com.bender.mpdlib.util.Log;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 /**
  */
@@ -14,14 +15,11 @@ public class StatusSimCommand extends SimCommand
 
     public void run(String[] commands) throws Exception
     {
-        StatusTuple statusTuple = simPlayer.getPlayStatus();
-        write(printWriter, statusTuple);
-        statusTuple = simPlayer.getVolumeStatus();
-        write(printWriter, statusTuple);
-        statusTuple = playlist.getStatus();
-        write(printWriter, statusTuple);
-        statusTuple = simPlayer.getTimeStatus();
-        write(printWriter, statusTuple);
+        List<StatusTuple> statusTupleList = simPlayer.getStatusList();
+        for (StatusTuple statusTuple : statusTupleList)
+        {
+            write(printWriter, statusTuple);
+        }
         printWriter.println(Response.OK);
     }
 

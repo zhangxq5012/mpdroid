@@ -56,6 +56,11 @@ class NullPlayerAdapter implements MpdPlayerAdapterIF
         Log.e(TAG, "seek() called on NULL object");
     }
 
+    public void toggleRepeat()
+    {
+        Log.e(TAG, "toggleRepeat() called on NULL object");
+    }
+
     public PlayStatus getPlayStatus()
     {
         Log.e(TAG, "getPlayStatus() called on NULL object");
