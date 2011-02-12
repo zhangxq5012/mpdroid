@@ -131,11 +131,6 @@ class MpdPlayer implements Player
         CommandRunner.runCommand(new SeekCommand(commandPipe, seekArg));
     }
 
-    public void toggleRepeat()
-    {
-        CommandRunner.runCommand(new RepeatCommand(commandPipe, !repeat));
-    }
-
     void processStatus(Map<MpdStatus, StatusTuple> statusTupleMap)
     {
 
@@ -159,27 +154,6 @@ class MpdPlayer implements Player
             timeUpdated(statusTupleMap.get(MpdStatus.time));
         }
 
-        if (statusTupleMap.containsKey(MpdStatus.repeat))
-        {
-            repeatUpdated(statusTupleMap.get(MpdStatus.repeat));
-        }
-
-    }
-
-    private void repeatUpdated(StatusTuple statusTuple)
-    {
-        String value = statusTuple.getValue();
-        boolean newRepeat = MpdBoolean.parseString(value);
-        boolean changed;
-        synchronized (this)
-        {
-            changed = newRepeat != repeat;
-        }
-        repeat = newRepeat;
-        if (changed)
-        {
-            Log.v(TAG, "repeat updated: " + newRepeat);
-        }
     }
 
     private void timeUpdated(StatusTuple statusTuple)

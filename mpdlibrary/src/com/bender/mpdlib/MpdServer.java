@@ -21,6 +21,7 @@ public class MpdServer
     private MpdPlayer player;
     private static final String TAG = MpdServer.class.getSimpleName();
     private ConnectionListener connectionListener = new NullConnectionListener();
+    private Options options;
 
     /**
      * Normal use constructor.
@@ -64,12 +65,10 @@ public class MpdServer
 
             callbackThread = new CallbackThread(this, socketAddress, callbackPipe);
             callbackThread.start();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
-            Log.e(TAG,e);
-        }
-        finally
+            Log.e(TAG, e);
+        } finally
         {
             connectionListener.connectionChanged(isConnected());
         }
@@ -79,6 +78,8 @@ public class MpdServer
     {
         getPlayer();
         player.processStatus(result);
+        getOptions();
+        options.processStatus(result);
     }
 
 
@@ -101,12 +102,10 @@ public class MpdServer
             CommandRunner.runCommand(new DisconnectCommand(commandPipe));
             commandPipe.disconnect();
             callbackThread.interrupt();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
-        }
-        finally
+        } finally
         {
             connectionListener.connectionChanged(isConnected());
         }
@@ -144,15 +143,22 @@ public class MpdServer
             player.disconnect();
             player = null;
             commandPipe.disconnect();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
-        }
-        finally
+        } finally
         {
             connectionListener.connectionChanged(isConnected());
         }
+    }
+
+    public synchronized Options getOptions()
+    {
+        if (options == null)
+        {
+            options = new Options(commandPipe);
+        }
+        return options;
     }
 
     private class NullConnectionListener implements ConnectionListener

@@ -68,6 +68,11 @@ public class MpdServerSimulator
         connections.clear();
     }
 
+    public OptionsReg getOptionsReg()
+    {
+        return optionsReg;
+    }
+
     private class CommandStreamProvider implements SocketStreamProviderIF
     {
 

@@ -48,8 +48,7 @@ public class MpdServerTest extends TestCase
         try
         {
             mpdServer.connect(HOSTNAME, PORT, "password");
-        }
-        catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             unsupported = true;
         }
@@ -419,6 +418,18 @@ public class MpdServerTest extends TestCase
         SongProgress progress = player.getProgress();
         smallWait();
         assertEquals(POSITION, progress.getCurrentTime());
+    }
+
+    public void testGetRepeat() throws Exception
+    {
+        final Boolean REPEAT = true;
+        mpdServerSimulator.getOptionsReg().setRepeat(REPEAT);
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        Options options = mpdServer.getOptions();
+
+        Boolean result = options.getRepeat();
+        assertEquals(REPEAT, result);
     }
 
     private static class MyVolumeListener implements VolumeListener
