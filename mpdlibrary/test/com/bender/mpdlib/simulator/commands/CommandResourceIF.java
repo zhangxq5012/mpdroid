@@ -1,6 +1,7 @@
 package com.bender.mpdlib.simulator.commands;
 
 import com.bender.mpdlib.SocketStreamProviderIF;
+import com.bender.mpdlib.simulator.OptionsReg;
 import com.bender.mpdlib.simulator.SimPlayer;
 import com.bender.mpdlib.simulator.SubSystemSupport;
 import com.bender.mpdlib.simulator.library.Playlist;
@@ -20,4 +21,6 @@ public interface CommandResourceIF
     SubSystemSupport getSubSystemSupport();
 
     SocketStreamProviderIF getProvider();
+
+    OptionsReg getOptionsReg();
 }

@@ -21,12 +21,14 @@ public class MpdServerSimulator
     private SubSystemSupport subSystemSupport;
     private static final String TAG = MpdServerSimulator.class.getSimpleName();
     private static List<CommandStreamProvider> connections = new ArrayList<CommandStreamProvider>();
+    private OptionsReg optionsReg;
 
     public MpdServerSimulator()
     {
         subSystemSupport = new SubSystemSupport();
         playlist = new Playlist(subSystemSupport);
         simPlayer = new SimPlayer(subSystemSupport, playlist);
+        optionsReg = new OptionsReg(subSystemSupport);
     }
 
     public SocketStreamProviderIF createMpdSocket()
@@ -58,8 +60,7 @@ public class MpdServerSimulator
             try
             {
                 connection.disconnect();
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 Log.e(TAG, e);
             }
@@ -112,7 +113,7 @@ public class MpdServerSimulator
                 {
                     return CommandStreamProvider.this.isConnected();
                 }
-            }, playlist, simPlayer, subSystemSupport);
+            }, playlist, simPlayer, subSystemSupport, optionsReg);
             serverThread.start();
             Log.v(TAG, "SIM connect()");
         }
@@ -185,8 +186,7 @@ public class MpdServerSimulator
                     {
                         System.err.println(line);
                     }
-                }
-                catch (IOException e)
+                } catch (IOException e)
                 {
                     e.printStackTrace();
                 }
@@ -207,8 +207,7 @@ public class MpdServerSimulator
                     {
                         bufferedWriter.println(line);
                     }
-                }
-                catch (IOException e)
+                } catch (IOException e)
                 {
                     e.printStackTrace();
                 }
@@ -228,6 +227,7 @@ public class MpdServerSimulator
         SubSystemSupport systemSupport = new SubSystemSupport();
         Playlist playlist = new Playlist(systemSupport);
         SimPlayer simPlayer = new SimPlayer(systemSupport, playlist);
+        OptionsReg optionsReg = new OptionsReg(systemSupport);
 
         while (true)
         {
@@ -258,7 +258,7 @@ public class MpdServerSimulator
                 {
                     return clientSocket.isConnected() && !clientSocket.isClosed();
                 }
-            }, playlist, simPlayer, systemSupport);
+            }, playlist, simPlayer, systemSupport, optionsReg);
             serverThread.start();
         }
     }

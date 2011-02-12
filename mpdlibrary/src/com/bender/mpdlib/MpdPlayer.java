@@ -22,6 +22,8 @@ class MpdPlayer implements Player
     private SongProgressListener songProgressListener = new NullSongProgressListener();
     private SongTimerManager songTimerManager;
 
+    private boolean repeat;
+
     public MpdPlayer(Pipe commandPipe)
     {
         this.commandPipe = commandPipe;
@@ -131,7 +133,7 @@ class MpdPlayer implements Player
 
     public void toggleRepeat()
     {
-        //todo: implement
+        CommandRunner.runCommand(new RepeatCommand(commandPipe, !repeat));
     }
 
     void processStatus(Map<MpdStatus, StatusTuple> statusTupleMap)
@@ -157,6 +159,27 @@ class MpdPlayer implements Player
             timeUpdated(statusTupleMap.get(MpdStatus.time));
         }
 
+        if (statusTupleMap.containsKey(MpdStatus.repeat))
+        {
+            repeatUpdated(statusTupleMap.get(MpdStatus.repeat));
+        }
+
+    }
+
+    private void repeatUpdated(StatusTuple statusTuple)
+    {
+        String value = statusTuple.getValue();
+        boolean newRepeat = MpdBoolean.parseString(value);
+        boolean changed;
+        synchronized (this)
+        {
+            changed = newRepeat != repeat;
+        }
+        repeat = newRepeat;
+        if (changed)
+        {
+            Log.v(TAG, "repeat updated: " + newRepeat);
+        }
     }
 
     private void timeUpdated(StatusTuple statusTuple)

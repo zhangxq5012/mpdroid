@@ -1,10 +1,10 @@
-package com.bender.mpdlib.simulator;
+package com.bender.mpdlib;
 
 /**
  * Value "0" = false
  * Value "1" = true
  */
-public class SimBoolean
+public class MpdBoolean
 {
     /**
      * Parse the text value into a boolean or throws a NumberFormatException.

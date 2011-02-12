@@ -26,13 +26,15 @@ class ServerThread extends Thread implements CommandResourceIF
     private SubSystemSupport subSystemSupport;
     private static final String TAG = "MpdServerThread";
     private SimCommandFactory simCommandFactory;
+    private OptionsReg optionsReg;
 
-    public ServerThread(SocketStreamProviderIF commandStreamProvider, Playlist playlist, SimPlayer simPlayer, SubSystemSupport subSystemSupport)
+    public ServerThread(SocketStreamProviderIF commandStreamProvider, Playlist playlist, SimPlayer simPlayer, SubSystemSupport subSystemSupport, OptionsReg optionsReg)
     {
         super("Sim-" + count++);
         this.playlist = playlist;
         this.simPlayer = simPlayer;
         this.subSystemSupport = subSystemSupport;
+        this.optionsReg = optionsReg;
         provider = commandStreamProvider;
         simCommandFactory = new SimCommandFactory();
         try
@@ -119,6 +121,11 @@ class ServerThread extends Thread implements CommandResourceIF
     public SocketStreamProviderIF getProvider()
     {
         return provider;
+    }
+
+    public OptionsReg getOptionsReg()
+    {
+        return optionsReg;
     }
 
     public PrintWriter getPrintWriter()

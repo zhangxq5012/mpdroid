@@ -1,7 +1,7 @@
 package com.bender.mpdlib.simulator.commands;
 
+import com.bender.mpdlib.MpdBoolean;
 import com.bender.mpdlib.commands.Response;
-import com.bender.mpdlib.simulator.SimBoolean;
 
 /**
  * todo: replace with documentation
@@ -15,8 +15,8 @@ public class RepeatSimCommand extends SimCommand
         {
             try
             {
-                boolean repeat = SimBoolean.parseString(commands[1]);
-                simPlayer.setRepeat(repeat);
+                boolean repeat = MpdBoolean.parseString(commands[1]);
+                optionsReg.setRepeat(repeat);
                 printWriter.println(Response.OK);
             } catch (NumberFormatException e)
             {
