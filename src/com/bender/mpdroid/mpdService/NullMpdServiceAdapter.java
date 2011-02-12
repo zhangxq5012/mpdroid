@@ -54,10 +54,29 @@ class NullMpdServiceAdapter implements MpdServiceAdapterIF
         return new NullPlaylistAdapter();
     }
 
+    public MpdOptionsIF getOptions()
+    {
+        Log.e(TAG, "getOptions() called on NULL object");
+        return new NullMpdOptions();
+    }
+
     public void addConnectionListener(MpdConnectionListenerIF connectionListenerIF)
     {
         Log.e(TAG, "addConnectionListener() called on NULL object");
     }
 
 
+    private static class NullMpdOptions implements MpdOptionsIF
+    {
+        public void toggleRepeat()
+        {
+            Log.e(TAG, "toggleRepeat() called on NULL object");
+        }
+
+        public Boolean getRepeat()
+        {
+            Log.e(TAG, "getRepeat() called on NULL object");
+            return false;
+        }
+    }
 }

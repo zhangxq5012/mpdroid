@@ -125,11 +125,6 @@ class MpdLibPlayerAdapter implements MpdPlayerAdapterIF
         player.seek(progress);
     }
 
-    public void toggleRepeat()
-    {
-        player.toggleRepeat();
-    }
-
     private static class MpdSongProgressWrapper implements MpdSongProgress
     {
         private final SongProgress progress;

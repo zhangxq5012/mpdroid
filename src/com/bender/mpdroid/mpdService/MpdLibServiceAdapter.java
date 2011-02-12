@@ -2,6 +2,7 @@ package com.bender.mpdroid.mpdService;
 
 import com.bender.mpdlib.ConnectionListener;
 import com.bender.mpdlib.MpdServer;
+import com.bender.mpdlib.Options;
 
 /**
  */
@@ -56,6 +57,11 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
         return new NullPlaylistAdapter();
     }
 
+    public MpdOptionsIF getOptions()
+    {
+        return new MpdOptionsImpl(mpdServer.getOptions());
+    }
+
     public void addConnectionListener(final MpdConnectionListenerIF connectionListenerIF)
     {
         mpdServer.addConnectionListener(new ConnectionListener()
@@ -68,4 +74,23 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
     }
 
 
+    private static class MpdOptionsImpl implements MpdOptionsIF
+    {
+        private Options options;
+
+        public MpdOptionsImpl(Options options)
+        {
+            this.options = options;
+        }
+
+        public void toggleRepeat()
+        {
+            options.toggleRepeat();
+        }
+
+        public Boolean getRepeat()
+        {
+            return options.getRepeat();
+        }
+    }
 }

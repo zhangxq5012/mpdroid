@@ -21,5 +21,7 @@ public interface MpdServiceAdapterIF
 
     MpdPlaylistAdapterIF getPlaylist();
 
+    MpdOptionsIF getOptions();
+
     void addConnectionListener(MpdConnectionListenerIF connectionListenerIF);
 }

@@ -39,6 +39,7 @@ public class MpDroidActivity extends Activity
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
     private List<MpDroidActivityWidget> mpDroidActivityWidgetList;
+    private MpdOptionsIF mpdOptionsIF;
 
     public MpDroidActivity()
     {
@@ -159,6 +160,21 @@ public class MpDroidActivity extends Activity
             getVolumeTask.execute();
             GetSongTask getSongTask = new GetSongTask(this, mpdPlayerAdapterIF);
             getSongTask.execute();
+            AsyncTask<Void, Void, Boolean> getRepeatTask = new AsyncTask<Void, Void, Boolean>()
+            {
+                @Override
+                protected Boolean doInBackground(Void... voids)
+                {
+                    return mpdOptionsIF.getRepeat();
+                }
+
+                @Override
+                protected void onPostExecute(Boolean repeat)
+                {
+                    repeatCheckbox.setChecked(repeat);
+                }
+            };
+            getRepeatTask.execute();
         }
         for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
         {
@@ -195,6 +211,8 @@ public class MpDroidActivity extends Activity
                 mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
                 mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
                 mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
+
+                mpdOptionsIF = mpdServiceAdapterIF.getOptions();
                 for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
                 {
                     mpDroidActivityWidget.onConnect();
@@ -265,7 +283,7 @@ public class MpDroidActivity extends Activity
                     @Override
                     protected Void doInBackground(Void... voids)
                     {
-                        mpdPlayerAdapterIF.toggleRepeat();
+                        mpdOptionsIF.toggleRepeat();
                         return null;
                     }
                 };
@@ -313,6 +331,10 @@ public class MpDroidActivity extends Activity
 
     private class GetVolumeTask extends AsyncTask<Void, Object, Integer>
     {
+        public GetVolumeTask()
+        {
+        }
+
         @Override
         protected Integer doInBackground(Void... objects)
         {
