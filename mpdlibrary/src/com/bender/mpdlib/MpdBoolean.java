@@ -6,6 +6,8 @@ package com.bender.mpdlib;
  */
 public class MpdBoolean
 {
+    private boolean boolValue;
+
     /**
      * Parse the text value into a boolean or throws a NumberFormatException.
      *
@@ -28,5 +30,21 @@ public class MpdBoolean
     public static String toString(boolean boolValue)
     {
         return boolValue ? "1" : "0";
+    }
+
+    public MpdBoolean(boolean boolValue)
+    {
+        this.boolValue = boolValue;
+    }
+
+    public MpdBoolean(String stringValue)
+    {
+        boolValue = parseString(stringValue);
+    }
+
+    @Override
+    public String toString()
+    {
+        return toString(boolValue);
     }
 }

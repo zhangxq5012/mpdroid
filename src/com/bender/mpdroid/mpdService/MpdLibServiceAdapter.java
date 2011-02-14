@@ -101,7 +101,22 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
                 {
                     optionsListener.repeatUpdated(repeat);
                 }
+
+                public void randomUpdated(boolean newRandom)
+                {
+                    optionsListener.randomUpdated(newRandom);
+                }
             });
+        }
+
+        public void toggleRandom()
+        {
+            options.toggleRandom();
+        }
+
+        public Boolean getRandom()
+        {
+            return options.getRandom();
         }
     }
 }

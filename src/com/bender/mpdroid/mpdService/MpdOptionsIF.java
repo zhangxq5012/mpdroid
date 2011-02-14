@@ -9,4 +9,8 @@ public interface MpdOptionsIF
     Boolean getRepeat();
 
     void addOptionsListener(OptionsListener optionsListener);
+
+    void toggleRandom();
+
+    Boolean getRandom();
 }

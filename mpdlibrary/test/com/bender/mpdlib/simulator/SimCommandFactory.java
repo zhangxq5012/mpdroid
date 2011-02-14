@@ -36,7 +36,8 @@ public class SimCommandFactory
         Stop(MpdCommands.stop, StopSimCommand.class),
         Seek(MpdCommands.seekid, SeekByIdSimCommand.class),
         Close(MpdCommands.close, CloseSimCommand.class),
-        Repeat(MpdCommands.repeat, RepeatSimCommand.class);
+        Repeat(MpdCommands.repeat, RepeatSimCommand.class),
+        Random(MpdCommands.random, RandomSimCommand.class);
 
         private MpdCommands command;
         private Class<? extends SimCommand> simCommandClass;

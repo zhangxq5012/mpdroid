@@ -32,7 +32,7 @@ public class MpDroidActivity extends Activity
     private TextView songDetailsTextView;
     private CheckBox repeatCheckbox;
     private CheckBox randomCheckbox;
-    private TextView nowPlayingLabel;
+    private TextView nowPlayingTextView;
 
     private MpdPreferences myPreferences;
 
@@ -81,7 +81,7 @@ public class MpDroidActivity extends Activity
         songDetailsTextView = (TextView) findViewById(R.id.song_details);
         repeatCheckbox = (CheckBox) findViewById(R.id.repeat);
         randomCheckbox = (CheckBox) findViewById(R.id.random);
-        nowPlayingLabel = (TextView) findViewById(R.id.now_playing_label);
+        nowPlayingTextView = (TextView) findViewById(R.id.now_playing_label);
     }
 
     private void initializeListeners()
@@ -158,7 +158,7 @@ public class MpDroidActivity extends Activity
         songDetailsTextView.setVisibility(visibility);
         repeatCheckbox.setVisibility(visibility);
         randomCheckbox.setVisibility(visibility);
-        nowPlayingLabel.setVisibility(visibility);
+        nowPlayingTextView.setVisibility(visibility);
 
         if (connected)
         {
@@ -181,6 +181,21 @@ public class MpDroidActivity extends Activity
                 }
             };
             getRepeatTask.execute();
+            AsyncTask<Void, Void, Boolean> getRandomTask = new AsyncTask<Void, Void, Boolean>()
+            {
+                @Override
+                protected Boolean doInBackground(Void... voids)
+                {
+                    return mpdOptionsIF.getRandom();
+                }
+
+                @Override
+                protected void onPostExecute(Boolean random)
+                {
+                    randomCheckbox.setChecked(random);
+                }
+            };
+            getRandomTask.execute();
         }
         for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
         {
@@ -295,6 +310,20 @@ public class MpDroidActivity extends Activity
                     }
                 };
                 toggleRepeatTask.execute();
+            }
+            else if (view == randomCheckbox)
+            {
+                AsyncTask<Void, Void, Void> toggleRandomTask = new AsyncTask<Void, Void, Void>()
+                {
+
+                    @Override
+                    protected Void doInBackground(Void... voids)
+                    {
+                        mpdOptionsIF.toggleRandom();
+                        return null;
+                    }
+                };
+                toggleRandomTask.execute();
             }
         }
     }
@@ -419,6 +448,18 @@ public class MpDroidActivity extends Activity
                 public void run()
                 {
                     repeatCheckbox.setChecked(repeat);
+                }
+            };
+            runOnUiThread(runnable);
+        }
+
+        public void randomUpdated(final boolean newRandom)
+        {
+            Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
+                    randomCheckbox.setChecked(newRandom);
                 }
             };
             runOnUiThread(runnable);

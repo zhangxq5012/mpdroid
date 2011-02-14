@@ -47,7 +47,9 @@ class CallbackThread extends Thread
                 if (idleResult.status.isSuccessful())
                 {
                     List<Subsystem> result = idleResult.result;
-                    if (result.contains(Subsystem.mixer) || result.contains(Subsystem.player) || result.contains(Subsystem.options))
+                    if (result.contains(Subsystem.mixer)
+                            || result.contains(Subsystem.player)
+                            || result.contains(Subsystem.options))
                     {
                         getAndProcessStatus();
                     }

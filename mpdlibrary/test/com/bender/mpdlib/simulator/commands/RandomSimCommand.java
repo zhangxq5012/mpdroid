@@ -5,7 +5,7 @@ import com.bender.mpdlib.commands.Response;
 
 /**
  */
-public class RepeatSimCommand extends SimCommand
+public class RandomSimCommand extends SimCommand
 {
     @Override
     public void run(String[] commands) throws Exception
@@ -15,7 +15,7 @@ public class RepeatSimCommand extends SimCommand
             try
             {
                 boolean repeat = MpdBoolean.parseString(commands[1]);
-                optionsReg.setRepeat(repeat);
+                optionsReg.setRandom(repeat);
                 printWriter.println(Response.OK);
             } catch (NumberFormatException e)
             {

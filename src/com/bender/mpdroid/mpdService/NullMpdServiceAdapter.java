@@ -83,5 +83,16 @@ class NullMpdServiceAdapter implements MpdServiceAdapterIF
         {
             Log.e(TAG, "addOptionsListener() called on NULL object");
         }
+
+        public void toggleRandom()
+        {
+            Log.e(TAG, "toggleRandom() called on NULL object");
+        }
+
+        public Boolean getRandom()
+        {
+            Log.e(TAG, "getRandom() called on NULL object");
+            return false;
+        }
     }
 }
