@@ -2,30 +2,44 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
-            android:orientation="horizontal"
+    <!--android:orientation="horizontal"-->
+    <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             >
 
-        <ImageButton
-                android:id="@+id/prev"
-                style="@android:style/MediaButton.Previous"
-                />
-
-        <ImageButton android:id="@+id/play" style="@android:style/MediaButton.Play"
-                />
-
-        <Button android:id="@+id/stop"
-                android:text="@string/stop"
+        <LinearLayout
+                android:layout_centerInParent="true"
+                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:enabled="false"
-                />
+                >
 
-        <ImageButton android:id="@+id/next" style="@android:style/MediaButton.Next"
-                />
+            <ImageButton
+                    android:id="@+id/prev"
+                    android:layout_centerInParent="true"
+                    style="@android:style/MediaButton.Previous"
+                    />
 
+            <ImageButton android:id="@+id/play" style="@android:style/MediaButton.Play"
+                         android:layout_alignRight="@id/prev"
+                    />
 
-    </LinearLayout>
+            <Button android:id="@+id/stop"
+                    android:text="@string/stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_alignRight="@id/play"
+                    android:enabled="false"
+                    />
+
+            <ImageButton
+                    android:id="@+id/next"
+                    android:layout_alignRight="@id/stop"
+                    style="@android:style/MediaButton.Next"
+                    />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 </merge>
