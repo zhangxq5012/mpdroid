@@ -30,8 +30,8 @@ public class MpDroidActivity extends Activity
     private SeekBar volumeSeekBar;
     private TextView songNameTextView;
     private TextView songDetailsTextView;
-    private CheckBox repeatCheckbox;
-    private CheckBox randomCheckbox;
+    private ImageButton repeatCheckbox;
+    private ImageButton randomCheckbox;
     private TextView nowPlayingTextView;
 
     private MpdPreferences myPreferences;
@@ -79,8 +79,8 @@ public class MpDroidActivity extends Activity
         volumeSeekBar = (SeekBar) findViewById(R.id.volume);
         songNameTextView = (TextView) findViewById(R.id.song_name);
         songDetailsTextView = (TextView) findViewById(R.id.song_details);
-        repeatCheckbox = (CheckBox) findViewById(R.id.repeat);
-        randomCheckbox = (CheckBox) findViewById(R.id.random);
+        repeatCheckbox = (ImageButton) findViewById(R.id.repeat);
+        randomCheckbox = (ImageButton) findViewById(R.id.random);
         nowPlayingTextView = (TextView) findViewById(R.id.now_playing_label);
     }
 
@@ -177,7 +177,7 @@ public class MpDroidActivity extends Activity
                 @Override
                 protected void onPostExecute(Boolean repeat)
                 {
-                    repeatCheckbox.setChecked(repeat);
+                    updateRepeat(repeat);
                 }
             };
             getRepeatTask.execute();
@@ -192,7 +192,7 @@ public class MpDroidActivity extends Activity
                 @Override
                 protected void onPostExecute(Boolean random)
                 {
-                    randomCheckbox.setChecked(random);
+                    updateRandom(random);
                 }
             };
             getRandomTask.execute();
@@ -201,6 +201,18 @@ public class MpDroidActivity extends Activity
         {
             mpDroidActivityWidget.onConnectionChange(connected);
         }
+    }
+
+    private void updateRandom(Boolean random)
+    {
+        int resource = random ? R.drawable.ic_mp_shuffle_on_btn : R.drawable.ic_mp_shuffle_off_btn;
+        randomCheckbox.setImageResource(resource);
+    }
+
+    private void updateRepeat(Boolean repeat)
+    {
+        int resource = repeat ? R.drawable.ic_mp_repeat_all_btn : R.drawable.ic_mp_repeat_off_btn;
+        repeatCheckbox.setImageResource(resource);
     }
 
 
@@ -447,7 +459,7 @@ public class MpDroidActivity extends Activity
             {
                 public void run()
                 {
-                    repeatCheckbox.setChecked(repeat);
+                    updateRepeat(repeat);
                 }
             };
             runOnUiThread(runnable);
@@ -459,7 +471,7 @@ public class MpDroidActivity extends Activity
             {
                 public void run()
                 {
-                    randomCheckbox.setChecked(newRandom);
+                    updateRandom(newRandom);
                 }
             };
             runOnUiThread(runnable);

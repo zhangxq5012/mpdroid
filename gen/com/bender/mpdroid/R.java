@@ -11,7 +11,11 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int icon=0x7f020000;
+        public static final int ic_mp_repeat_all_btn=0x7f020000;
+        public static final int ic_mp_repeat_off_btn=0x7f020001;
+        public static final int ic_mp_shuffle_off_btn=0x7f020002;
+        public static final int ic_mp_shuffle_on_btn=0x7f020003;
+        public static final int icon=0x7f020004;
     }
     public static final class id {
         public static final int connect=0x7f070007;

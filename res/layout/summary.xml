@@ -66,22 +66,36 @@
             android:layout_height="wrap_content"
             >
 
-        <CheckBox
+        <ImageButton
                 android:id="@+id/repeat"
-                android:text="@string/repeat"
-                android:enabled="true"
+                android:src="@drawable/ic_mp_repeat_off_btn"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                />
+            />
 
-        <CheckBox
+        <ImageButton
                 android:id="@+id/random"
-                android:text="@string/random"
-                android:enabled="true"
+                android:src="@drawable/ic_mp_shuffle_off_btn"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_alignParentRight="true"
                 />
+        <!--<CheckBox-->
+                <!--android:id="@+id/repeat"-->
+                <!--android:text="@string/repeat"-->
+                <!--android:enabled="true"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--/>-->
+
+        <!--<CheckBox-->
+                <!--android:id="@+id/random"-->
+                <!--android:text="@string/random"-->
+                <!--android:enabled="true"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--/>-->
 
     </RelativeLayout>
 
