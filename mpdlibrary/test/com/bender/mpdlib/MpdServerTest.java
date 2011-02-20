@@ -432,6 +432,75 @@ public class MpdServerTest extends TestCase
         assertEquals(REPEAT, result);
     }
 
+    public void testToggleRepeat() throws Exception
+    {
+        final boolean REPEAT = true;
+        mpdServerSimulator.getOptionsReg().setRepeat(REPEAT);
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        Options options = mpdServer.getOptions();
+
+        boolean result = options.getRepeat();
+        assertEquals(REPEAT, result);
+
+        options.toggleRepeat();
+        smallWait();
+
+        result = options.getRepeat();
+        assertEquals(!REPEAT, result);
+    }
+
+    public void testGetRandom() throws Exception
+    {
+        final Boolean RANDOM = true;
+        mpdServerSimulator.getOptionsReg().setRandom(RANDOM);
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        Options options = mpdServer.getOptions();
+
+        Boolean result = options.getRandom();
+        assertEquals(RANDOM, result);
+    }
+
+    public void testToggleRandom() throws Exception
+    {
+        final boolean RANDOM = true;
+        mpdServerSimulator.getOptionsReg().setRandom(RANDOM);
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        Options options = mpdServer.getOptions();
+
+        boolean result = options.getRandom();
+        assertEquals(RANDOM, result);
+
+        options.toggleRandom();
+        smallWait();
+
+        result = options.getRandom();
+        assertEquals(!RANDOM, result);
+    }
+
+    public void testOptionsListener() throws Exception
+    {
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+        UnitTestOptionsListener optionsListener = new UnitTestOptionsListener();
+        Options options = mpdServer.getOptions();
+        options.setListener(optionsListener);
+
+        options.toggleRepeat();
+        smallWait();
+
+        assertEquals(true, optionsListener.repeatChanged);
+        assertEquals(true, optionsListener.repeatValue);
+
+        options.toggleRandom();
+        smallWait();
+
+        assertEquals(true, optionsListener.randomChanged);
+        assertEquals(true, optionsListener.randomValue);
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;
@@ -449,6 +518,26 @@ public class MpdServerTest extends TestCase
         public void execute(Runnable runnable)
         {
             runnable.run();
+        }
+    }
+
+    private static class UnitTestOptionsListener implements OptionsListener
+    {
+        private boolean repeatValue;
+        private boolean repeatChanged;
+        private boolean randomValue;
+        private boolean randomChanged;
+
+        public void repeatUpdated(boolean repeat)
+        {
+            repeatValue = repeat;
+            repeatChanged = true;
+        }
+
+        public void randomUpdated(boolean newRandom)
+        {
+            randomValue = newRandom;
+            randomChanged = true;
         }
     }
 
