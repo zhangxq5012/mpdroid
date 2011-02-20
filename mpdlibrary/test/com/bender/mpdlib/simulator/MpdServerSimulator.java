@@ -28,7 +28,7 @@ public class MpdServerSimulator
         subSystemSupport = new SubSystemSupport();
         playlist = new Playlist(subSystemSupport);
         simPlayer = new SimPlayer(subSystemSupport, playlist);
-        optionsReg = new OptionsReg(subSystemSupport);
+        optionsReg = new OptionsReg(subSystemSupport, playlist);
     }
 
     public SocketStreamProviderIF createMpdSocket()
@@ -232,7 +232,7 @@ public class MpdServerSimulator
         SubSystemSupport systemSupport = new SubSystemSupport();
         Playlist playlist = new Playlist(systemSupport);
         SimPlayer simPlayer = new SimPlayer(systemSupport, playlist);
-        OptionsReg optionsReg = new OptionsReg(systemSupport);
+        OptionsReg optionsReg = new OptionsReg(systemSupport, playlist);
 
         while (true)
         {

@@ -20,8 +20,11 @@ public class StatusSimCommand extends SimCommand
         {
             write(printWriter, statusTuple);
         }
-        StatusTuple statusTuple = playlist.getStatus();
-        write(printWriter, statusTuple);
+        statusTupleList = playlist.getStatusList();
+        for (StatusTuple statusTuple : statusTupleList)
+        {
+            write(printWriter, statusTuple);
+        }
 
         statusTupleList = optionsReg.getStatusList();
         for (StatusTuple tuple : statusTupleList)

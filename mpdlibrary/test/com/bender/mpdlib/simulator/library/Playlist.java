@@ -23,6 +23,8 @@ public class Playlist
 
     private List<SongInfo> library;
     private SubSystemSupport subSystemSupport;
+    private boolean repeat;
+    private boolean random;
 
 
     public Playlist(SubSystemSupport subSystemSupport)
@@ -40,8 +42,7 @@ public class Playlist
                 library.add(songInfo);
             }
             Log.v(TAG, "Loaded library. (" + library.size() + ") entries");
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Log.e(TAG, "Error parsing library xml", e);
         }
@@ -77,13 +78,12 @@ public class Playlist
         return currentSong;
     }
 
-    public StatusTuple getStatus()
+    private StatusTuple getCurrentSongStatus()
     {
         if (currentSong != null)
         {
             return new StatusTuple(MpdStatus.songid, currentSong.getValue(SongInfo.SongAttributeType.Id));
-        }
-        else
+        } else
         {
             return null;
         }
@@ -105,8 +105,7 @@ public class Playlist
         if (index >= library.size())
         {
             index = 0;
-        }
-        else if (index < 0)
+        } else if (index < 0)
         {
             index = library.size() - 1;
         }
@@ -137,5 +136,30 @@ public class Playlist
         {
             gotoSongIndex(songId - 1);
         }
+    }
+
+    public void setRepeat(boolean repeat)
+    {
+        //todo: use repeat
+        this.repeat = repeat;
+    }
+
+    public void setRandom(boolean random)
+    {
+        //todo: use random
+        this.random = random;
+    }
+
+    public List<StatusTuple> getStatusList()
+    {
+        List<StatusTuple> statusTuples = new ArrayList<StatusTuple>();
+        statusTuples.add(getCurrentSongStatus());
+        statusTuples.add(getPlaylistLengthStatus());
+        return statusTuples;
+    }
+
+    private StatusTuple getPlaylistLengthStatus()
+    {
+        return new StatusTuple(MpdStatus.playlistlength, Integer.toString(size()));
     }
 }

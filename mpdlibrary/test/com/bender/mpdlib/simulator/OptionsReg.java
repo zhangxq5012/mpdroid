@@ -4,6 +4,7 @@ import com.bender.mpdlib.MpdBoolean;
 import com.bender.mpdlib.MpdStatus;
 import com.bender.mpdlib.Subsystem;
 import com.bender.mpdlib.commands.StatusTuple;
+import com.bender.mpdlib.simulator.library.Playlist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,23 +18,25 @@ public class OptionsReg
 
     private AtomicBoolean repeat = new AtomicBoolean(false);
     private AtomicBoolean random = new AtomicBoolean(false);
+    private Playlist playlist;
 
-    public OptionsReg(SubSystemSupport subSystemSupport)
+    public OptionsReg(SubSystemSupport subSystemSupport, Playlist playlist)
     {
         this.subSystemSupport = subSystemSupport;
+        this.playlist = playlist;
     }
 
     public void setRepeat(boolean repeat)
     {
         this.repeat.set(repeat);
-        // todo: update playlist
+        playlist.setRepeat(repeat);
         subSystemSupport.updateSubSystemChanged(Subsystem.options);
     }
 
     public void setRandom(boolean random)
     {
         this.random.set(random);
-        // todo: update playlist
+        playlist.setRandom(random);
         subSystemSupport.updateSubSystemChanged(Subsystem.options);
     }
 
