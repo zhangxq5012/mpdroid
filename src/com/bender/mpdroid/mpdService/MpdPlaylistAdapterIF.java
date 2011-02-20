@@ -6,4 +6,6 @@ package com.bender.mpdroid.mpdService;
 public interface MpdPlaylistAdapterIF
 {
     MpdSongAdapterIF getCurrentSong();
+
+    int getPlaylistSize();
 }

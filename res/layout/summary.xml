@@ -46,7 +46,6 @@
     </RelativeLayout>
 
 
-    <include layout="@layout/player"/>
 
 
     <TextView
@@ -99,6 +98,7 @@
 
     </RelativeLayout>
 
+
     <TextView
             android:id="@+id/now_playing_label"
             android:text="@string/now_playing"
@@ -114,6 +114,8 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
             />
+
+    <include layout="@layout/player"/>
 
     <TextView
             android:tag="@string/progress"

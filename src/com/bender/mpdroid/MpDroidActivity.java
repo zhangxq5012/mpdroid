@@ -36,7 +36,7 @@ public class MpDroidActivity extends Activity
 
     private MpdPreferences myPreferences;
 
-    private MpdServiceAdapterIF mpdServiceAdapterIF;
+    private static MpdServiceAdapterIF mpdServiceAdapterIF;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
     private List<MpDroidActivityWidget> mpDroidActivityWidgetList;
@@ -213,6 +213,11 @@ public class MpDroidActivity extends Activity
     {
         int resource = repeat ? R.drawable.ic_mp_repeat_all_btn : R.drawable.ic_mp_repeat_off_btn;
         repeatCheckbox.setImageResource(resource);
+    }
+
+    public static MpdServiceAdapterIF getMpdService()
+    {
+        return mpdServiceAdapterIF != null ? mpdServiceAdapterIF : new NullMpdService();
     }
 
 

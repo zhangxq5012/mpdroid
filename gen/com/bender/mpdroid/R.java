@@ -15,7 +15,12 @@ public final class R {
         public static final int ic_mp_repeat_off_btn=0x7f020001;
         public static final int ic_mp_shuffle_off_btn=0x7f020002;
         public static final int ic_mp_shuffle_on_btn=0x7f020003;
-        public static final int icon=0x7f020004;
+        public static final int ic_tab_playback_selected=0x7f020004;
+        public static final int ic_tab_playback_unselected=0x7f020005;
+        public static final int ic_tab_playlist=0x7f020006;
+        public static final int ic_tab_playlists_selected=0x7f020007;
+        public static final int ic_tab_playlists_unselected=0x7f020008;
+        public static final int icon=0x7f020009;
     }
     public static final class id {
         public static final int connect=0x7f070007;
@@ -39,7 +44,9 @@ public final class R {
     }
     public static final class layout {
         public static final int player=0x7f030000;
-        public static final int summary=0x7f030001;
+        public static final int playlist_item=0x7f030001;
+        public static final int summary=0x7f030002;
+        public static final int tabmain=0x7f030003;
     }
     public static final class menu {
         public static final int settings=0x7f060000;

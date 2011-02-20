@@ -40,10 +40,12 @@ public class PlayerFrame implements MpDroidActivityWidget
 
     public void onConnectionChange(boolean connected)
     {
-        playButton.setEnabled(connected);
+        int visibility = connected ? View.VISIBLE : View.INVISIBLE;
         stopButton.setEnabled(connected);
-        nextButton.setEnabled(connected);
-        prevButton.setEnabled(connected);
+        playButton.setVisibility(visibility);
+        stopButton.setVisibility(visibility);
+        nextButton.setVisibility(visibility);
+        prevButton.setVisibility(visibility);
 
     }
 

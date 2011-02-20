@@ -10,4 +10,9 @@ class NullPlaylistAdapter implements MpdPlaylistAdapterIF
         return new NullSongAdapter();
     }
 
+    public int getPlaylistSize()
+    {
+        return 0;
+    }
+
 }
