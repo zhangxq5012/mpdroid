@@ -501,6 +501,18 @@ public class MpdServerTest extends TestCase
         assertEquals(true, optionsListener.randomValue);
     }
 
+    public void testPlaylistLength() throws Exception
+    {
+        final int LENGTH = mpdServerSimulator.getPlaylist().size();
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+
+        Playlist playlist = mpdServer.getPlaylist();
+
+        int result = playlist.getPlaylistLength();
+        assertEquals(LENGTH, result);
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;

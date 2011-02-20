@@ -22,6 +22,7 @@ public class MpdServer
     private static final String TAG = MpdServer.class.getSimpleName();
     private ConnectionListener connectionListener = new NullConnectionListener();
     private Options options;
+    private Playlist playlist;
 
     /**
      * Normal use constructor.
@@ -80,6 +81,8 @@ public class MpdServer
         player.processStatus(result);
         getOptions();
         options.processStatus(result);
+        getPlaylist();
+        playlist.processStatus(result);
     }
 
 
@@ -159,6 +162,15 @@ public class MpdServer
             options = new Options(commandPipe);
         }
         return options;
+    }
+
+    public Playlist getPlaylist()
+    {
+        if (playlist == null)
+        {
+            playlist = new Playlist();
+        }
+        return playlist;
     }
 
     private class NullConnectionListener implements ConnectionListener
