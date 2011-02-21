@@ -20,7 +20,7 @@ public class MpdServer
     private CallbackThread callbackThread;
     private MpdPlayer player;
     private static final String TAG = MpdServer.class.getSimpleName();
-    private ConnectionListener connectionListener = new NullConnectionListener();
+    private MulticastConnectionListener connectionListener = new MulticastConnectionListener();
     private Options options;
     private Playlist playlist;
 
@@ -110,7 +110,7 @@ public class MpdServer
             e.printStackTrace();
         } finally
         {
-            connectionListener.connectionChanged(isConnected());
+            connectionListener.connectionChanged(false);
         }
     }
 
@@ -136,7 +136,7 @@ public class MpdServer
 
     public void addConnectionListener(ConnectionListener listener)
     {
-        connectionListener = listener;
+        connectionListener.addConnectionListener(listener);
     }
 
     void crashDetected()
@@ -173,10 +173,4 @@ public class MpdServer
         return playlist;
     }
 
-    private class NullConnectionListener implements ConnectionListener
-    {
-        public void connectionChanged(boolean isConnected)
-        {
-        }
-    }
 }

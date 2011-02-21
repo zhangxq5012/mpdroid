@@ -6,23 +6,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.bender.mpdroid.mpdService.MpdPlaylistAdapterIF;
-import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
-import com.bender.mpdroid.mpdService.MpdSongAdapterIF;
-import com.bender.mpdroid.mpdService.SongNameDecorator;
+import com.bender.mpdroid.mpdService.*;
 
 /**
  */
 public class PlaylistActivity extends ListActivity
 {
+    private PlaylistAdapter playlistAdapter;
+    private MpdPlaylistAdapterIF mpdPlaylistAdapterIF;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-//        setListAdapter(new ArrayAdapter<String>(this, R.layout.playlist_item,
-//                new String[]{"a", "b", "c"}));
-        setListAdapter(new PlaylistAdapter());
+        final MpdServiceAdapterIF mpdService = MpDroidActivity.getMpdService();
+        mpdPlaylistAdapterIF = mpdService.getPlaylist();
+        playlistAdapter = new PlaylistAdapter();
+        mpdService.addConnectionListener(new MpdConnectionListenerIF()
+        {
+            public void connectionStateUpdated(boolean connected)
+            {
+                mpdPlaylistAdapterIF = mpdService.getPlaylist();
+                playlistAdapter.updatePlaylist();
+            }
+        });
+        setListAdapter(playlistAdapter);
 
         ListView lv = getListView();
         lv.setTextFilterEnabled(true);
@@ -32,7 +41,7 @@ public class PlaylistActivity extends ListActivity
             public void onItemClick(AdapterView<?> adapterView, View view, int songPos, long l)
             {
                 Toast.makeText(getApplicationContext(), ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
-                MpDroidActivity.getMpdService().getPlaylist().play(songPos);
+                mpdPlaylistAdapterIF.play(songPos);
                 //todo: jump to player frame
             }
         });
@@ -49,16 +58,12 @@ public class PlaylistActivity extends ListActivity
 
         public int getCount()
         {
-            MpdServiceAdapterIF mpdService = MpDroidActivity.getMpdService();
-            MpdPlaylistAdapterIF playlist = mpdService.getPlaylist();
-            return playlist.getPlaylistSize();
+            return mpdPlaylistAdapterIF.getPlaylistSize();
         }
 
         public Object getItem(int i)
         {
-            MpdServiceAdapterIF mpdService = MpDroidActivity.getMpdService();
-            MpdPlaylistAdapterIF playlist = mpdService.getPlaylist();
-            return new SongNameDecorator(playlist.getSongInfo(i));
+            return new SongNameDecorator(mpdPlaylistAdapterIF.getSongInfo(i));
         }
 
         public long getItemId(int i)
@@ -75,6 +80,18 @@ public class PlaylistActivity extends ListActivity
             MpdSongAdapterIF song = (MpdSongAdapterIF) getItem(i);
             ((TextView) view).setText(song.getSongName());
             return view;
+        }
+
+        public void updatePlaylist()
+        {
+            Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
+                    notifyDataSetChanged();
+                }
+            };
+            runOnUiThread(runnable);
         }
     }
 }

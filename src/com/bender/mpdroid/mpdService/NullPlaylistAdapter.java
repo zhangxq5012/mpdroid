@@ -22,7 +22,6 @@ class NullPlaylistAdapter implements MpdPlaylistAdapterIF
 
     public void play(int songPos)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
 

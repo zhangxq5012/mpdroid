@@ -54,7 +54,10 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
     public MpdPlaylistAdapterIF getPlaylist()
     {
-        return new MpdLibPlaylistAdapter(mpdServer.getPlaylist());
+        if (isConnected())
+            return new MpdLibPlaylistAdapter(mpdServer.getPlaylist());
+        else
+            return new NullPlaylistAdapter();
     }
 
     public MpdOptionsIF getOptions()
