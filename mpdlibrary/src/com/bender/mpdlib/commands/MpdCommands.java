@@ -18,6 +18,7 @@ public enum MpdCommands
     currentsong,
     random,
     repeat,
+    playlistinfo,
     setvol;
 
     public static MpdCommands parse(String value)

@@ -37,6 +37,7 @@ public class SimCommandFactory
         Seek(MpdCommands.seekid, SeekByIdSimCommand.class),
         Close(MpdCommands.close, CloseSimCommand.class),
         Repeat(MpdCommands.repeat, RepeatSimCommand.class),
+        PlaylistInfo(MpdCommands.playlistinfo, PlaylistInfoCommand.class),
         Random(MpdCommands.random, RandomSimCommand.class);
 
         private MpdCommands command;

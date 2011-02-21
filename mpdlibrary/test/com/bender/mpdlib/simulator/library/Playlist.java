@@ -162,4 +162,14 @@ public class Playlist
     {
         return new StatusTuple(MpdStatus.playlistlength, Integer.toString(size()));
     }
+
+    public List<SongInfo> getPlaylistInfo(int beginRange, int endRange)
+    {
+        if (beginRange == -1 && endRange == -1)
+        {
+            beginRange = 0;
+            endRange = size();
+        }
+        return library.subList(beginRange, endRange);
+    }
 }

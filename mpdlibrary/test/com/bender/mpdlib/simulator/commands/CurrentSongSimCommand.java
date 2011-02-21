@@ -15,12 +15,16 @@ public class CurrentSongSimCommand extends SimCommand
         SongInfo currentSong = playlist.getCurrentSong();
         for (SongInfo.SongAttributeType songAttributeType : SongInfo.SongAttributeType.values())
         {
+            if (songAttributeType.equals(SongInfo.SongAttributeType.Id)) continue;
             String value = currentSong.getValue(songAttributeType);
             if (value != null)
             {
                 printWriter.println(songAttributeType + ": " + value);
             }
         }
+        // print id last
+        SongInfo.SongAttributeType songAttributeType = SongInfo.SongAttributeType.Id;
+        printWriter.println(songAttributeType + ": " + currentSong.getValue(songAttributeType));
         Log.v(getClass().getSimpleName(), ": id=" + currentSong.getValue(SongInfo.SongAttributeType.Id));
         printWriter.println(Response.OK);
     }
