@@ -172,4 +172,9 @@ public class Playlist
         }
         return library.subList(beginRange, endRange);
     }
+
+    public SongInfo getSongInfo(int i)
+    {
+        return library.get(i);
+    }
 }

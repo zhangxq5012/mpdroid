@@ -1,5 +1,7 @@
 package com.bender.mpdlib;
 
+import com.bender.mpdlib.commands.GetPlaylistInfoCommand;
+import com.bender.mpdlib.commands.Result;
 import com.bender.mpdlib.commands.StatusTuple;
 import com.bender.mpdlib.util.Log;
 
@@ -11,6 +13,12 @@ public class Playlist
 {
     private int playlistLength = 0;
     private static final String TAG = Playlist.class.getSimpleName();
+    private Pipe commandPipe;
+
+    public Playlist(Pipe commandPipe)
+    {
+        this.commandPipe = commandPipe;
+    }
 
     public int getPlaylistLength()
     {
@@ -40,5 +48,11 @@ public class Playlist
             Log.v(TAG, "playlistLength updated: " + newLength);
         }
 
+    }
+
+    public SongInfo getPlaylistInfo(int songPos)
+    {
+        Result<SongInfo> songInfoResult = CommandRunner.runCommand(new GetPlaylistInfoCommand(commandPipe, songPos));
+        return songInfoResult.result;
     }
 }

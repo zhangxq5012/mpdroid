@@ -54,4 +54,23 @@ public class SongInfo
             valueMap.put(songAttributeType, value.toString());
         }
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SongInfo songInfo = (SongInfo) o;
+
+        if (valueMap != null ? !valueMap.equals(songInfo.valueMap) : songInfo.valueMap != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return valueMap != null ? valueMap.hashCode() : 0;
+    }
 }

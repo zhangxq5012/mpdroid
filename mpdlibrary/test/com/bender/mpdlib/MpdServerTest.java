@@ -513,6 +513,18 @@ public class MpdServerTest extends TestCase
         assertEquals(LENGTH, result);
     }
 
+    public void testPlaylistInfo() throws Exception
+    {
+        SongInfo songInfo = mpdServerSimulator.getPlaylist().getSongInfo(0);
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+
+        Playlist playlist = mpdServer.getPlaylist();
+        SongInfo playlistInfo = playlist.getPlaylistInfo(0);
+
+        assertEquals(songInfo, playlistInfo);
+    }
+
     private static class MyVolumeListener implements VolumeListener
     {
         private boolean volumeChanged;

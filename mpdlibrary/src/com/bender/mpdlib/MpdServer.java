@@ -168,7 +168,7 @@ public class MpdServer
     {
         if (playlist == null)
         {
-            playlist = new Playlist();
+            playlist = new Playlist(commandPipe);
         }
         return playlist;
     }
