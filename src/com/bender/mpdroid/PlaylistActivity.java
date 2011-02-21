@@ -1,7 +1,6 @@
 package com.bender.mpdroid;
 
 import android.app.ListActivity;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,31 +38,13 @@ public class PlaylistActivity extends ListActivity
         });
     }
 
-    private class PlaylistAdapter implements ListAdapter
+    private class PlaylistAdapter extends BaseAdapter
     {
         private LayoutInflater mInflater;
 
         public PlaylistAdapter()
         {
             mInflater = PlaylistActivity.this.getLayoutInflater();
-        }
-
-        public boolean areAllItemsEnabled()
-        {
-            return true;
-        }
-
-        public boolean isEnabled(int i)
-        {
-            return true;
-        }
-
-        public void registerDataSetObserver(DataSetObserver dataSetObserver)
-        {
-        }
-
-        public void unregisterDataSetObserver(DataSetObserver dataSetObserver)
-        {
         }
 
         public int getCount()
@@ -85,11 +66,6 @@ public class PlaylistActivity extends ListActivity
             return 0;
         }
 
-        public boolean hasStableIds()
-        {
-            return true;
-        }
-
         public View getView(int i, View view, ViewGroup viewGroup)
         {
             if (view == null)
@@ -99,21 +75,6 @@ public class PlaylistActivity extends ListActivity
             MpdSongAdapterIF song = (MpdSongAdapterIF) getItem(i);
             ((TextView) view).setText(song.getSongName());
             return view;
-        }
-
-        public int getItemViewType(int i)
-        {
-            return 0;
-        }
-
-        public int getViewTypeCount()
-        {
-            return 1;
-        }
-
-        public boolean isEmpty()
-        {
-            return getCount() == 0;
         }
     }
 }
