@@ -1,6 +1,7 @@
 package com.bender.mpdlib;
 
 import com.bender.mpdlib.commands.GetPlaylistInfoCommand;
+import com.bender.mpdlib.commands.PlaySongPosCommand;
 import com.bender.mpdlib.commands.Result;
 import com.bender.mpdlib.commands.StatusTuple;
 import com.bender.mpdlib.util.Log;
@@ -54,5 +55,10 @@ public class Playlist
     {
         Result<SongInfo> songInfoResult = CommandRunner.runCommand(new GetPlaylistInfoCommand(commandPipe, songPos));
         return songInfoResult == null ? new SongInfo() : songInfoResult.result;
+    }
+
+    public void play(int songPos)
+    {
+        CommandRunner.runCommand(new PlaySongPosCommand(commandPipe, songPos));
     }
 }

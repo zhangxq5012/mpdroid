@@ -23,7 +23,6 @@ public class PlaylistActivity extends ListActivity
 
 //        setListAdapter(new ArrayAdapter<String>(this, R.layout.playlist_item,
 //                new String[]{"a", "b", "c"}));
-        // todo: get playlist from mpd service
         setListAdapter(new PlaylistAdapter());
 
         ListView lv = getListView();
@@ -31,9 +30,11 @@ public class PlaylistActivity extends ListActivity
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            public void onItemClick(AdapterView<?> adapterView, View view, int songPos, long l)
             {
                 Toast.makeText(getApplicationContext(), ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
+                MpDroidActivity.getMpdService().getPlaylist().play(songPos);
+                //todo: jump to player frame
             }
         });
     }
@@ -49,12 +50,12 @@ public class PlaylistActivity extends ListActivity
 
         public boolean areAllItemsEnabled()
         {
-            return false;
+            return true;
         }
 
         public boolean isEnabled(int i)
         {
-            return false;
+            return true;
         }
 
         public void registerDataSetObserver(DataSetObserver dataSetObserver)

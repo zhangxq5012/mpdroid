@@ -28,4 +28,9 @@ public class MpdLibPlaylistAdapter implements MpdPlaylistAdapterIF
         return new MpdLibSongAdapter(playlist.getPlaylistInfo(songPosition));
     }
 
+    public void play(int songPos)
+    {
+        playlist.play(songPos);
+    }
+
 }

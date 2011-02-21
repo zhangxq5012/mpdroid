@@ -8,16 +8,27 @@ import com.bender.mpdlib.commands.Response;
 public abstract class PlayerSimCommand extends SimCommand
 {
 
-    public void run(String[] commands)
+    public final void run(String[] commands)
     {
         try
         {
-            simPlayer.updatePlayStatus(getPlayStatus());
-            printWriter.println(Response.OK);
+            if (commands.length == 1)
+            {
+                simPlayer.updatePlayStatus(getPlayStatus());
+                printWriter.println(Response.OK);
+            } else
+            {
+                runWithArgs(commands);
+            }
         } catch (Exception e)
         {
             e.printStackTrace();
         }
+    }
+
+    protected void runWithArgs(String[] commands)
+    {
+
     }
 
     protected abstract PlayStatus getPlayStatus();

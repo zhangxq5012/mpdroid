@@ -100,7 +100,7 @@ public class Playlist
      *
      * @param index
      */
-    private void gotoSongIndex(int index)
+    public void gotoSongIndex(int index)
     {
         if (index >= library.size())
         {

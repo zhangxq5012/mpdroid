@@ -10,4 +10,6 @@ public interface MpdPlaylistAdapterIF
     int getPlaylistSize();
 
     MpdSongAdapterIF getSongInfo(int songPosition);
+
+    void play(int songPos);
 }
