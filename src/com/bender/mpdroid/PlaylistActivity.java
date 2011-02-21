@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.bender.mpdroid.mpdService.MpdPlaylistAdapterIF;
 import com.bender.mpdroid.mpdService.MpdServiceAdapterIF;
+import com.bender.mpdroid.mpdService.MpdSongAdapterIF;
+import com.bender.mpdroid.mpdService.SongNameDecorator;
 
 /**
  */
@@ -72,7 +74,9 @@ public class PlaylistActivity extends ListActivity
 
         public Object getItem(int i)
         {
-            return "text " + i;
+            MpdServiceAdapterIF mpdService = MpDroidActivity.getMpdService();
+            MpdPlaylistAdapterIF playlist = mpdService.getPlaylist();
+            return new SongNameDecorator(playlist.getSongInfo(i));
         }
 
         public long getItemId(int i)
@@ -91,8 +95,8 @@ public class PlaylistActivity extends ListActivity
             {
                 view = mInflater.inflate(R.layout.playlist_item, viewGroup, false);
             }
-            String text = (String) getItem(i);
-            ((TextView) view).setText(text);
+            MpdSongAdapterIF song = (MpdSongAdapterIF) getItem(i);
+            ((TextView) view).setText(song.getSongName());
             return view;
         }
 

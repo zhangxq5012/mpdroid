@@ -15,4 +15,10 @@ class NullPlaylistAdapter implements MpdPlaylistAdapterIF
         return 0;
     }
 
+    public MpdSongAdapterIF getSongInfo(int songPosition)
+    {
+        return new NullSongAdapter();
+    }
+
+
 }

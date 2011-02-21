@@ -22,4 +22,10 @@ public class MpdLibPlaylistAdapter implements MpdPlaylistAdapterIF
     {
         return playlist.getPlaylistLength();
     }
+
+    public MpdSongAdapterIF getSongInfo(int songPosition)
+    {
+        return new MpdLibSongAdapter(playlist.getPlaylistInfo(songPosition));
+    }
+
 }

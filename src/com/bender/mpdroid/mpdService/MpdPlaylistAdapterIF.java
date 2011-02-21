@@ -8,4 +8,6 @@ public interface MpdPlaylistAdapterIF
     MpdSongAdapterIF getCurrentSong();
 
     int getPlaylistSize();
+
+    MpdSongAdapterIF getSongInfo(int songPosition);
 }

@@ -53,6 +53,6 @@ public class Playlist
     public SongInfo getPlaylistInfo(int songPos)
     {
         Result<SongInfo> songInfoResult = CommandRunner.runCommand(new GetPlaylistInfoCommand(commandPipe, songPos));
-        return songInfoResult.result;
+        return songInfoResult == null ? new SongInfo() : songInfoResult.result;
     }
 }
