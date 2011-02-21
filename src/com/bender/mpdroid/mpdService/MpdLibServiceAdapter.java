@@ -54,7 +54,7 @@ public class MpdLibServiceAdapter implements MpdServiceAdapterIF
 
     public MpdPlaylistAdapterIF getPlaylist()
     {
-        return new NullPlaylistAdapter();
+        return new MpdLibPlaylistAdapter(mpdServer.getPlaylist());
     }
 
     public MpdOptionsIF getOptions()

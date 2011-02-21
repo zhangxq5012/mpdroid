@@ -3,6 +3,7 @@ package com.bender.mpdroid;
 import android.app.ListActivity;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -18,10 +19,10 @@ public class PlaylistActivity extends ListActivity
     {
         super.onCreate(savedInstanceState);
 
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.playlist_item,
-                new String[]{"a", "b", "c"}));
+//        setListAdapter(new ArrayAdapter<String>(this, R.layout.playlist_item,
+//                new String[]{"a", "b", "c"}));
         // todo: get playlist from mpd service
-//        setListAdapter(new PlaylistAdapter());
+        setListAdapter(new PlaylistAdapter());
 
         ListView lv = getListView();
         lv.setTextFilterEnabled(true);
@@ -37,6 +38,13 @@ public class PlaylistActivity extends ListActivity
 
     private class PlaylistAdapter implements ListAdapter
     {
+        private LayoutInflater mInflater;
+
+        public PlaylistAdapter()
+        {
+            mInflater = PlaylistActivity.this.getLayoutInflater();
+        }
+
         public boolean areAllItemsEnabled()
         {
             return false;
@@ -81,7 +89,7 @@ public class PlaylistActivity extends ListActivity
         {
             if (view == null)
             {
-                view = findViewById(R.layout.playlist_item);
+                view = mInflater.inflate(R.layout.playlist_item, viewGroup, false);
             }
             String text = (String) getItem(i);
             ((TextView) view).setText(text);
