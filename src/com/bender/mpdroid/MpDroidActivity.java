@@ -36,6 +36,7 @@ public class MpDroidActivity extends Activity
 
     private MpdPreferences myPreferences;
 
+    // todo: remove static field
     private static MpdServiceAdapterIF mpdServiceAdapterIF;
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
@@ -47,6 +48,7 @@ public class MpDroidActivity extends Activity
         mpDroidActivityWidgetList = new ArrayList<MpDroidActivityWidget>();
         mpDroidActivityWidgetList.add(new PlayerFrame());
         mpDroidActivityWidgetList.add(new SongProgressFrame());
+        mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
     }
 
     /**
@@ -57,7 +59,6 @@ public class MpDroidActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.summary);
-        mpdServiceAdapterIF = MpdAdapterFactory.createAdapter();
         myPreferences = new MpdPreferences(this);
         for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
         {
@@ -220,6 +221,11 @@ public class MpDroidActivity extends Activity
         return mpdServiceAdapterIF != null ? mpdServiceAdapterIF : new NullMpdService();
     }
 
+    void setMpdService(MpdServiceAdapterIF service)
+    {
+        mpdServiceAdapterIF = service;
+    }
+
 
     private class ConnectTask extends AsyncTask<Void, MpdPlayerAdapterIF.PlayStatus, Boolean>
     {
@@ -327,8 +333,7 @@ public class MpDroidActivity extends Activity
                     }
                 };
                 toggleRepeatTask.execute();
-            }
-            else if (view == randomCheckbox)
+            } else if (view == randomCheckbox)
             {
                 AsyncTask<Void, Void, Void> toggleRandomTask = new AsyncTask<Void, Void, Void>()
                 {
