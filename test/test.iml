@@ -30,6 +30,7 @@
     <orderEntry type="jdk" jdkName="Android SDK" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="mpdroid" scope="PROVIDED" />
+    <orderEntry type="module" module-name="mpdlibrary" />
   </component>
 </module>
 
