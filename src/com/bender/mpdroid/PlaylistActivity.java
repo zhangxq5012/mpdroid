@@ -40,9 +40,9 @@ public class PlaylistActivity extends ListActivity
         {
             public void onItemClick(AdapterView<?> adapterView, View view, int songPos, long l)
             {
-                Toast.makeText(getApplicationContext(), ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
                 mpdPlaylistAdapterIF.play(songPos);
-                //todo: jump to player frame
+                MpdTabActivity mpdTabActivity = (MpdTabActivity) getParent();
+                mpdTabActivity.switchTab(mpdTabActivity.playerTabIndex());
             }
         });
     }
