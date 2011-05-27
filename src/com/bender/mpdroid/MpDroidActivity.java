@@ -2,6 +2,8 @@ package com.bender.mpdroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -65,11 +67,23 @@ public class MpDroidActivity extends Activity {
         initializeListeners();
         updateServerSettingsDisplay();
         updateConnectedStatusOnUI(false);
-        if (myPreferences.autoConnect()) {
+        if (autoConnect()) {
             ConnectTask connectTask = new ConnectTask();
             connectTask.execute();
         }
         Log.v(TAG, "onCreate: DONE");
+    }
+
+    private boolean autoConnect() {
+        boolean autoConnect = myPreferences.autoConnect();
+        if (autoConnect) {
+            if (myPreferences.autoConnectWithWifiOnly()) {
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                autoConnect = networkInfo.isConnected();
+            }
+        }
+        return autoConnect;
     }
 
     private void initializeWidgets() {

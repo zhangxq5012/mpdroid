@@ -12,6 +12,7 @@ public class MpdPreferences {
     private static final String SERVER_KEY = "server";
     private static final String AUTO_CONNECT_KEY = "auto_connect";
     private SharedPreferences sharedPreferences;
+    private static final String WIFI_ONLY = "wifi_only";
 
     public MpdPreferences(Context context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -46,7 +47,12 @@ public class MpdPreferences {
     public boolean autoConnect() {
         boolean autoConnect = sharedPreferences.getBoolean(AUTO_CONNECT_KEY, true);
         boolean serverDefined = sharedPreferences.contains(SERVER_KEY);
-        return autoConnect && serverDefined;
+        autoConnect = autoConnect && serverDefined;
+        return autoConnect;
+    }
+
+    public boolean autoConnectWithWifiOnly() {
+        return sharedPreferences.getBoolean(WIFI_ONLY, false);
     }
 
     public boolean firstRun() {

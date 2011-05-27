@@ -6,4 +6,10 @@
             android:defaultValue="true"
             android:title="@string/auto_connect"
             />
+    <CheckBoxPreference
+            android:key="wifi_only"
+            android:defaultValue="false"
+            android:title="@string/wifi_auto"
+            android:dependency="auto_connect"
+            />
 </PreferenceScreen>

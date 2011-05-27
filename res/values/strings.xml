@@ -22,4 +22,5 @@
     <string name="random">Random</string>
     <string name="auto_connect">Auto Connect</string>
     <string name="server_preferences">Server Settings</string>
+    <string name="wifi_auto">Only when using Wifi</string>
 </resources>
