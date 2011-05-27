@@ -18,10 +18,10 @@ import java.util.List;
 /**
  * Main activity for the mpd droid application
  */
-public class MpDroidActivity extends Activity
-{
+public class MpDroidActivity extends Activity {
     private static final String TAG = MpDroidActivity.class.getSimpleName();
     private static final int REQUEST_PREFERENCES = 1;
+    private static final int REQUEST_SYSTEM_SETTINGS = 2;
 
     private TextView serverTextView;
     private TextView portTextView;
@@ -43,8 +43,7 @@ public class MpDroidActivity extends Activity
     private List<MpDroidActivityWidget> mpDroidActivityWidgetList;
     private MpdOptionsIF mpdOptionsIF;
 
-    public MpDroidActivity()
-    {
+    public MpDroidActivity() {
         mpDroidActivityWidgetList = new ArrayList<MpDroidActivityWidget>();
         mpDroidActivityWidgetList.add(new PlayerFrame());
         mpDroidActivityWidgetList.add(new SongProgressFrame());
@@ -55,24 +54,25 @@ public class MpDroidActivity extends Activity
      * Called when the activity is first created.
      */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.summary);
         myPreferences = new MpdPreferences(this);
-        for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
-        {
+        for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList) {
             mpDroidActivityWidget.onCreate(this);
         }
         initializeWidgets();
         initializeListeners();
-        updatePreferencesDisplay();
+        updateServerSettingsDisplay();
         updateConnectedStatusOnUI(false);
+        if (myPreferences.autoConnect()) {
+            ConnectTask connectTask = new ConnectTask();
+            connectTask.execute();
+        }
         Log.v(TAG, "onCreate: DONE");
     }
 
-    private void initializeWidgets()
-    {
+    private void initializeWidgets() {
         serverTextView = (TextView) findViewById(R.id.server_name);
         portTextView = (TextView) findViewById(R.id.port);
         useAuthenticationCheckbox = (CheckBox) findViewById(R.id.use_authentication);
@@ -85,8 +85,7 @@ public class MpDroidActivity extends Activity
         nowPlayingTextView = (TextView) findViewById(R.id.now_playing_label);
     }
 
-    private void initializeListeners()
-    {
+    private void initializeListeners() {
         ButtonClickListener buttonClickListener = new ButtonClickListener();
         connectButton.setOnClickListener(buttonClickListener);
         volumeSeekBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener());
@@ -95,47 +94,50 @@ public class MpDroidActivity extends Activity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == REQUEST_PREFERENCES)
-        {
-            Log.v(TAG, "Preferences Updated");
-            updatePreferencesDisplay();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_PREFERENCES) {
+            Log.v(TAG, "Server Settings Updated");
+            updateServerSettingsDisplay();
+        } else if (requestCode == REQUEST_SYSTEM_SETTINGS) {
+            Log.v(TAG, "System settings updated");
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.settings, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         boolean ret = true;
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case R.id.settings_menu:
-                openPreferences();
+                openSystemSettings();
                 break;
+            case R.id.server_menu:
+                openServerSettings();
             default:
                 ret = super.onOptionsItemSelected(item);
         }
         return ret;
     }
 
-    private void openPreferences()
-    {
+    private void openSystemSettings() {
+        Intent launchPreferencesIntent = new Intent();
+        launchPreferencesIntent.setClass(MpDroidActivity.this, SystemSettingsActivity.class);
+        startActivityForResult(launchPreferencesIntent, REQUEST_SYSTEM_SETTINGS);
+    }
+
+    private void openServerSettings() {
         Intent launchPreferencesIntent = new Intent();
         launchPreferencesIntent.setClass(MpDroidActivity.this, MpDroidPreferenceActivity.class);
         startActivityForResult(launchPreferencesIntent, REQUEST_PREFERENCES);
     }
 
-    private void updatePreferencesDisplay()
-    {
+    private void updateServerSettingsDisplay() {
         String server = myPreferences.getServer();
         serverTextView.setText(getText(R.string.server) + ": " + server);
         String port = String.valueOf(myPreferences.getPort());
@@ -144,13 +146,11 @@ public class MpDroidActivity extends Activity
         useAuthenticationCheckbox.setChecked(useAuthentication);
     }
 
-    MpdServiceAdapterIF getMpdServiceAdapterIF()
-    {
+    MpdServiceAdapterIF getMpdServiceAdapterIF() {
         return mpdServiceAdapterIF;
     }
 
-    private void updateConnectedStatusOnUI(Boolean connected)
-    {
+    private void updateConnectedStatusOnUI(Boolean connected) {
         String text = connected ? getString(R.string.disconnect) : getString(R.string.connect);
         connectButton.setText(text);
         volumeSeekBar.setEnabled(connected);
@@ -161,105 +161,86 @@ public class MpDroidActivity extends Activity
         randomCheckbox.setVisibility(visibility);
         nowPlayingTextView.setVisibility(visibility);
 
-        if (connected)
-        {
+        if (connected) {
             GetVolumeTask getVolumeTask = new GetVolumeTask();
             getVolumeTask.execute();
             GetSongTask getSongTask = new GetSongTask(this, mpdPlayerAdapterIF);
             getSongTask.execute();
-            AsyncTask<Void, Void, Boolean> getRepeatTask = new AsyncTask<Void, Void, Boolean>()
-            {
+            AsyncTask<Void, Void, Boolean> getRepeatTask = new AsyncTask<Void, Void, Boolean>() {
                 @Override
-                protected Boolean doInBackground(Void... voids)
-                {
+                protected Boolean doInBackground(Void... voids) {
                     return mpdOptionsIF.getRepeat();
                 }
 
                 @Override
-                protected void onPostExecute(Boolean repeat)
-                {
+                protected void onPostExecute(Boolean repeat) {
                     updateRepeat(repeat);
                 }
             };
             getRepeatTask.execute();
-            AsyncTask<Void, Void, Boolean> getRandomTask = new AsyncTask<Void, Void, Boolean>()
-            {
+            AsyncTask<Void, Void, Boolean> getRandomTask = new AsyncTask<Void, Void, Boolean>() {
                 @Override
-                protected Boolean doInBackground(Void... voids)
-                {
+                protected Boolean doInBackground(Void... voids) {
                     return mpdOptionsIF.getRandom();
                 }
 
                 @Override
-                protected void onPostExecute(Boolean random)
-                {
+                protected void onPostExecute(Boolean random) {
                     updateRandom(random);
                 }
             };
             getRandomTask.execute();
         }
-        for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
-        {
+        for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList) {
             mpDroidActivityWidget.onConnectionChange(connected);
         }
     }
 
-    private void updateRandom(Boolean random)
-    {
+    private void updateRandom(Boolean random) {
         int resource = random ? R.drawable.ic_mp_shuffle_on_btn : R.drawable.ic_mp_shuffle_off_btn;
         randomCheckbox.setImageResource(resource);
     }
 
-    private void updateRepeat(Boolean repeat)
-    {
+    private void updateRepeat(Boolean repeat) {
         int resource = repeat ? R.drawable.ic_mp_repeat_all_btn : R.drawable.ic_mp_repeat_off_btn;
         repeatCheckbox.setImageResource(resource);
     }
 
-    public static MpdServiceAdapterIF getMpdService()
-    {
+    public static MpdServiceAdapterIF getMpdService() {
         return mpdServiceAdapterIF != null ? mpdServiceAdapterIF : new NullMpdService();
     }
 
-    void setMpdService(MpdServiceAdapterIF service)
-    {
+    void setMpdService(MpdServiceAdapterIF service) {
         mpdServiceAdapterIF = service;
     }
 
 
-    private class ConnectTask extends AsyncTask<Void, MpdPlayerAdapterIF.PlayStatus, Boolean>
-    {
+    private class ConnectTask extends AsyncTask<Void, MpdPlayerAdapterIF.PlayStatus, Boolean> {
         @Override
-        protected Boolean doInBackground(Void... unused)
-        {
+        protected Boolean doInBackground(Void... unused) {
             String server = myPreferences.getServer();
             int port = myPreferences.getPort();
             boolean useAuthentication = myPreferences.useAuthentication();
             boolean usePort = myPreferences.usePort();
-            if (useAuthentication)
-            {
+            if (useAuthentication) {
                 String password = myPreferences.getPassword();
                 mpdServiceAdapterIF.connect(server, port, password);
-            } else if (usePort)
-            {
+            } else if (usePort) {
                 mpdServiceAdapterIF.connect(server, port);
-            } else
-            {
+            } else {
                 mpdServiceAdapterIF.connect(server);
             }
             boolean connected = mpdServiceAdapterIF.isConnected();
             mpdServiceAdapterIF.addConnectionListener(new MyMpdConnectionListenerIF());
 
-            if (connected)
-            {
+            if (connected) {
                 mpdPlayerAdapterIF = mpdServiceAdapterIF.getPlayer();
                 mpdPlayerAdapterIF.addSongChangeListener(new SongListener());
                 mpdPlayerAdapterIF.addVolumeListener(new UiVolumeListener());
 
                 mpdOptionsIF = mpdServiceAdapterIF.getOptions();
                 mpdOptionsIF.addOptionsListener(new MyOptionsListener());
-                for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList)
-                {
+                for (MpDroidActivityWidget mpDroidActivityWidget : mpDroidActivityWidgetList) {
                     mpDroidActivityWidget.onConnect();
                 }
 
@@ -270,31 +251,24 @@ public class MpDroidActivity extends Activity
             return connected;
         }
 
-        private String makeConnectedText(String server, boolean connected)
-        {
+        private String makeConnectedText(String server, boolean connected) {
             return connected ? "Connected to " + server + "!"
                     : "Unable to Connect to " + server + "!";
         }
 
         @Override
-        protected void onPostExecute(Boolean connected)
-        {
+        protected void onPostExecute(Boolean connected) {
             updateConnectedStatusOnUI(connected);
-            if (!connected)
-            {
+            if (!connected) {
                 Toast.makeText(MpDroidActivity.this,
                         makeConnectedText(myPreferences.getServer(), connected), Toast.LENGTH_SHORT).show();
             }
         }
 
-        private class MyMpdConnectionListenerIF implements MpdConnectionListenerIF
-        {
-            public void connectionStateUpdated(final boolean connected)
-            {
-                runOnUiThread(new Runnable()
-                {
-                    public void run()
-                    {
+        private class MyMpdConnectionListenerIF implements MpdConnectionListenerIF {
+            public void connectionStateUpdated(final boolean connected) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
                         updateConnectedStatusOnUI(connected);
                     }
                 });
@@ -304,43 +278,32 @@ public class MpDroidActivity extends Activity
     }
 
 
-    private class ButtonClickListener implements View.OnClickListener
-    {
-        public void onClick(View view)
-        {
-            if (view == connectButton)
-            {
+    private class ButtonClickListener implements View.OnClickListener {
+        public void onClick(View view) {
+            if (view == connectButton) {
                 boolean connected = mpdServiceAdapterIF.isConnected();
-                if (connected)
-                {
+                if (connected) {
                     DisconnectTask disconnectTask = new DisconnectTask();
                     disconnectTask.execute();
-                } else
-                {
+                } else {
                     ConnectTask connectTask = new ConnectTask();
                     connectTask.execute();
                 }
-            } else if (view == repeatCheckbox)
-            {
-                AsyncTask<Void, Void, Void> toggleRepeatTask = new AsyncTask<Void, Void, Void>()
-                {
+            } else if (view == repeatCheckbox) {
+                AsyncTask<Void, Void, Void> toggleRepeatTask = new AsyncTask<Void, Void, Void>() {
 
                     @Override
-                    protected Void doInBackground(Void... voids)
-                    {
+                    protected Void doInBackground(Void... voids) {
                         mpdOptionsIF.toggleRepeat();
                         return null;
                     }
                 };
                 toggleRepeatTask.execute();
-            } else if (view == randomCheckbox)
-            {
-                AsyncTask<Void, Void, Void> toggleRandomTask = new AsyncTask<Void, Void, Void>()
-                {
+            } else if (view == randomCheckbox) {
+                AsyncTask<Void, Void, Void> toggleRandomTask = new AsyncTask<Void, Void, Void>() {
 
                     @Override
-                    protected Void doInBackground(Void... voids)
-                    {
+                    protected Void doInBackground(Void... voids) {
                         mpdOptionsIF.toggleRandom();
                         return null;
                     }
@@ -350,93 +313,73 @@ public class MpDroidActivity extends Activity
         }
     }
 
-    private class DisconnectTask extends AsyncTask<Void, Void, Boolean>
-    {
+    private class DisconnectTask extends AsyncTask<Void, Void, Boolean> {
         @Override
-        protected Boolean doInBackground(Void... ignored)
-        {
+        protected Boolean doInBackground(Void... ignored) {
             mpdServiceAdapterIF.disconnect();
             return mpdServiceAdapterIF.isConnected();
         }
 
         @Override
-        protected void onPostExecute(Boolean connected)
-        {
+        protected void onPostExecute(Boolean connected) {
             updateConnectedStatusOnUI(connected);
         }
     }
 
-    private class VolumeSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener
-    {
-        public void onProgressChanged(SeekBar seekBar, int volume, boolean fromUser)
-        {
-            if (seekBar == volumeSeekBar && fromUser)
-            {
+    private class VolumeSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+        public void onProgressChanged(SeekBar seekBar, int volume, boolean fromUser) {
+            if (seekBar == volumeSeekBar && fromUser) {
                 VolumeTask volumeTask = new VolumeTask(mpdPlayerAdapterIF);
                 volumeTask.execute(volume);
             }
         }
 
-        public void onStartTrackingTouch(SeekBar seekBar)
-        {
+        public void onStartTrackingTouch(SeekBar seekBar) {
         }
 
-        public void onStopTrackingTouch(SeekBar seekBar)
-        {
+        public void onStopTrackingTouch(SeekBar seekBar) {
         }
 
     }
 
-    private class GetVolumeTask extends AsyncTask<Void, Object, Integer>
-    {
-        public GetVolumeTask()
-        {
+    private class GetVolumeTask extends AsyncTask<Void, Object, Integer> {
+        public GetVolumeTask() {
         }
 
         @Override
-        protected Integer doInBackground(Void... objects)
-        {
+        protected Integer doInBackground(Void... objects) {
             return mpdPlayerAdapterIF.getVolume();
         }
 
         @Override
-        protected void onPostExecute(Integer volume)
-        {
+        protected void onPostExecute(Integer volume) {
             volumeSeekBar.setProgress(volume);
         }
     }
 
-    void updateSongOnUI(MpdSongAdapterIF mpdSongAdapterIF)
-    {
+    void updateSongOnUI(MpdSongAdapterIF mpdSongAdapterIF) {
         String songName = mpdSongAdapterIF.getSongName();
         songNameTextView.setText(songName);
         String artist = mpdSongAdapterIF.getArtist();
         String album = mpdSongAdapterIF.getAlbumName();
         String date = mpdSongAdapterIF.getDate();
         StringBuilder details = new StringBuilder();
-        if (artist != null)
-        {
+        if (artist != null) {
             details.append("by ").append(artist);
         }
-        if (album != null)
-        {
+        if (album != null) {
             details.append(" from ").append(album);
         }
-        if (date != null)
-        {
+        if (date != null) {
             details.append(" (").append(date).append(")");
         }
         songDetailsTextView.setText(details);
     }
 
-    private class SongListener implements MpdSongListener
-    {
-        public void songUpdated(final MpdSongAdapterIF song)
-        {
-            Runnable runnable = new Runnable()
-            {
-                public void run()
-                {
+    private class SongListener implements MpdSongListener {
+        public void songUpdated(final MpdSongAdapterIF song) {
+            Runnable runnable = new Runnable() {
+                public void run() {
                     updateSongOnUI(new SongNameDecorator(song));
                 }
             };
@@ -445,14 +388,10 @@ public class MpDroidActivity extends Activity
     }
 
 
-    private class UiVolumeListener implements MpdPlayerAdapterIF.MpdVolumeListener
-    {
-        public void volumeUpdated(final Integer volume)
-        {
-            Runnable runnable = new Runnable()
-            {
-                public void run()
-                {
+    private class UiVolumeListener implements MpdPlayerAdapterIF.MpdVolumeListener {
+        public void volumeUpdated(final Integer volume) {
+            Runnable runnable = new Runnable() {
+                public void run() {
                     volumeSeekBar.setProgress(volume);
                 }
             };
@@ -461,26 +400,19 @@ public class MpDroidActivity extends Activity
     }
 
 
-    private class MyOptionsListener implements OptionsListener
-    {
-        public void repeatUpdated(final boolean repeat)
-        {
-            Runnable runnable = new Runnable()
-            {
-                public void run()
-                {
+    private class MyOptionsListener implements OptionsListener {
+        public void repeatUpdated(final boolean repeat) {
+            Runnable runnable = new Runnable() {
+                public void run() {
                     updateRepeat(repeat);
                 }
             };
             runOnUiThread(runnable);
         }
 
-        public void randomUpdated(final boolean newRandom)
-        {
-            Runnable runnable = new Runnable()
-            {
-                public void run()
-                {
+        public void randomUpdated(final boolean newRandom) {
+            Runnable runnable = new Runnable() {
+                public void run() {
                     updateRandom(newRandom);
                 }
             };

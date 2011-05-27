@@ -7,7 +7,7 @@
     <string name="use_authentication">Use Authentication?</string>
     <string name="connect">Connect</string>
     <string name="port">Port</string>
-    <string name="preferences">MPD Server Settings</string>
+    <string name="preferences">MPDroid Settings</string>
     <string name="disconnect">Disconnect</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
@@ -20,4 +20,6 @@
     <string name="progress">Progress:</string>
     <string name="repeat">Repeat</string>
     <string name="random">Random</string>
+    <string name="auto_connect">Auto Connect</string>
+    <string name="server_preferences">Server Settings</string>
 </resources>
