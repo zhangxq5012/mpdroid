@@ -5,12 +5,12 @@ import java.util.Map;
 
 /**
  */
-public class SongInfo
-{
+public class SongInfo {
     private Map<SongAttributeType, String> valueMap = new HashMap<SongAttributeType, String>(SongAttributeType.values().length);
 
-    public static enum SongAttributeType
-    {
+    public static final String ANY = "any";
+
+    public static enum SongAttributeType {
         file,
         Title,
         Artist,
@@ -21,12 +21,9 @@ public class SongInfo
         Pos,
         Id;
 
-        public static SongAttributeType parse(String line)
-        {
-            for (SongAttributeType songAttributeType : values())
-            {
-                if (songAttributeType.name().equals(line))
-                {
+        public static SongAttributeType parse(String line) {
+            for (SongAttributeType songAttributeType : values()) {
+                if (songAttributeType.name().equals(line)) {
                     return songAttributeType;
                 }
             }
@@ -34,30 +31,25 @@ public class SongInfo
         }
     }
 
-    public String getValue(SongAttributeType songAttributeType)
-    {
+    public String getValue(SongAttributeType songAttributeType) {
         return valueMap.get(songAttributeType);
     }
 
-    public void updateValue(String line)
-    {
+    public void updateValue(String line) {
         String[] strings = line.split(":");
         SongAttributeType songAttributeType = SongAttributeType.parse(strings[0].trim());
         String stringValue = strings[1].trim();
         updateValue(songAttributeType, stringValue);
     }
 
-    public void updateValue(SongAttributeType songAttributeType, Object value)
-    {
-        if (value != null)
-        {
+    public void updateValue(SongAttributeType songAttributeType, Object value) {
+        if (value != null) {
             valueMap.put(songAttributeType, value.toString());
         }
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -69,8 +61,7 @@ public class SongInfo
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return valueMap != null ? valueMap.hashCode() : 0;
     }
 }

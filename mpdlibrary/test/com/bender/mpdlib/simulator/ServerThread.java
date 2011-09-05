@@ -12,11 +12,12 @@ import com.bender.mpdlib.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  */
-class ServerThread extends Thread implements CommandResourceIF
-{
+class ServerThread extends Thread implements CommandResourceIF {
     private SocketStreamProviderIF provider;
     private PrintWriter printWriter;
     private BufferedReader simBufferedReader;
@@ -28,8 +29,7 @@ class ServerThread extends Thread implements CommandResourceIF
     private SimCommandFactory simCommandFactory;
     private OptionsReg optionsReg;
 
-    public ServerThread(SocketStreamProviderIF commandStreamProvider, Playlist playlist, SimPlayer simPlayer, SubSystemSupport subSystemSupport, OptionsReg optionsReg)
-    {
+    public ServerThread(SocketStreamProviderIF commandStreamProvider, Playlist playlist, SimPlayer simPlayer, SubSystemSupport subSystemSupport, OptionsReg optionsReg) {
         super("Sim-" + count++);
         this.playlist = playlist;
         this.simPlayer = simPlayer;
@@ -37,114 +37,117 @@ class ServerThread extends Thread implements CommandResourceIF
         this.optionsReg = optionsReg;
         provider = commandStreamProvider;
         simCommandFactory = new SimCommandFactory();
-        try
-        {
+        try {
             simBufferedReader = provider.getBufferedReader();
             printWriter = provider.getPrintWriter();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void run()
-    {
-        if (connected())
-        {
+    public void run() {
+        if (connected()) {
             printWriter.println(Response.OK + " " + MpdServerSimulator.VERSION);
         }
-        while (connected())
-        {
+        while (connected()) {
             String line = null;
-            try
-            {
+            try {
                 line = simBufferedReader.readLine();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 Log.e(TAG, e);
             }
-            if (!connected() || line == null)
-            {
+            if (!connected() || line == null) {
                 return;
             }
-            try
-            {
+            try {
                 process(line);
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 Log.e(TAG, e);
             }
         }
     }
 
-    private void process(String line) throws IOException
-    {
+    private void process(String line) throws IOException {
         String[] strings = line.split("\\s");
+        // this is kind of hack.
+        strings = processQuotes(strings);
         String commandString = strings[0].trim();
         MpdCommands command = MpdCommands.parse(commandString);
-        if (command == null)
-        {
+        if (command == null) {
             printWriter.println(Response.ACK + " [5@0] {} unknown command \"" + commandString + "\"");
             return;
         }
         Log.v(TAG, "process: " + command);
-        try
-        {
+        try {
             SimCommand simCommand = simCommandFactory.create(command);
-            if (simCommand == null)
-            {
+            if (simCommand == null) {
                 printWriter.println(Response.ACK + "[5@0] Unimplemented method: " + command);
-            } else
-            {
+            } else {
                 runCommand(strings, simCommand);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.e(TAG, e);
             printWriter.println(Response.ACK + "[5@0] Unhandled Exception");
         }
         Log.v(TAG, command + " DONE");
     }
 
+    // this is soo bad =/  it 'parses' double quotes as a single argument
+    private String[] processQuotes(String[] strings) {
+        boolean foundQuote = false;
+        List<String> result = new ArrayList<String>(strings.length);
+        StringBuffer buf = null;
+        for (int i = 0, stringsLength = strings.length; i < stringsLength; i++) {
+            String string = strings[i];
+            if (string.charAt(0) == '"') {
+                foundQuote = true;
+                buf = new StringBuffer();
+                buf.append(string.substring(1));
+            } else if (foundQuote && string.charAt(string.length() - 1) == '"') {
+                // end quote
+                foundQuote = false;
+                buf.append(' ').append(string.substring(0, string.length() - 1));
+                result.add(buf.toString());
+            } else if (foundQuote) {
+                buf.append(' ').append(string);
+            } else {
+                result.add(string);
+            }
+        }
+        return result.toArray(new String[result.size()]);
+    }
+
     private void runCommand(String[] strings, SimCommand simCommand)
-            throws Exception
-    {
+            throws Exception {
         simCommand.execute(strings, this);
     }
 
-    private boolean connected()
-    {
+    private boolean connected() {
         return provider.isConnected() || !CloseSimCommand.isClosed();
     }
 
-    public SocketStreamProviderIF getProvider()
-    {
+    public SocketStreamProviderIF getProvider() {
         return provider;
     }
 
-    public OptionsReg getOptionsReg()
-    {
+    public OptionsReg getOptionsReg() {
         return optionsReg;
     }
 
-    public PrintWriter getPrintWriter()
-    {
+    public PrintWriter getPrintWriter() {
         return printWriter;
     }
 
-    public Playlist getPlaylist()
-    {
+    public Playlist getPlaylist() {
         return playlist;
     }
 
-    public SimPlayer getSimPlayer()
-    {
+    public SimPlayer getSimPlayer() {
         return simPlayer;
     }
 
-    public SubSystemSupport getSubSystemSupport()
-    {
+    public SubSystemSupport getSubSystemSupport() {
         return subSystemSupport;
     }
 }

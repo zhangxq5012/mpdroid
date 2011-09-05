@@ -10,21 +10,17 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * todo: replace with documentation
  */
-public class SimCommandFactory
-{
+public class SimCommandFactory {
 
-    public SimCommandFactory()
-    {
+    public SimCommandFactory() {
     }
 
-    public SimCommand create(MpdCommands command)
-    {
+    public SimCommand create(MpdCommands command) {
         return SimCommands.construct(command);
     }
 
     //todo: refactor to avoid needing to specify the mapping
-    private static enum SimCommands
-    {
+    private static enum SimCommands {
         Idle(MpdCommands.idle, IdleSimCommand.class),
         CurrentSong(MpdCommands.currentsong, CurrentSongSimCommand.class),
         Volume(MpdCommands.setvol, VolumeSimCommand.class),
@@ -38,47 +34,38 @@ public class SimCommandFactory
         Close(MpdCommands.close, CloseSimCommand.class),
         Repeat(MpdCommands.repeat, RepeatSimCommand.class),
         PlaylistInfo(MpdCommands.playlistinfo, PlaylistInfoCommand.class),
+        PlaylistSearch(MpdCommands.playlistsearch, PlaylistSearchCommand.class),
         Random(MpdCommands.random, RandomSimCommand.class);
 
         private MpdCommands command;
         private Class<? extends SimCommand> simCommandClass;
         private static final String TAG = SimCommand.class.getSimpleName();
 
-        SimCommands(MpdCommands mpdCommands, Class<? extends SimCommand> simCommandClass)
-        {
+        SimCommands(MpdCommands mpdCommands, Class<? extends SimCommand> simCommandClass) {
             command = mpdCommands;
             this.simCommandClass = simCommandClass;
         }
 
-        static SimCommand construct(MpdCommands mpdCommands)
-        {
-            for (SimCommands simCommands : values())
-            {
-                if (simCommands.command.equals(mpdCommands))
-                {
+        static SimCommand construct(MpdCommands mpdCommands) {
+            for (SimCommands simCommands : values()) {
+                if (simCommands.command.equals(mpdCommands)) {
                     return newInstance(simCommands.simCommandClass);
                 }
             }
             return null;
         }
 
-        private static SimCommand newInstance(Class<? extends SimCommand> simCommandClass)
-        {
-            try
-            {
+        private static SimCommand newInstance(Class<? extends SimCommand> simCommandClass) {
+            try {
                 Constructor<? extends SimCommand> constructor = simCommandClass.getConstructor();
                 return constructor.newInstance();
-            } catch (NoSuchMethodException e)
-            {
+            } catch (NoSuchMethodException e) {
                 Log.e(TAG, e);
-            } catch (InvocationTargetException e)
-            {
+            } catch (InvocationTargetException e) {
                 Log.e(TAG, e);
-            } catch (InstantiationException e)
-            {
+            } catch (InstantiationException e) {
                 Log.e(TAG, e);
-            } catch (IllegalAccessException e)
-            {
+            } catch (IllegalAccessException e) {
                 Log.e(TAG, e);
             }
             return null;
