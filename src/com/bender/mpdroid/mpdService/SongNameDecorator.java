@@ -1,54 +1,43 @@
 package com.bender.mpdroid.mpdService;
 
-/**
- */
-public class SongNameDecorator implements MpdSongAdapterIF
-{
+public class SongNameDecorator implements MpdSongAdapterIF {
     private MpdSongAdapterIF implementation;
 
-    public SongNameDecorator(MpdSongAdapterIF implementation)
-    {
+    public SongNameDecorator(MpdSongAdapterIF implementation) {
         this.implementation = implementation;
     }
 
-    public String getSongName()
-    {
+    public String getSongName() {
         String name = implementation.getSongName();
-        if (name == null)
-        {
+        if (name == null) {
             name = implementation.getFile();
+            if (name == null) return "<unknown song name>";
             name = name.substring(name.lastIndexOf('/') + 1, name.length());
             int endIndex = name.lastIndexOf('.');
-            if (endIndex != -1)
-            {
+            if (endIndex != -1) {
                 name = name.substring(0, endIndex);
             }
         }
         return name;
     }
 
-    public String getArtist()
-    {
+    public String getArtist() {
         return implementation.getArtist();
     }
 
-    public String getAlbumName()
-    {
+    public String getAlbumName() {
         return implementation.getAlbumName();
     }
 
-    public String getFile()
-    {
+    public String getFile() {
         return implementation.getFile();
     }
 
-    public String getDate()
-    {
+    public String getDate() {
         return implementation.getDate();
     }
 
-    public Integer getSongLength()
-    {
+    public Integer getSongLength() {
         return implementation.getSongLength();
     }
 }
