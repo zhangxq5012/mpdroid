@@ -43,7 +43,7 @@ public class MpDroidActivity extends Activity {
     private MpdPlayerAdapterIF mpdPlayerAdapterIF;
 
     private List<MpDroidActivityWidget> mpDroidActivityWidgetList;
-    private MpdOptionsIF mpdOptionsIF;
+    private volatile MpdOptionsIF mpdOptionsIF = new NullMpdOptions();
 
     public MpDroidActivity() {
         mpDroidActivityWidgetList = new ArrayList<MpDroidActivityWidget>();
@@ -290,7 +290,6 @@ public class MpDroidActivity extends Activity {
         }
 
     }
-
 
     private class ButtonClickListener implements View.OnClickListener {
         public void onClick(View view) {
