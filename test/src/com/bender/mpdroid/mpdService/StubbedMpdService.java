@@ -4,6 +4,8 @@ import com.bender.mpdlib.ConnectionListener;
 import com.bender.mpdlib.MulticastConnectionListener;
 
 /**
+ * A stubbed implementation of MpdServiceAdapterIF that doesn't
+  * perform any network communication.
  */
 public class StubbedMpdService implements MpdServiceAdapterIF
 {
