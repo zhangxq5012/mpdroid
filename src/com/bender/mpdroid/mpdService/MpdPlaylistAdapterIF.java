@@ -3,8 +3,7 @@ package com.bender.mpdroid.mpdService;
 /**
  * mpd service playlist interface
  */
-public interface MpdPlaylistAdapterIF
-{
+public interface MpdPlaylistAdapterIF {
     MpdSongAdapterIF getCurrentSong();
 
     int getPlaylistSize();
@@ -12,4 +11,10 @@ public interface MpdPlaylistAdapterIF
     MpdSongAdapterIF getSongInfo(int songPosition);
 
     void play(int songPos);
+
+    void setListener(MpdPlaylistListenerIF playlistListenerIF);
+
+    interface MpdPlaylistListenerIF {
+        void playlistUpdated(int newLength);
+    }
 }
