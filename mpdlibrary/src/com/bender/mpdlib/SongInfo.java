@@ -22,8 +22,9 @@ public class SongInfo {
         Id;
 
         public static SongAttributeType parse(String line) {
+            line = line.toLowerCase();
             for (SongAttributeType songAttributeType : values()) {
-                if (songAttributeType.name().equals(line)) {
+                if (songAttributeType.name().toLowerCase().equals(line)) {
                     return songAttributeType;
                 }
             }

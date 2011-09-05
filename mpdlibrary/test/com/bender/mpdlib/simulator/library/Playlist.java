@@ -153,6 +153,35 @@ public class Playlist {
 
     public List<SongInfo> search(String tag, String query) {
         Log.d(getClass().getSimpleName(), "search(" + tag + ",'" + query + "')");
-        return new ArrayList<SongInfo>(0);
+        List<SongInfo> result = new ArrayList<SongInfo>();
+        for (SongInfo songInfo : library) {
+            searchSongInfo(tag, query, result, songInfo);
+        }
+        Log.v(getClass().getSimpleName(), "search returning: " + result.size() + " entries");
+        return result;
+    }
+
+    private void searchSongInfo(String tag, String query, List<SongInfo> result, SongInfo songInfo) {
+        query = query.toLowerCase();
+        if (SongInfo.ANY.equals(tag)) {
+            SongInfo.SongAttributeType[] values = SongInfo.SongAttributeType.values();
+            int i = 0, valuesLength = values.length;
+            boolean found = false;
+            while (i < valuesLength && !found) {
+                SongInfo.SongAttributeType songAttributeType = values[i];
+                String songInfoValue = songInfo.getValue(songAttributeType);
+                if (songInfoValue != null && songInfoValue.toLowerCase().contains(query)) {
+                    result.add(songInfo);
+                    found = true;
+                }
+                i++;
+            }
+        } else {
+            SongInfo.SongAttributeType songAttributeType = SongInfo.SongAttributeType.parse(tag);
+            String value = songInfo.getValue(songAttributeType);
+            if (value != null && value.toLowerCase().contains(query)) {
+                result.add(songInfo);
+            }
+        }
     }
 }

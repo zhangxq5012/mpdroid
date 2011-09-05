@@ -69,7 +69,7 @@ class ServerThread extends Thread implements CommandResourceIF {
     }
 
     private void process(String line) throws IOException {
-        String[] strings = line.split("\\s");
+        String[] strings = line.trim().split("\\s");
         // this is kind of hack.
         strings = processQuotes(strings);
         String commandString = strings[0].trim();
@@ -100,6 +100,7 @@ class ServerThread extends Thread implements CommandResourceIF {
         StringBuffer buf = null;
         for (int i = 0, stringsLength = strings.length; i < stringsLength; i++) {
             String string = strings[i];
+            if (string.length() == 0) continue;
             if (string.charAt(0) == '"') {
                 foundQuote = true;
                 buf = new StringBuffer();
