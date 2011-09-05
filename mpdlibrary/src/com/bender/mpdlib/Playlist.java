@@ -1,11 +1,10 @@
 package com.bender.mpdlib;
 
-import com.bender.mpdlib.commands.GetPlaylistInfoCommand;
-import com.bender.mpdlib.commands.PlaySongPosCommand;
-import com.bender.mpdlib.commands.Result;
-import com.bender.mpdlib.commands.StatusTuple;
+import com.bender.mpdlib.commands.*;
 import com.bender.mpdlib.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Playlist {
@@ -54,5 +53,10 @@ public class Playlist {
 
     public void setListener(PlaylistListener listener) {
         this.listener = listener;
+    }
+
+    public List<SongInfo> searchAll(String query) {
+        Result<List<SongInfo>> searchResult = CommandRunner.runCommand(new SearchPlaylistCommand(commandPipe, query));
+        return searchResult == null ? new ArrayList<SongInfo>(0) : searchResult.result;
     }
 }

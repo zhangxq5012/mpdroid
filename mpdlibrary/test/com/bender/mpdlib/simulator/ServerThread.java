@@ -102,9 +102,13 @@ class ServerThread extends Thread implements CommandResourceIF {
             String string = strings[i];
             if (string.length() == 0) continue;
             if (string.charAt(0) == '"') {
-                foundQuote = true;
-                buf = new StringBuffer();
-                buf.append(string.substring(1));
+                if (string.charAt(string.length() - 1) == '"') {
+                    result.add(string.substring(1, string.length() - 1));
+                } else {
+                    foundQuote = true;
+                    buf = new StringBuffer();
+                    buf.append(string.substring(1));
+                }
             } else if (foundQuote && string.charAt(string.length() - 1) == '"') {
                 // end quote
                 foundQuote = false;
