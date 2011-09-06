@@ -40,4 +40,9 @@ public class SongNameDecorator implements MpdSongAdapterIF {
     public Integer getSongLength() {
         return implementation.getSongLength();
     }
+
+    @Override
+    public String toString() {
+        return getSongName();
+    }
 }

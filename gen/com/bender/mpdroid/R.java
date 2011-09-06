@@ -33,6 +33,7 @@ public final class R {
         public static final int prev = 0x7f070000;
         public static final int random = 0x7f07000a;
         public static final int repeat = 0x7f070009;
+        public static final int search = 0x7f070013;
         public static final int server_menu = 0x7f070012;
         public static final int server_name = 0x7f070004;
         public static final int settings_menu = 0x7f070011;

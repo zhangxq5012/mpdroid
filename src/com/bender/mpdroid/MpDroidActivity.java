@@ -133,6 +133,11 @@ public class MpDroidActivity extends Activity {
                 break;
             case R.id.server_menu:
                 openServerSettings();
+                break;
+            case R.id.search:
+                Log.v(TAG, "search!");
+                onSearchRequested();
+                break;
             default:
                 ret = super.onOptionsItemSelected(item);
         }
