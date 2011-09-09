@@ -2,8 +2,7 @@ package com.bender.mpdlib.commands;
 
 /**
  */
-public enum MpdCommands
-{
+public enum MpdCommands {
     idle,
     play,
     next,
@@ -19,14 +18,13 @@ public enum MpdCommands
     random,
     repeat,
     playlistinfo,
-    setvol;
+    playlistsearch,
+    setvol,
+    playid;
 
-    public static MpdCommands parse(String value)
-    {
-        for (MpdCommands mpdCommands : values())
-        {
-            if (mpdCommands.toString().equals(value))
-            {
+    public static MpdCommands parse(String value) {
+        for (MpdCommands mpdCommands : values()) {
+            if (mpdCommands.toString().equals(value)) {
                 return mpdCommands;
             }
         }

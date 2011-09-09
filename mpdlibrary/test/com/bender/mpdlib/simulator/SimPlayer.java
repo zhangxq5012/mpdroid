@@ -18,8 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  */
-public class SimPlayer
-{
+public class SimPlayer {
     private static final long INTERVAL = 1000L;
     private AtomicReference<PlayStatus> currentPlayStatus = new AtomicReference<PlayStatus>(PlayStatus.Stopped);
     private AtomicInteger currentVolume = new AtomicInteger(100);
@@ -28,32 +27,25 @@ public class SimPlayer
     private Playlist playlist;
     private Timer songTimer;
 
-    public SimPlayer(SubSystemSupport subSystemSupport, Playlist playlist)
-    {
+    public SimPlayer(SubSystemSupport subSystemSupport, Playlist playlist) {
         this.subSystemSupport = subSystemSupport;
         this.playlist = playlist;
         songProgress = new AtomicInteger(0);
     }
 
-    public void updatePlayStatus(PlayStatus playStatus)
-    {
+    public void updatePlayStatus(PlayStatus playStatus) {
         PlayStatus oldValue = currentPlayStatus.getAndSet(playStatus);
-        if (!oldValue.equals(playStatus))
-        {
+        if (!oldValue.equals(playStatus)) {
             processPlayStatus(playStatus);
             subSystemSupport.updateSubSystemChanged(Subsystem.player);
         }
     }
 
-    private void processPlayStatus(PlayStatus playStatus)
-    {
-        switch (playStatus)
-        {
+    private void processPlayStatus(PlayStatus playStatus) {
+        switch (playStatus) {
             case Playing:
-                synchronized (this)
-                {
-                    if (songTimer == null)
-                    {
+                synchronized (this) {
+                    if (songTimer == null) {
                         songTimer = new Timer("SongTimer");
                         songTimer.scheduleAtFixedRate(new SongTimerTask(), INTERVAL, INTERVAL);
                     }
@@ -63,10 +55,8 @@ public class SimPlayer
             case Stopped:
                 resetProgress();
             case Paused:
-                synchronized (this)
-                {
-                    if (songTimer != null)
-                    {
+                synchronized (this) {
+                    if (songTimer != null) {
                         songTimer.cancel();
                         songTimer = null;
                     }
@@ -75,104 +65,84 @@ public class SimPlayer
         }
     }
 
-    private StatusTuple getPlayStatus()
-    {
+    private StatusTuple getPlayStatus() {
         return new StatusTuple(MpdStatus.state, currentPlayStatus.get().serverString);
     }
 
-    public PlayStatus getCurrentPlayStatus()
-    {
+    public PlayStatus getCurrentPlayStatus() {
         return currentPlayStatus.get();
     }
 
-    public Integer getVolume()
-    {
+    public Integer getVolume() {
         return currentVolume.get();
     }
 
-    public boolean setVolume(Integer volume)
-    {
-        if (volume == null)
-        {
+    public boolean setVolume(Integer volume) {
+        if (volume == null) {
             throw new IllegalArgumentException("Null volume");
         }
-        if (volume > 100)
-        {
+        if (volume > 100) {
             volume = 100;
         }
-        if (volume < 0)
-        {
+        if (volume < 0) {
             volume = 0;
         }
         Integer oldVolume = currentVolume.getAndSet(volume);
         boolean changed = !oldVolume.equals(volume);
-        if (changed)
-        {
+        if (changed) {
             subSystemSupport.updateSubSystemChanged(Subsystem.mixer);
         }
         return changed;
     }
 
-    private StatusTuple getVolumeStatus()
-    {
+    private StatusTuple getVolumeStatus() {
         return new StatusTuple(MpdStatus.volume, currentVolume.toString());
     }
 
-    public void setSongProgress(int i)
-    {
+    public void setSongProgress(int i) {
         songProgress.set(i);
     }
 
-    private StatusTuple getTimeStatus()
-    {
+    private StatusTuple getTimeStatus() {
         String totalTime = getCurrentSongTotalTime();
-        if (totalTime == null)
-        {
+        if (totalTime == null) {
             totalTime = BigInteger.ZERO.toString();
         }
         int currentTime = songProgress.get();
         return new StatusTuple(MpdStatus.time, currentTime + ":" + totalTime);
     }
 
-    public void next()
-    {
+    public void next() {
         resetProgress();
     }
 
-    public void previous()
-    {
+    public void previous() {
         resetProgress();
     }
 
-    private void resetProgress()
-    {
+    public void resetProgress() {
         songProgress.set(0);
     }
 
-    public void seek(Integer songId, Integer position)
-    {
+    public void seek(Integer songId, Integer position) {
         playlist.gotoSongBySongId(songId);
         String currentSongTotalTime = getCurrentSongTotalTime();
         // todo: potential threading problem between get and set
         int progress = songProgress.get();
-        if (currentSongTotalTime != null && (progress <= Integer.parseInt(currentSongTotalTime)))
-        {
+        if (currentSongTotalTime != null && (progress <= Integer.parseInt(currentSongTotalTime))) {
             Log.v(getClass().getSimpleName(), "seekid: " + position + ", previous=" + progress);
             songProgress.set(position);
             subSystemSupport.updateSubSystemChanged(Subsystem.player);
-        } else
-        {
+        } else {
             Log.d(getClass().getSimpleName(), "seekid: not seeking. total=" + currentSongTotalTime + ", progress=" + progress);
         }
     }
 
-    private String getCurrentSongTotalTime()
-    {
+    private String getCurrentSongTotalTime() {
         return playlist.getCurrentSong().getValue(SongInfo.SongAttributeType.Time);
     }
 
-    public List<StatusTuple> getStatusList()
-    {
+    public List<StatusTuple> getStatusList() {
         ArrayList<StatusTuple> statusTuples = new ArrayList<StatusTuple>();
         statusTuples.add(getPlayStatus());
         statusTuples.add(getTimeStatus());
@@ -180,15 +150,12 @@ public class SimPlayer
         return statusTuples;
     }
 
-    private class SongTimerTask extends TimerTask
-    {
+    private class SongTimerTask extends TimerTask {
         @Override
-        public void run()
-        {
+        public void run() {
             int progress = songProgress.incrementAndGet();
             String totalTimeString = getCurrentSongTotalTime();
-            if (totalTimeString != null && progress >= Integer.parseInt(totalTimeString))
-            {
+            if (totalTimeString != null && progress >= Integer.parseInt(totalTimeString)) {
                 // song finished
                 resetProgress();
                 playlist.next();

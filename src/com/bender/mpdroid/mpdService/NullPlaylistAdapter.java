@@ -1,5 +1,8 @@
 package com.bender.mpdroid.mpdService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Null object playlist adapter
  */
@@ -20,6 +23,14 @@ class NullPlaylistAdapter implements MpdPlaylistAdapterIF {
     }
 
     public void setListener(MpdPlaylistListenerIF playlistListenerIF) {
+
+    }
+
+    public List<MpdSongAdapterIF> search(String query) {
+        return new ArrayList<MpdSongAdapterIF>(0);
+    }
+
+    public void play(MpdSongAdapterIF mpdSongAdapterIF) {
 
     }
 

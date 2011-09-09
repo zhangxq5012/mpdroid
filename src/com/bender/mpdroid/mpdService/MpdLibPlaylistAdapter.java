@@ -2,6 +2,10 @@ package com.bender.mpdroid.mpdService;
 
 import com.bender.mpdlib.Playlist;
 import com.bender.mpdlib.PlaylistListener;
+import com.bender.mpdlib.SongInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  */
@@ -36,4 +40,17 @@ public class MpdLibPlaylistAdapter implements MpdPlaylistAdapterIF {
         });
     }
 
+    public List<MpdSongAdapterIF> search(String query) {
+        final List<SongInfo> songInfoList = playlist.searchAll(query);
+        List<MpdSongAdapterIF> result = new ArrayList<MpdSongAdapterIF>(songInfoList.size());
+        for (SongInfo songInfo : songInfoList) {
+            result.add(new MpdLibSongAdapter(songInfo));
+        }
+        return result;
+    }
+
+    public void play(MpdSongAdapterIF mpdSongAdapterIF) {
+        int id = mpdSongAdapterIF.getId();
+        playlist.playid(id);
+    }
 }

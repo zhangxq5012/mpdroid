@@ -4,10 +4,11 @@ import com.bender.mpdlib.simulator.MpdServerSimulator;
 import com.bender.mpdlib.simulator.SubSystemSupport;
 import junit.framework.TestCase;
 
+import java.util.List;
+
 /**
  */
-public class MpdServerTest extends TestCase
-{
+public class MpdServerTest extends TestCase {
     private MpdServer mpdServer;
     public static final String HOSTNAME = "localhost";
     private static final int PORT = 6601;
@@ -15,8 +16,7 @@ public class MpdServerTest extends TestCase
     private MpdServerSimulator mpdServerSimulator;
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         mpdServerSimulator = new MpdServerSimulator();
         mpdServerSimulator.getSubSystemSupport().setIdleStrategy(new SingleThreadIdleStrategy());
         SocketStreamProviderIF mpdSocket = mpdServerSimulator.createMpdSocket();
@@ -25,45 +25,37 @@ public class MpdServerTest extends TestCase
     }
 
     @Override
-    public void tearDown() throws Exception
-    {
+    public void tearDown() throws Exception {
         mpdServer.disconnect();
     }
 
-    public void testConnectWithHostname() throws Exception
-    {
+    public void testConnectWithHostname() throws Exception {
         mpdServer.connect(HOSTNAME);
         assertEquals(true, mpdServer.isConnected());
     }
 
-    public void testConnectWithHostnameAndPort() throws Exception
-    {
+    public void testConnectWithHostnameAndPort() throws Exception {
         mpdServer.connect(HOSTNAME, PORT);
         assertEquals(true, mpdServer.isConnected());
     }
 
-    public void testConnectWithAuthenticationUnsupported() throws Exception
-    {
+    public void testConnectWithAuthenticationUnsupported() throws Exception {
         boolean unsupported = false;
-        try
-        {
+        try {
             mpdServer.connect(HOSTNAME, PORT, "password");
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             unsupported = true;
         }
         assertEquals(true, unsupported);
     }
 
-    public void testVersion() throws Exception
-    {
+    public void testVersion() throws Exception {
         mpdServer.connect(HOSTNAME);
         String version = mpdServer.getServerVersion();
         assertEquals(VERSION, version);
     }
 
-    public void testPlay() throws Exception
-    {
+    public void testPlay() throws Exception {
         mpdServer.connect(HOSTNAME);
 
         Player player = mpdServer.getPlayer();
@@ -90,8 +82,7 @@ public class MpdServerTest extends TestCase
 //        assertEquals(false,mpdServer.isConnected());
 //    }
 
-    public void testStatus() throws Exception
-    {
+    public void testStatus() throws Exception {
         mpdServer.connect(HOSTNAME);
 
         Player player = mpdServer.getPlayer();
@@ -106,16 +97,13 @@ public class MpdServerTest extends TestCase
     }
 
     private void smallWait()
-            throws InterruptedException
-    {
-        synchronized (this)
-        {
+            throws InterruptedException {
+        synchronized (this) {
             wait(100);
         }
     }
 
-    public void testStop() throws Exception
-    {
+    public void testStop() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
 
@@ -130,8 +118,7 @@ public class MpdServerTest extends TestCase
         assertEquals(PlayStatus.Stopped, playStatus);
     }
 
-    public void testNext() throws Exception
-    {
+    public void testNext() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
 
@@ -146,8 +133,7 @@ public class MpdServerTest extends TestCase
     }
 
 
-    public void testPrev() throws Exception
-    {
+    public void testPrev() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
 
@@ -163,8 +149,7 @@ public class MpdServerTest extends TestCase
         assertEquals(size, id);
     }
 
-    public void testGetVolume() throws Exception
-    {
+    public void testGetVolume() throws Exception {
         final Integer VOLUME = 75;
 
         mpdServerSimulator.getSimPlayer().setVolume(VOLUME);
@@ -175,8 +160,7 @@ public class MpdServerTest extends TestCase
         assertEquals(VOLUME, volume);
     }
 
-    public void testSongName() throws Exception
-    {
+    public void testSongName() throws Exception {
         final String name = "Song title";
         mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Title, name);
         mpdServer.connect(HOSTNAME);
@@ -186,8 +170,7 @@ public class MpdServerTest extends TestCase
         assertEquals(name, songInfo.getValue(SongInfo.SongAttributeType.Title));
     }
 
-    public void testSongListener() throws Exception
-    {
+    public void testSongListener() throws Exception {
 
         mpdServer.connect(HOSTNAME);
         smallWait();
@@ -209,8 +192,7 @@ public class MpdServerTest extends TestCase
         assertEquals(songTitle, currentSongListener.currentSong.getValue(SongInfo.SongAttributeType.Title));
     }
 
-    public void testSetVolume() throws Exception
-    {
+    public void testSetVolume() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
 
@@ -224,8 +206,7 @@ public class MpdServerTest extends TestCase
     }
 
 
-    public void testVolumeListener() throws Exception
-    {
+    public void testVolumeListener() throws Exception {
 
         final Integer volume = 75;
         mpdServer.connect(HOSTNAME);
@@ -244,8 +225,7 @@ public class MpdServerTest extends TestCase
         assertEquals(volume, listener.newVolume);
     }
 
-    public void testPlayListener() throws Exception
-    {
+    public void testPlayListener() throws Exception {
         MyPlayStatusListener listener = new MyPlayStatusListener();
 
         mpdServer.connect(HOSTNAME);
@@ -263,8 +243,7 @@ public class MpdServerTest extends TestCase
         assertEquals(playStatus, listener.playStatus);
     }
 
-    public void testArtist() throws Exception
-    {
+    public void testArtist() throws Exception {
         final String ARTIST = "Test Artist";
         mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Artist, ARTIST);
         mpdServer.connect(HOSTNAME);
@@ -276,8 +255,7 @@ public class MpdServerTest extends TestCase
         assertEquals(ARTIST, artist);
     }
 
-    public void testAlbum() throws Exception
-    {
+    public void testAlbum() throws Exception {
         final String ALBUM = "Test Album";
         mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Album, ALBUM);
 
@@ -289,8 +267,7 @@ public class MpdServerTest extends TestCase
         assertEquals(ALBUM, album);
     }
 
-    public void testFilename() throws Exception
-    {
+    public void testFilename() throws Exception {
         final String FILENAME = "/test/path/filename.mp3";
         mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.file, FILENAME);
 
@@ -302,8 +279,7 @@ public class MpdServerTest extends TestCase
         assertEquals(FILENAME, filename);
     }
 
-    public void testDate() throws Exception
-    {
+    public void testDate() throws Exception {
         final String DATE = "2010";
         mpdServerSimulator.getPlaylist().getCurrentSong().updateValue(SongInfo.SongAttributeType.Date, DATE);
 
@@ -315,8 +291,7 @@ public class MpdServerTest extends TestCase
         assertEquals(DATE, date);
     }
 
-    public void testMute() throws Exception
-    {
+    public void testMute() throws Exception {
         mpdServer.connect(HOSTNAME);
 
         smallWait();
@@ -337,8 +312,7 @@ public class MpdServerTest extends TestCase
 
     }
 
-    public void testConnectionListenerOnConnection() throws Exception
-    {
+    public void testConnectionListenerOnConnection() throws Exception {
         MyConnectionListener listener = new MyConnectionListener();
         mpdServer.addConnectionListener(listener);
         mpdServer.connect(HOSTNAME);
@@ -348,8 +322,7 @@ public class MpdServerTest extends TestCase
         assertEquals(true, listener.connected);
     }
 
-    public void testConnectionListenerOnDisconnect() throws Exception
-    {
+    public void testConnectionListenerOnDisconnect() throws Exception {
         mpdServer.connect(HOSTNAME);
         MyConnectionListener listener = new MyConnectionListener();
         mpdServer.addConnectionListener(listener);
@@ -360,8 +333,7 @@ public class MpdServerTest extends TestCase
         assertEquals(false, listener.connected);
     }
 
-    public void testConnectionListenerOnServerCrash() throws Exception
-    {
+    public void testConnectionListenerOnServerCrash() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
         MyConnectionListener listener = new MyConnectionListener();
@@ -375,8 +347,7 @@ public class MpdServerTest extends TestCase
         assertEquals(false, listener.connected);
     }
 
-    public void testReconnectAfterCrash() throws Exception
-    {
+    public void testReconnectAfterCrash() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
         MyConnectionListener listener = new MyConnectionListener();
@@ -392,8 +363,7 @@ public class MpdServerTest extends TestCase
         assertEquals(true, listener.connected);
     }
 
-    public void testCurrentTime() throws Exception
-    {
+    public void testCurrentTime() throws Exception {
         Integer currentTime = 123;
         mpdServerSimulator.getSimPlayer().setSongProgress(currentTime);
         mpdServer.connect(HOSTNAME);
@@ -406,8 +376,7 @@ public class MpdServerTest extends TestCase
     //todo: song progress listener test?
 
 
-    public void testSeek() throws Exception
-    {
+    public void testSeek() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
         Player player = mpdServer.getPlayer();
@@ -420,8 +389,7 @@ public class MpdServerTest extends TestCase
         assertEquals(POSITION, progress.getCurrentTime());
     }
 
-    public void testGetRepeat() throws Exception
-    {
+    public void testGetRepeat() throws Exception {
         final Boolean REPEAT = true;
         mpdServerSimulator.getOptionsReg().setRepeat(REPEAT);
         mpdServer.connect(HOSTNAME);
@@ -432,8 +400,7 @@ public class MpdServerTest extends TestCase
         assertEquals(REPEAT, result);
     }
 
-    public void testToggleRepeat() throws Exception
-    {
+    public void testToggleRepeat() throws Exception {
         final boolean REPEAT = true;
         mpdServerSimulator.getOptionsReg().setRepeat(REPEAT);
         mpdServer.connect(HOSTNAME);
@@ -450,8 +417,7 @@ public class MpdServerTest extends TestCase
         assertEquals(!REPEAT, result);
     }
 
-    public void testGetRandom() throws Exception
-    {
+    public void testGetRandom() throws Exception {
         final Boolean RANDOM = true;
         mpdServerSimulator.getOptionsReg().setRandom(RANDOM);
         mpdServer.connect(HOSTNAME);
@@ -462,8 +428,7 @@ public class MpdServerTest extends TestCase
         assertEquals(RANDOM, result);
     }
 
-    public void testToggleRandom() throws Exception
-    {
+    public void testToggleRandom() throws Exception {
         final boolean RANDOM = true;
         mpdServerSimulator.getOptionsReg().setRandom(RANDOM);
         mpdServer.connect(HOSTNAME);
@@ -480,8 +445,7 @@ public class MpdServerTest extends TestCase
         assertEquals(!RANDOM, result);
     }
 
-    public void testOptionsListener() throws Exception
-    {
+    public void testOptionsListener() throws Exception {
         mpdServer.connect(HOSTNAME);
         smallWait();
         UnitTestOptionsListener optionsListener = new UnitTestOptionsListener();
@@ -501,8 +465,7 @@ public class MpdServerTest extends TestCase
         assertEquals(true, optionsListener.randomValue);
     }
 
-    public void testPlaylistLength() throws Exception
-    {
+    public void testPlaylistLength() throws Exception {
         final int LENGTH = mpdServerSimulator.getPlaylist().size();
         mpdServer.connect(HOSTNAME);
         smallWait();
@@ -513,8 +476,7 @@ public class MpdServerTest extends TestCase
         assertEquals(LENGTH, result);
     }
 
-    public void testPlaylistInfo() throws Exception
-    {
+    public void testPlaylistInfo() throws Exception {
         SongInfo songInfo = mpdServerSimulator.getPlaylist().getSongInfo(0);
         mpdServer.connect(HOSTNAME);
         smallWait();
@@ -525,77 +487,110 @@ public class MpdServerTest extends TestCase
         assertEquals(songInfo, playlistInfo);
     }
 
-    private static class MyVolumeListener implements VolumeListener
-    {
+    public void testPlaylistSearch() throws Exception {
+        SongInfo songInfo = mpdServerSimulator.getPlaylist().getSongInfo(0);
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+
+        Playlist playlist = mpdServer.getPlaylist();
+        List<SongInfo> result = playlist.searchAll(songInfo.getValue(SongInfo.SongAttributeType.Title));
+
+        assertEquals(1, result.size());
+        assertEquals(songInfo.getValue(SongInfo.SongAttributeType.Id), result.get(0).getValue(SongInfo.SongAttributeType.Id));
+    }
+
+    public void testPlaylistSearchSingleWord() throws Exception {
+        mpdServer.connect(HOSTNAME);
+        smallWait();
+
+        Playlist playlist = mpdServer.getPlaylist();
+        List<SongInfo> result = playlist.searchAll("song");
+
+        assertEquals(2, result.size());
+    }
+
+//    TODO: fix threading issue here
+//    public void testPlaylistPlayId() throws Exception {
+//        SongInfo songInfo = mpdServerSimulator.getPlaylist().getSongInfo(2);
+//        mpdServer.connect(HOSTNAME);
+//
+//        Playlist playlist = mpdServer.getPlaylist();
+//        Player player = mpdServer.getPlayer();
+//        //wait for idle
+//        smallWait();
+//        smallWait();
+//        int SONG_ID = Integer.parseInt(songInfo.getValue(SongInfo.SongAttributeType.Id));
+//        playlist.playid(SONG_ID);
+//        // wait for callback
+//        smallWait();
+//
+//        PlayStatus playStatus = player.getPlayStatus();
+//        SongInfo currentSongInfo = player.getCurrentSongInfo();
+//
+//        assertEquals(PlayStatus.Playing, mpdServerSimulator.getSimPlayer().getCurrentPlayStatus());
+//        assertEquals(PlayStatus.Playing, playStatus);
+//        int songId = Integer.parseInt(currentSongInfo.getValue(SongInfo.SongAttributeType.Id));
+//        assertEquals(SONG_ID, songId);
+//    }
+
+    private static class MyVolumeListener implements VolumeListener {
         private boolean volumeChanged;
         private Integer newVolume;
 
-        public void volumeChanged(Integer volume)
-        {
+        public void volumeChanged(Integer volume) {
             volumeChanged = true;
             newVolume = volume;
         }
     }
 
-    private static class SingleThreadIdleStrategy implements SubSystemSupport.IdleStrategy
-    {
-        public void execute(Runnable runnable)
-        {
+    private static class SingleThreadIdleStrategy implements SubSystemSupport.IdleStrategy {
+        public void execute(Runnable runnable) {
             runnable.run();
         }
     }
 
-    private static class UnitTestOptionsListener implements OptionsListener
-    {
+    private static class UnitTestOptionsListener implements OptionsListener {
         private boolean repeatValue;
         private boolean repeatChanged;
         private boolean randomValue;
         private boolean randomChanged;
 
-        public void repeatUpdated(boolean repeat)
-        {
+        public void repeatUpdated(boolean repeat) {
             repeatValue = repeat;
             repeatChanged = true;
         }
 
-        public void randomUpdated(boolean newRandom)
-        {
+        public void randomUpdated(boolean newRandom) {
             randomValue = newRandom;
             randomChanged = true;
         }
     }
 
-    private class MyConnectionListener implements ConnectionListener
-    {
+    private class MyConnectionListener implements ConnectionListener {
         private boolean connectionUpdated;
         private boolean connected;
 
-        public void connectionChanged(boolean isConnected)
-        {
+        public void connectionChanged(boolean isConnected) {
             connectionUpdated = true;
             connected = isConnected;
         }
     }
 
-    private class MyCurrentSongListener implements CurrentSongListener
-    {
+    private class MyCurrentSongListener implements CurrentSongListener {
         private boolean songUpdated;
         private SongInfo currentSong;
 
-        public void songUpdated(SongInfo songInfo)
-        {
+        public void songUpdated(SongInfo songInfo) {
             songUpdated = true;
             currentSong = songInfo;
         }
     }
 
-    private class MyPlayStatusListener implements PlayStatusListener
-    {
+    private class MyPlayStatusListener implements PlayStatusListener {
         private boolean playStatusUpdated;
         private PlayStatus playStatus;
 
-        public void playStatusChanged(PlayStatus playStatus)
-        {
+        public void playStatusChanged(PlayStatus playStatus) {
             playStatusUpdated = true;
             this.playStatus = playStatus;
         }

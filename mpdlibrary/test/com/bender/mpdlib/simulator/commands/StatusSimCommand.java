@@ -10,35 +10,29 @@ import java.util.List;
 
 /**
  */
-public class StatusSimCommand extends SimCommand
-{
+public class StatusSimCommand extends SimCommand {
 
-    public void run(String[] commands) throws Exception
-    {
+    public void run(String[] commands) throws Exception {
         List<StatusTuple> statusTupleList = simPlayer.getStatusList();
-        for (StatusTuple statusTuple : statusTupleList)
-        {
-            write(printWriter, statusTuple);
-        }
+        addStatuses(statusTupleList);
+
         statusTupleList = playlist.getStatusList();
-        for (StatusTuple statusTuple : statusTupleList)
-        {
-            write(printWriter, statusTuple);
-        }
+        addStatuses(statusTupleList);
 
         statusTupleList = optionsReg.getStatusList();
-        for (StatusTuple tuple : statusTupleList)
-        {
-            write(printWriter, tuple);
-        }
+        addStatuses(statusTupleList);
 
         printWriter.println(Response.OK);
     }
 
-    private void write(PrintWriter printWriter, StatusTuple statusTuple) throws IOException
-    {
-        if (statusTuple != null)
-        {
+    private void addStatuses(List<StatusTuple> statusTupleList) throws IOException {
+        for (StatusTuple statusTuple : statusTupleList) {
+            write(printWriter, statusTuple);
+        }
+    }
+
+    private void write(PrintWriter printWriter, StatusTuple statusTuple) throws IOException {
+        if (statusTuple != null) {
             String string = statusTuple.first() + ": " + statusTuple.second();
             Log.v(getClass().getSimpleName(), "   " + string);
             printWriter.println(string);
