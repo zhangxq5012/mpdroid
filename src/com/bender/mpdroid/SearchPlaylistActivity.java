@@ -55,6 +55,7 @@ public class SearchPlaylistActivity extends ListActivity {
                         MpdSongAdapterIF mpdSongAdapterIF = mpdSongAdapterIFs.get(songPos);
                         Log.w(SearchPlaylistActivity.class.getSimpleName(), "TODO: play seletected song: " + new SongNameDecorator(mpdSongAdapterIF));
                         // todo: play by song id
+                        playlist.play(mpdSongAdapterIF);
                         //todo: how to go to player tab?
                         finish();
                     }

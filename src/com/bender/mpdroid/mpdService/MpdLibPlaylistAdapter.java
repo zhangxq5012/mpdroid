@@ -48,4 +48,9 @@ public class MpdLibPlaylistAdapter implements MpdPlaylistAdapterIF {
         }
         return result;
     }
+
+    public void play(MpdSongAdapterIF mpdSongAdapterIF) {
+        int id = mpdSongAdapterIF.getId();
+        playlist.playid(id);
+    }
 }

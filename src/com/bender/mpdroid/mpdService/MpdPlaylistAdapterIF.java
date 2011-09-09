@@ -18,6 +18,8 @@ public interface MpdPlaylistAdapterIF {
 
     List<MpdSongAdapterIF> search(String query);
 
+    void play(MpdSongAdapterIF mpdSongAdapterIF);
+
     interface MpdPlaylistListenerIF {
         void playlistUpdated(int newLength);
     }

@@ -30,5 +30,9 @@ class NullPlaylistAdapter implements MpdPlaylistAdapterIF {
         return new ArrayList<MpdSongAdapterIF>(0);
     }
 
+    public void play(MpdSongAdapterIF mpdSongAdapterIF) {
+
+    }
+
 
 }

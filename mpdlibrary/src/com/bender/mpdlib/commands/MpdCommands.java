@@ -19,7 +19,8 @@ public enum MpdCommands {
     repeat,
     playlistinfo,
     playlistsearch,
-    setvol;
+    setvol,
+    playid;
 
     public static MpdCommands parse(String value) {
         for (MpdCommands mpdCommands : values()) {

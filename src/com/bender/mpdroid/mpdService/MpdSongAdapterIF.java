@@ -3,8 +3,7 @@ package com.bender.mpdroid.mpdService;
 /**
  * mpd service song interface
  */
-public interface MpdSongAdapterIF
-{
+public interface MpdSongAdapterIF {
     String getSongName();
 
     String getArtist();
@@ -16,4 +15,6 @@ public interface MpdSongAdapterIF
     String getDate();
 
     Integer getSongLength();
+
+    int getId();
 }

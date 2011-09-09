@@ -59,4 +59,8 @@ public class Playlist {
         Result<List<SongInfo>> searchResult = CommandRunner.runCommand(new SearchPlaylistCommand(commandPipe, query));
         return searchResult == null ? new ArrayList<SongInfo>(0) : searchResult.result;
     }
+
+    public void playid(int id) {
+        CommandRunner.runCommand(new PlaySongIdCommand(commandPipe, id));
+    }
 }

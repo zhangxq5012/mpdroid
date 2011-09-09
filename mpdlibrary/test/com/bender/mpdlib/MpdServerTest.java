@@ -509,6 +509,30 @@ public class MpdServerTest extends TestCase {
         assertEquals(2, result.size());
     }
 
+//    TODO: fix threading issue here
+//    public void testPlaylistPlayId() throws Exception {
+//        SongInfo songInfo = mpdServerSimulator.getPlaylist().getSongInfo(2);
+//        mpdServer.connect(HOSTNAME);
+//
+//        Playlist playlist = mpdServer.getPlaylist();
+//        Player player = mpdServer.getPlayer();
+//        //wait for idle
+//        smallWait();
+//        smallWait();
+//        int SONG_ID = Integer.parseInt(songInfo.getValue(SongInfo.SongAttributeType.Id));
+//        playlist.playid(SONG_ID);
+//        // wait for callback
+//        smallWait();
+//
+//        PlayStatus playStatus = player.getPlayStatus();
+//        SongInfo currentSongInfo = player.getCurrentSongInfo();
+//
+//        assertEquals(PlayStatus.Playing, mpdServerSimulator.getSimPlayer().getCurrentPlayStatus());
+//        assertEquals(PlayStatus.Playing, playStatus);
+//        int songId = Integer.parseInt(currentSongInfo.getValue(SongInfo.SongAttributeType.Id));
+//        assertEquals(SONG_ID, songId);
+//    }
+
     private static class MyVolumeListener implements VolumeListener {
         private boolean volumeChanged;
         private Integer newVolume;
