@@ -16,8 +16,7 @@ import java.util.List;
 
 /**
  */
-public class Playlist
-{
+public class Playlist {
     public static final String TAG = Playlist.class.getSimpleName();
     private SongInfo currentSong;
 
@@ -27,34 +26,28 @@ public class Playlist
     private boolean random;
 
 
-    public Playlist(SubSystemSupport subSystemSupport)
-    {
+    public Playlist(SubSystemSupport subSystemSupport) {
         library = new ArrayList<SongInfo>();
         URL libraryXml = getClass().getResource("/com/bender/mpdlib/simulator/library/library.xml");
-        try
-        {
+        try {
             LibraryDocument libraryDocument = LibraryDocument.Factory.parse(libraryXml);
             SongType[] songs = libraryDocument.getLibrary().getSongArray();
-            for (SongType song : songs)
-            {
+            for (SongType song : songs) {
                 SongInfo songInfo = new SongInfo();
                 updateSong(songInfo, song);
                 library.add(songInfo);
             }
             Log.v(TAG, "Loaded library. (" + library.size() + ") entries");
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.e(TAG, "Error parsing library xml", e);
         }
         this.subSystemSupport = subSystemSupport;
-        if (!library.isEmpty())
-        {
+        if (!library.isEmpty()) {
             currentSong = library.get(0);
         }
     }
 
-    private static void updateSong(SongInfo songInfo, SongType song)
-    {
+    private static void updateSong(SongInfo songInfo, SongType song) {
         String artist = song.getArtist();
         songInfo.updateValue(SongInfo.SongAttributeType.Artist, artist);
         String file = song.getFile();
@@ -73,24 +66,19 @@ public class Playlist
         songInfo.updateValue(SongInfo.SongAttributeType.Title, title);
     }
 
-    public SongInfo getCurrentSong()
-    {
+    public SongInfo getCurrentSong() {
         return currentSong;
     }
 
-    private StatusTuple getCurrentSongStatus()
-    {
-        if (currentSong != null)
-        {
+    private StatusTuple getCurrentSongStatus() {
+        if (currentSong != null) {
             return new StatusTuple(MpdStatus.songid, currentSong.getValue(SongInfo.SongAttributeType.Id));
-        } else
-        {
+        } else {
             return null;
         }
     }
 
-    public void next()
-    {
+    public void next() {
         int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
         gotoSongIndex(index);
     }
@@ -100,81 +88,100 @@ public class Playlist
      *
      * @param index
      */
-    public void gotoSongIndex(int index)
-    {
-        if (index >= library.size())
-        {
+    public void gotoSongIndex(int index) {
+        if (index >= library.size()) {
             index = 0;
-        } else if (index < 0)
-        {
+        } else if (index < 0) {
             index = library.size() - 1;
         }
         currentSong = library.get(index);
         subSystemSupport.updateSubSystemChanged(Subsystem.player);
     }
 
-    public void previous()
-    {
+    public void previous() {
         int index = Integer.parseInt(currentSong.getValue(SongInfo.SongAttributeType.Id));
         gotoSongIndex(index - 2);
     }
 
-    public int size()
-    {
+    public int size() {
         return library.size();
     }
 
-    public void addSong(SongInfo songInfo)
-    {
+    public void addSong(SongInfo songInfo) {
         library.add(songInfo);
     }
 
-    public void gotoSongBySongId(Integer songId)
-    {
+    public void gotoSongBySongId(Integer songId) {
         Integer currentSongId = Integer.valueOf(currentSong.getValue(SongInfo.SongAttributeType.Id));
-        if (!currentSongId.equals(songId))
-        {
+        if (!currentSongId.equals(songId)) {
             gotoSongIndex(songId - 1);
         }
     }
 
-    public void setRepeat(boolean repeat)
-    {
+    public void setRepeat(boolean repeat) {
         //todo: use repeat
         this.repeat = repeat;
     }
 
-    public void setRandom(boolean random)
-    {
+    public void setRandom(boolean random) {
         //todo: use random
         this.random = random;
     }
 
-    public List<StatusTuple> getStatusList()
-    {
+    public List<StatusTuple> getStatusList() {
         List<StatusTuple> statusTuples = new ArrayList<StatusTuple>();
         statusTuples.add(getCurrentSongStatus());
         statusTuples.add(getPlaylistLengthStatus());
         return statusTuples;
     }
 
-    private StatusTuple getPlaylistLengthStatus()
-    {
+    private StatusTuple getPlaylistLengthStatus() {
         return new StatusTuple(MpdStatus.playlistlength, Integer.toString(size()));
     }
 
-    public List<SongInfo> getPlaylistInfo(int beginRange, int endRange)
-    {
-        if (beginRange == -1 && endRange == -1)
-        {
+    public List<SongInfo> getPlaylistInfo(int beginRange, int endRange) {
+        if (beginRange == -1 && endRange == -1) {
             beginRange = 0;
             endRange = size();
         }
         return library.subList(beginRange, endRange);
     }
 
-    public SongInfo getSongInfo(int i)
-    {
+    public SongInfo getSongInfo(int i) {
         return library.get(i);
+    }
+
+    public List<SongInfo> search(String tag, String query) {
+        Log.d(getClass().getSimpleName(), "search(" + tag + ",'" + query + "')");
+        List<SongInfo> result = new ArrayList<SongInfo>();
+        for (SongInfo songInfo : library) {
+            searchSongInfo(tag, query, result, songInfo);
+        }
+        Log.v(getClass().getSimpleName(), "search returning: " + result.size() + " entries");
+        return result;
+    }
+
+    private void searchSongInfo(String tag, String query, List<SongInfo> result, SongInfo songInfo) {
+        query = query.toLowerCase();
+        if (SongInfo.ANY.equals(tag)) {
+            SongInfo.SongAttributeType[] values = SongInfo.SongAttributeType.values();
+            int i = 0, valuesLength = values.length;
+            boolean found = false;
+            while (i < valuesLength && !found) {
+                SongInfo.SongAttributeType songAttributeType = values[i];
+                String songInfoValue = songInfo.getValue(songAttributeType);
+                if (songInfoValue != null && songInfoValue.toLowerCase().contains(query)) {
+                    result.add(songInfo);
+                    found = true;
+                }
+                i++;
+            }
+        } else {
+            SongInfo.SongAttributeType songAttributeType = SongInfo.SongAttributeType.parse(tag);
+            String value = songInfo.getValue(songAttributeType);
+            if (value != null && value.toLowerCase().contains(query)) {
+                result.add(songInfo);
+            }
+        }
     }
 }

@@ -6,26 +6,23 @@ import com.bender.mpdlib.util.Log;
 
 /**
  */
-class CommandRunner
-{
+class CommandRunner {
     public static final String TAG = CommandRunner.class.getSimpleName();
 
-    public static <K extends Arg, T> T runCommand(Command<K, T> command)
-    {
-        try
-        {
+    public static <K extends Arg, T> T runCommand(Command<K, T> command) {
+        try {
             return callCommand(command);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.e(TAG, e);
         }
         return null;
     }
 
-    public static <K extends Arg, T> T callCommand(Command<K, T> command) throws Exception
-    {
+    public static <K extends Arg, T> T callCommand(Command<K, T> command) throws Exception {
         String debugLine = "callCommand: " + command.toString();
         Log.i(TAG, debugLine);
-        return command.call();
+        T result = command.call();
+        Log.i(TAG, command + ": DONE");
+        return result;
     }
 }

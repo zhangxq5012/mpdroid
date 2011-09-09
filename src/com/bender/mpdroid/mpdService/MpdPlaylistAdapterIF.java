@@ -1,5 +1,7 @@
 package com.bender.mpdroid.mpdService;
 
+import java.util.List;
+
 /**
  * mpd service playlist interface
  */
@@ -13,6 +15,10 @@ public interface MpdPlaylistAdapterIF {
     void play(int songPos);
 
     void setListener(MpdPlaylistListenerIF playlistListenerIF);
+
+    List<MpdSongAdapterIF> search(String query);
+
+    void play(MpdSongAdapterIF mpdSongAdapterIF);
 
     interface MpdPlaylistListenerIF {
         void playlistUpdated(int newLength);
